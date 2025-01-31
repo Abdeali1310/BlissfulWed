@@ -51,9 +51,9 @@ export default function Signup() {
       if (res.data.token) {
         toast.success("Successfully Registered!");
         localStorage.setItem("user", res.data.user);
-        // setTimeout(() => {
-        //     navigate("/")
-        // }, 1000);
+        setTimeout(() => {
+            navigate("/")
+        }, 1000);
       }
     } catch (error) {
       console.log(error);

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -12,7 +13,7 @@ import {
 import weddingImage from "../../assets/weddign2.jpeg";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const signinSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -41,7 +42,9 @@ export default function Signin() {
       if (res.data.token) {
         toast.success("Successfully Signed In!");
         localStorage.setItem("user", res.data.user);
-        // navigate("/dashboard");
+        setTimeout(() => {
+            navigate("/")
+        }, 1000);
       }
     } catch (error) {
       toast.error("Invalid username or password");
@@ -119,6 +122,7 @@ export default function Signin() {
                   >
                     Sign In
                   </Button>
+                  <Typography sx={{marginTop:"2rem",lg:{marginBottom:"4rem"}}}>Do not have an account? <Link to={"/user/signup"} style={{textDecoration:"underline"}}>Sign up </Link> </Typography>
                 </form>
               </Grid>
             </Paper>

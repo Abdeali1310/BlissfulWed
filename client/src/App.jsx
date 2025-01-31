@@ -1,11 +1,13 @@
 import { Route, Routes } from "react-router-dom"
 import Signup from "./pages/user/Signup"
 import Signin from "./pages/user/Signin"
+import Home from "./pages/Home"
 
 const App = () => {
   return (
-    <div className="bg-[] flex w-screen h-screen">
+    <div className="bg-[#fec5ea] flex w-screen h-screen">
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />
       </Routes>
