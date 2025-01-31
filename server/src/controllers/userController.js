@@ -105,7 +105,7 @@ async function userSignin(req, res) {
             return res
                 .status(200)
                 .json({
-                    id: existingUser._id,
+                    user: existingUser._id,
                     name: existingUser.username,
                     email: existingUser.email,
                     token,
