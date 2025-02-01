@@ -5,6 +5,7 @@ import Home from "./pages/Home"
 import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
+import ResetPasswordPage from "./utils/Resetpassword"
 
 const App = () => {
   return (
@@ -16,6 +17,7 @@ const App = () => {
         <Route path="/user/forgot-password" element={<ForgotPassword />} />
         <Route path="/user/forgot-password/otp-verification" element={<Verification />} />
         <Route path="/user/change-password" element={<Changepassword />} />
+        <Route path="/user/reset-password" element={<ResetPasswordPage />} />
       </Routes>
     </div>
   )

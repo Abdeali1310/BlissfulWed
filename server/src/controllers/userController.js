@@ -228,7 +228,7 @@ async function forgotPassword(req, res) {
     }
 }
 
-const otpVerification = async (req, res) => {
+async function otpVerification(req, res) {
     const { email, otp } = req.body;
 
     try {
@@ -254,4 +254,23 @@ const otpVerification = async (req, res) => {
     }
 };
 
-module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification }
+async function resetPassword(req,res) {
+    const { email, newPassword } = req.body;
+
+    try {
+      const user = await User.findOne({ email });
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      
+      user.password = newPassword.trim();
+      await user.save();
+
+      return res.status(200).json({ success: true, message: 'Password reset successfully' });
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword }

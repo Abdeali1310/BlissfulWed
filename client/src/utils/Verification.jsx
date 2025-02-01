@@ -39,7 +39,7 @@ const OTPVerification = () => {
 
               toast.success("OTP Verified!");
               setTimeout(() => {
-                navigate("/user/change-password");
+                navigate("/user/reset-password");
               }, 1000);
               console.log("Entered OTP:", data.otp);
           } else {
