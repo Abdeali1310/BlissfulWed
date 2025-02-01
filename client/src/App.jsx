@@ -2,6 +2,9 @@ import { Route, Routes } from "react-router-dom"
 import Signup from "./pages/user/Signup"
 import Signin from "./pages/user/Signin"
 import Home from "./pages/Home"
+import ForgotPassword from "./utils/Forgotpassword"
+import Verification from "./utils/Verification"
+import Changepassword from "./utils/Changepassword"
 
 const App = () => {
   return (
@@ -10,6 +13,9 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />
+        <Route path="/user/forgot-password" element={<ForgotPassword />} />
+        <Route path="/user/forgot-password/otp-verification" element={<Verification />} />
+        <Route path="/user/change-password" element={<Changepassword />} />
       </Routes>
     </div>
   )

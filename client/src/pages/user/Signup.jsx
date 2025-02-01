@@ -58,7 +58,7 @@ export default function Signup() {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#f5f5f5] flex justify-center items-center">
+    <div className="h-screen w-screen bg-[#fec5ea] flex justify-center items-center">
       <Container maxWidth="xl">
         <ToastContainer />
         <Grid container spacing={4} alignItems="center" justifyContent="center">
@@ -84,7 +84,7 @@ export default function Signup() {
               <Grid item xs={12} md={6} sx={{ p: 4, bgcolor: "#fff" }}>
                 <Typography
                   variant="h4"
-                  color="#2a9d7f"
+                  color="#e73895"
                   fontWeight={600}
                   textAlign="center"
                 >
@@ -177,9 +177,9 @@ export default function Signup() {
                     sx={{
                       mt: 3,
                       py: 1.5,
-                      backgroundColor: "#2a9d7f",
+                      backgroundColor: "#e73895",
                       color: "#fff",
-                      "&:hover": { backgroundColor: "#2a9d8f" },
+                      "&:hover": { backgroundColor: "#e74895" },
                     }}
                   >
                     Sign Up

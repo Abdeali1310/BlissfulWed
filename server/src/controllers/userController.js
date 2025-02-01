@@ -2,7 +2,9 @@ const User = require('../models/User');
 const jwt = require("jsonwebtoken")
 const bcrypt = require('bcrypt');
 const { z } = require('zod');
+const crypto = require("crypto");
 const { signupSchema, signinSchema } = require('../utils/validation');
+const { sendOtpEmail } = require('../utils/emailService');
 
 
 async function userSignup(req, res) {
@@ -115,8 +117,8 @@ async function userSignin(req, res) {
         console.log(error);
         if (error instanceof z.ZodError) {
             const errorMessages = error.errors.map(err => err.message);
-            console.log("Zod Validation Error:", errorMessages); 
-            return res.status(400).json({ msg: errorMessages }); 
+            console.log("Zod Validation Error:", errorMessages);
+            return res.status(400).json({ msg: errorMessages });
         }
         res.status(400).json({ msg: "Invalid credentials" })
 
@@ -143,8 +145,8 @@ async function editProfile(req, res) {
     const { userId } = req.params;
     const { username, email, bio, contact, city } = req.body;
 
-    const profilePicUrl = req.file 
-        ? req.file.path 
+    const profilePicUrl = req.file
+        ? req.file.path
         : "https://static.vecteezy.com/system/resources/previews/002/534/006/original/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg";
 
     try {
@@ -155,13 +157,13 @@ async function editProfile(req, res) {
 
         const updatedUser = await User.findByIdAndUpdate(
             userId,
-            { 
-                username, 
+            {
+                username,
                 email,
                 bio,
                 profilePicUrl,
                 contact,
-                city 
+                city
             },
             { new: true }
         );
@@ -170,9 +172,9 @@ async function editProfile(req, res) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ msg: "Profile updated successfully" });
+        res.status(200).json({ success:true, msg: "Profile updated successfully" });
     } catch (error) {
-        res.status(500).json({ message: 'Error updating profile', error });
+        res.status(500).json({  success:false,message: 'Error updating profile', error });
     }
 }
 
@@ -190,16 +192,66 @@ async function changePassword(req, res) {
         if (!isPasswordValid) {
             return res.status(401).json({ message: 'Invalid old password' });
         }
-        user.password = newPassword.trim();  
-        await user.save();  
-        
+        user.password = newPassword.trim();
+        await user.save();
 
-        res.status(200).json({ msg: "Password changed successfully" });
+
+        res.status(200).json({ success:true,msg: "Password changed successfully" });
     } catch (error) {
-        res.status(500).json({ message: 'Error changing password', error });
+        res.status(500).json({ success:false, message: 'Error changing password', error });
     }
 }
 
+async function forgotPassword(req, res) {
+    try {
+        const { email } = req.body;
 
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        console.log(user);
 
-module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword }
+        const otp = crypto.randomInt(100000, 999999).toString();
+
+        const hashedOtp = await bcrypt.hash(otp, 10);
+
+        user.resetOtp = hashedOtp;
+        user.resetOtpExpiry = Date.now() + 10 * 60 * 1000;
+        await user.save();
+        await sendOtpEmail(email, otp);
+
+        return res.status(200).json({ success: true, message: "OTP sent to email" });
+    } catch (error) {
+        console.error("Forgot Password Error:", error);
+        return res.status(500).json({ success: false,message: "Internal server error" });
+    }
+}
+
+const otpVerification = async (req, res) => {
+    const { email, otp } = req.body;
+
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const currentTime = Date.now();
+        if (currentTime > user.resetOtpExpiry) {
+            return res.status(400).json({ message: 'OTP has expired, please request a new one' });
+        }
+
+        const isOtpValid = await bcrypt.compare(otp, user.resetOtp);
+        if (!isOtpValid) {
+            return res.status(400).json({ message: 'Invalid OTP' });
+        }
+
+        return res.status(200).json({ success:true,message: 'OTP verified successfully' });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ success:false,message: 'Server error' });
+    }
+};
+
+module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification }

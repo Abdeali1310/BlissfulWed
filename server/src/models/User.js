@@ -37,8 +37,14 @@ const userSchema = new mongoose.Schema({
     city: {
         type: String,
         required: true,
-    }
-},{timestamps:true})
+    },
+    resetOtp: { 
+        type: String 
+    },
+    resetOtpExpiry: {
+        type: Date 
+    },
+}, { timestamps: true })
 
 //password hashing
 userSchema.pre('save', async function (next) {
