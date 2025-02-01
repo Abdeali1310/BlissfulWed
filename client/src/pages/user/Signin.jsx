@@ -52,7 +52,7 @@ export default function Signin() {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#fec5ea] flex justify-center items-center">
+    <div className="h-screen w-screen bg-[#f5f5f5] flex justify-center items-center">
       <Container maxWidth="xl">
         <ToastContainer />
         <Grid container spacing={4} alignItems="center" justifyContent="center">
@@ -86,12 +86,12 @@ export default function Signin() {
                 item
                 xs={12}
                 md={6}
-                sx={{ p: 4, bgcolor: "#fff5f8", textAlign: "center", width: "100%" }}
+                sx={{ p: 4, bgcolor: "#fff", textAlign: "center", width: "100%" }}
               >
-                <Typography variant="h4" fontWeight={600} color="#E73895">
-                  Welcome Back 💍
+                <Typography variant="h4" fontWeight={600} color="#2a9d7f">
+                  Welcome Back 
                 </Typography>
-                <Typography variant="body1" color="textSecondary" mb={2}>
+                <Typography variant="body2" color="textSecondary" mb={2}>
                   Sign in to continue
                 </Typography>
 
@@ -118,7 +118,10 @@ export default function Signin() {
                     type="submit"
                     variant="contained"
                     fullWidth
-                    sx={{ mt: 2, bgcolor: "#E73895", color: "#fff" }}
+                    sx={{ mt: 2, bgcolor: "#2a9d7f", color: "#fff",
+                        "&:hover":{
+                        backgroundColor: "#2a9d8f",
+                    },}}
                   >
                     Sign In
                   </Button>

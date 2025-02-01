@@ -10,8 +10,6 @@ import {
   Typography,
   MenuItem,
 } from "@mui/material";
-
-// Working Unsplash wedding image link
 import weddingImage from "../../assets/wedding.webp";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -42,9 +40,7 @@ export default function Signup() {
       const res = await axios.post(
         "http://localhost:3000/api/v1/user/signup",
         data,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       console.log(res);
 
@@ -52,7 +48,7 @@ export default function Signup() {
         toast.success("Successfully Registered!");
         localStorage.setItem("user", res.data.user);
         setTimeout(() => {
-            navigate("/")
+          navigate("/");
         }, 1000);
       }
     } catch (error) {
@@ -62,148 +58,151 @@ export default function Signup() {
   };
 
   return (
-    <div className=" h-full w-screen bg-[#fec5ea] overflow-y-scroll">
-      <Container
-      
-      sx={{ minHeight: "100vh", display: "flex", alignItems: "center" }}
-    >
-      <ToastContainer />
-      <Grid container spacing={4} alignItems="center" justifyContent="center">
-        {/* Wrapper for Image and Form */}
-        <Grid item xs={12} md={10} lg={10}>
-          <Paper
-            elevation={6}
-            sx={{
-              p: 4,
-              borderRadius: "10px",
-              display: "flex",
-              flexDirection: { xs: "column", md: "row" },
-              boxShadow: "0 4px 10px rgba(0,0,0,0.2)",
-              backgroundColor: "#fda2c6",
-            }}
-          >
-            {/* Wedding Image */}
-            <Grid
-              item
-              xs={12}
-              md={6}
+    <div className="h-screen w-screen bg-[#f5f5f5] flex justify-center items-center">
+      <Container maxWidth="xl">
+        <ToastContainer />
+        <Grid container spacing={4} alignItems="center" justifyContent="center">
+          <Grid item xs={12} md={8} lg={6}>
+            <Paper
+              elevation={6}
               sx={{
-                display: { xs: "none", sm: "block" },
-                justifyContent: "center",
-                alignItems: "center",
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+                backgroundColor: "#2a9d8f",
                 borderRadius: "10px",
+                overflow: "hidden",
               }}
             >
-              <img
-                src={weddingImage}
-                alt="Wedding Theme"
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "cover",
-                  borderRadius: "10px",
-                }}
-              />
-            </Grid>
+              <Grid item xs={12} md={6} sx={{ display: { xs: "none", md: "block" } }}>
+                <img
+                  src={weddingImage}
+                  alt="Wedding Theme"
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              </Grid>
 
-            {/* Signup Form */}
-            <Grid item xs={12} md={6}>
-              <Paper
-                elevation={0}
-                sx={{
-                  p: 4,
-                  borderRadius: "10px",
-                  textAlign: "center",
-                  bgcolor: "#fff5f8",
-                }}
-              >
-                <Typography variant="h4" color="primary" fontWeight={600}>
-                  Join BlissfulWed 💍
+              <Grid item xs={12} md={6} sx={{ p: 4, bgcolor: "#fff" }}>
+                <Typography
+                  variant="h4"
+                  color="#2a9d7f"
+                  fontWeight={600}
+                  textAlign="center"
+                >
+                  Join BlissfulWed
                 </Typography>
-                <Typography variant="body1" color="textSecondary" mb={2}>
+                <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  mb={3}
+                  textAlign="center"
+                >
                   Find your perfect wedding planner!
                 </Typography>
+
                 <form onSubmit={handleSubmit(onSubmit)}>
-                  <TextField
-                    fullWidth
-                    label="Username"
-                    {...register("username")}
-                    error={!!errors.username}
-                    helperText={errors.username?.message}
-                    margin="normal"
-                  />
-                  <TextField
-                    fullWidth
-                    label="Email"
-                    type="email"
-                    {...register("email")}
-                    error={!!errors.email}
-                    helperText={errors.email?.message}
-                    margin="normal"
-                  />
-                  <TextField
-                    fullWidth
-                    label="Password"
-                    type="password"
-                    {...register("password")}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    margin="normal"
-                  />
-                  <TextField
-                    fullWidth
-                    label="Contact Number"
-                    {...register("contact")}
-                    error={!!errors.contact}
-                    helperText={errors.contact?.message}
-                    margin="normal"
-                  />
-                  <TextField
-                    fullWidth
-                    select
-                    label="Gender"
-                    {...register("gender")}
-                    error={!!errors.gender}
-                    helperText={errors.gender?.message}
-                    margin="normal"
-                  >
-                    <MenuItem value="male">Male</MenuItem>
-                    <MenuItem value="female">Female</MenuItem>
-                    <MenuItem value="other">Other</MenuItem>
-                  </TextField>
-                  <TextField
-                    fullWidth
-                    label="City"
-                    {...register("city")}
-                    error={!!errors.city}
-                    helperText={errors.city?.message}
-                    margin="normal"
-                  />
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        sx={{ width: "104%" }}
+                        label="Username"
+                        {...register("username")}
+                        error={!!errors.username}
+                        helperText={errors.username?.message}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        sx={{ width: "104%" }}
+                        label="Email"
+                        type="email"
+                        {...register("email")}
+                        error={!!errors.email}
+                        helperText={errors.email?.message}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        sx={{ width: "104%" }}
+                        label="Password"
+                        type="password"
+                        {...register("password")}
+                        error={!!errors.password}
+                        helperText={errors.password?.message}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        sx={{ width: "104%" }}
+                        label="Contact Number"
+                        {...register("contact")}
+                        error={!!errors.contact}
+                        helperText={errors.contact?.message}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        sx={{ width: "104%" }}
+                        select
+                        label="Gender"
+                        {...register("gender")}
+                        error={!!errors.gender}
+                        helperText={errors.gender?.message}
+                      >
+                        <MenuItem value="male">Male</MenuItem>
+                        <MenuItem value="female">Female</MenuItem>
+                        <MenuItem value="other">Other</MenuItem>
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        sx={{ width: "104%" }}
+                        label="City"
+                        {...register("city")}
+                        error={!!errors.city}
+                        helperText={errors.city?.message}
+                      />
+                    </Grid>
+                  </Grid>
+
                   <Button
                     type="submit"
                     variant="contained"
                     fullWidth
                     sx={{
-                      mt: 2,
+                      mt: 3,
                       py: 1.5,
-                      fontSize: "1rem",
-                      backgroundColor: "#E73895", // Baby Pink
-                      color: "#fff", // White text
-                      "&:hover": {
-                        backgroundColor: "#E75999", // Lighter pink on hover
-                      },
+                      backgroundColor: "#2a9d7f",
+                      color: "#fff",
+                      "&:hover": { backgroundColor: "#2a9d8f" },
                     }}
                   >
                     Sign Up
                   </Button>
-                  <Typography sx={{marginTop:"2rem",lg:{marginBottom:"4rem"}}}>Already have an account? <Link to={"/user/signin"} style={{textDecoration:"underline"}}>Sign in </Link> </Typography>
                 </form>
-              </Paper>
-            </Grid>
-          </Paper>
+
+                <Typography
+                  sx={{
+                    marginTop: "2rem",
+                    lg: { marginBottom: "4rem" },
+                    textAlign: "center",
+                  }}
+                >
+                  Already have an account?{' '}
+                  <Link to="/user/signin" style={{ textDecoration: "underline" }}>
+                    Sign In
+                  </Link>
+                </Typography>
+              </Grid>
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
     </div>
   );
 }
