@@ -101,13 +101,12 @@ const AdminSignup = () => {
     >
       <ToastContainer />
       <Grid container justifyContent="center" alignItems="center">
-        <Grid item xs={12} sm={8} md={6} lg={5}>
+        <Grid item xs={12} sm={10} md={8} lg={6}>
           <Paper
             elevation={8}
             sx={{
               padding: 4,
               borderRadius: "16px",
-              textAlign: "center",
               backgroundColor: "#FFF5F8",
               border: "2px solid #E73895",
             }}
@@ -119,80 +118,87 @@ const AdminSignup = () => {
                 fontWeight: 700,
                 mb: 2,
                 fontFamily: "'Dancing Script', cursive",
+                textAlign: "center",
               }}
             >
               "Become the Heart of BlissfulWed – Sign Up"
             </Typography>
-            <Typography variant="body1" sx={{ color: "#000", mb: 3 }}>
+            <Typography variant="body1" sx={{ color: "#000", mb: 3, textAlign: "center" }}>
               Welcome to the admin panel of <b>BlissfulWed</b>. Please create
               your account below to manage weddings with elegance.
             </Typography>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <TextField
-                fullWidth
-                label="Name"
-                {...register("name")}
-                error={!!errors.name}
-                helperText={errors.name?.message}
-                margin="normal"
-              />
-              <TextField
-                fullWidth
-                label="Email"
-                type="email"
-                {...register("email")}
-                error={!!errors.email}
-                helperText={errors.email?.message}
-                margin="normal"
-              />
-              <TextField
-                fullWidth
-                label="Contact"
-                {...register("contact")}
-                error={!!errors.contact}
-                helperText={errors.contact?.message}
-                margin="normal"
-              />
-
-              <FormControl fullWidth margin="normal" error={!!errors.gender}>
-                <InputLabel>Gender</InputLabel>
-                <Controller
-                  name="gender"
-                  control={control}
-                  defaultValue=""
-                  render={({ field }) => (
-                    <Select {...field}>
-                      <MenuItem value="male">Male</MenuItem>
-                      <MenuItem value="female">Female</MenuItem>
-                      <MenuItem value="other">Other</MenuItem>
-                    </Select>
-                  )}
-                />
-              </FormControl>
-              {errors.gender && (
-                <Typography color="error">{errors.gender.message}</Typography>
-              )}
-
-              <TextField
-                fullWidth
-                label="Password"
-                type="password"
-                {...register("password")}
-                error={!!errors.password}
-                helperText={errors.password?.message}
-                margin="normal"
-              />
-
-              <TextField
-                fullWidth
-                label="Admin Key"
-                type="text"
-                {...register("key")}
-                error={!!errors.key}
-                helperText={errors.key?.message}
-                margin="normal"
-                autoComplete="off"
-              />
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Name"
+                    {...register("name")}
+                    error={!!errors.name}
+                    helperText={errors.name?.message}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Email"
+                    type="email"
+                    {...register("email")}
+                    error={!!errors.email}
+                    helperText={errors.email?.message}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Contact"
+                    {...register("contact")}
+                    error={!!errors.contact}
+                    helperText={errors.contact?.message}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl fullWidth error={!!errors.gender}>
+                    <InputLabel>Gender</InputLabel>
+                    <Controller
+                      name="gender"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <Select {...field}>
+                          <MenuItem value="male">Male</MenuItem>
+                          <MenuItem value="female">Female</MenuItem>
+                          <MenuItem value="other">Other</MenuItem>
+                        </Select>
+                      )}
+                    />
+                    {errors.gender && (
+                      <Typography color="error">{errors.gender.message}</Typography>
+                    )}
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Password"
+                    type="password"
+                    {...register("password")}
+                    error={!!errors.password}
+                    helperText={errors.password?.message}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Admin Key"
+                    type="text"
+                    {...register("key")}
+                    error={!!errors.key}
+                    helperText={errors.key?.message}
+                    autoComplete="off"
+                  />
+                </Grid>
+              </Grid>
 
               <Button
                 type="submit"
@@ -200,7 +206,7 @@ const AdminSignup = () => {
                 fullWidth
                 disabled={loading}
                 sx={{
-                  mt: 2,
+                  mt: 3,
                   py: 1.5,
                   fontSize: "1rem",
                   backgroundColor: "#E73895",
@@ -208,11 +214,7 @@ const AdminSignup = () => {
                   "&:hover": { backgroundColor: "#D81B60" },
                 }}
               >
-                {loading ? (
-                  <CircularProgress size={24} color="inherit" />
-                ) : (
-                  "Sign Up"
-                )}
+                {loading ? <CircularProgress size={24} color="inherit" /> : "Sign Up"}
               </Button>
             </form>
           </Paper>
@@ -222,4 +224,4 @@ const AdminSignup = () => {
   );
 };
 
-export default AdminSignup;
+export default AdminSignup; 

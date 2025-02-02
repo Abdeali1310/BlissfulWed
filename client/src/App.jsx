@@ -1,11 +1,14 @@
 import { Route, Routes } from "react-router-dom"
 import Signup from "./pages/user/Signup"
 import Signin from "./pages/user/Signin"
-import Home from "./pages/Home"
+// import Home from "./pages/Home"
 import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
 import ResetPasswordPage from "./utils/Resetpassword"
+import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
+import AdminSignup from "./pages/admin/Signup"
+import AdminSignIn from "./pages/admin/Signin"
 
 const App = () => {
   return (
