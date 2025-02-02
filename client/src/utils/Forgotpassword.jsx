@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 import {
     Container,
     Grid,
@@ -22,10 +23,10 @@ import { useNavigate } from "react-router-dom";
       formState: { errors },
     } = useForm();
   
-    const [loading, setLoading] = useState(false); // Loading state
+    const [loading, setLoading] = useState(false); 
   
     const onSubmit = async (data) => {
-      setLoading(true); // Start loading
+      setLoading(true);
       try {
         const response = await axios.post(
           "http://localhost:3000/api/v1/user/forgotPassword",
@@ -49,7 +50,7 @@ import { useNavigate } from "react-router-dom";
         toast.error("Error sending OTP. Please check your email and try again.");
         console.error("Error:", error);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
   
@@ -73,7 +74,7 @@ import { useNavigate } from "react-router-dom";
                 padding: 4,
                 borderRadius: "12px",
                 textAlign: "center",
-                backgroundColor: "#FFF5F8", // Soft pink card background
+                backgroundColor: "#FFF5F8",
               }}
             >
               <Typography
@@ -100,7 +101,7 @@ import { useNavigate } from "react-router-dom";
                   type="submit"
                   variant="contained"
                   fullWidth
-                  disabled={loading} // Disable button when loading
+                  disabled={loading} 
                   sx={{
                     mt: 2,
                     py: 1.5,

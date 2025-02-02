@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable no-unused-vars */
 import  { useState } from 'react';
 import { Container, Grid, Paper, Typography, TextField, Button, CircularProgress } from '@mui/material';
@@ -45,7 +46,7 @@ const ResetPasswordPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#fec5ea', // Soft romantic pink
+        backgroundColor: '#fec5ea',
         padding: 0,
       }}
     >
@@ -58,8 +59,8 @@ const ResetPasswordPage = () => {
               padding: 4,
               borderRadius: '16px',
               textAlign: 'center',
-              backgroundColor: '#FFF5F8', // Elegant wedding color
-              border: '2px solid #E73895', // Wedding-themed accent
+              backgroundColor: '#FFF5F8', 
+              border: '2px solid #E73895', 
             }}
           >
             <Typography

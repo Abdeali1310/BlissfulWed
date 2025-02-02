@@ -68,7 +68,6 @@ export default function Signin() {
                 overflow: "hidden",
               }}
             >
-              {/* Wedding Image - Visible on Medium+ Screens */}
               <Grid item md={6} sx={{ display: { xs: "none", md: "block" } }}>
                 <img
                   src={weddingImage}
@@ -81,7 +80,6 @@ export default function Signin() {
                 />
               </Grid>
 
-              {/* Signin Form */}
               <Grid
                 item
                 xs={12}
