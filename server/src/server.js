@@ -7,7 +7,7 @@ const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const adminRouter = require("./routers/adminRouter");
 
-const PORT = process.env.PORT;
+const PORT = 3000;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

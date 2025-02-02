@@ -6,7 +6,9 @@ import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
 import ResetPasswordPage from "./utils/Resetpassword"
-
+import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"; 
+import AdminSignup from "./pages/admin/Signup"; 
+import AdminSignIn from "./pages/admin/Signin"; 
 const App = () => {
   return (
     <div className="bg-[#fec5ea] flex w-screen h-screen">
