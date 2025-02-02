@@ -6,12 +6,13 @@ import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
 import ResetPasswordPage from "./utils/Resetpassword"
+import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
 
 const App = () => {
   return (
     <div className="bg-[#fec5ea] flex w-screen h-screen">
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<WeddingPlanner />} />
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />
         <Route path="/user/forgot-password" element={<ForgotPassword />} />
