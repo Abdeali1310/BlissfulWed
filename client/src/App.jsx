@@ -6,7 +6,6 @@ import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
 import ResetPasswordPage from "./utils/Resetpassword"
-import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
 
 const App = () => {
   return (
@@ -19,6 +18,9 @@ const App = () => {
         <Route path="/user/forgot-password/otp-verification" element={<Verification />} />
         <Route path="/user/change-password" element={<Changepassword />} />
         <Route path="/user/reset-password" element={<ResetPasswordPage />} />
+
+        <Route path="/admin/signup" element={<AdminSignup />} />
+        <Route path="/admin/signin" element={<AdminSignIn />} />
       </Routes>
     </div>
   )
