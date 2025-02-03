@@ -6,10 +6,16 @@ import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
 import ResetPasswordPage from "./utils/Resetpassword"
+<<<<<<< HEAD
 import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
 import AdminSignup from "./pages/admin/Signup"
 import AdminSignIn from "./pages/admin/Signin"
 
+=======
+import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"; 
+import AdminSignup from "./pages/admin/Signup"; 
+import AdminSignIn from "./pages/admin/Signin";
+>>>>>>> 061b5ad4a2cdad9d105303895bf55e50710742a2
 const App = () => {
   return (
     <div className="bg-[#fec5ea] flex w-screen h-screen">
