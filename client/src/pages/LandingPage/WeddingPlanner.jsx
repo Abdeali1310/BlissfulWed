@@ -1,127 +1,499 @@
-import React from "react";
-import { AppBar, Toolbar, Typography, Button, Box, Grid, Card, CardContent, TextField, CardMedia } from "@mui/material";
+import React, { useState, useRef } from "react";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardMedia,
+} from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
-import { Carousel } from "react-responsive-carousel";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { Facebook, Instagram, Twitter, LinkedIn } from "@mui/icons-material";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import { Carousel } from "react-responsive-carousel";
+import { motion } from "framer-motion";
+import { InputBase, TextField, CircularProgress } from "@mui/material";
 
-// Dummy data
-const images = [
-  "https://upload.wikimedia.org/wikipedia/commons/b/bd/Indian_wedding_Delhi.jpg",
-  "https://i.pinimg.com/originals/de/77/2d/de772d8e09c146ba6167242d17b9f37d.jpg",
-  "https://symphonyevents.com.au/wp-content/uploads/2023/06/30-scaled.jpg",
-  "https://www.alfaazphotography.com/wp-content/uploads/2019/10/How-to-find-right-Indian-Wedding-Photographer-0028.jpg"
+import hp1 from "../../assets/haldi1.jpg"
+// import hp2 from "../../assets/haldi2.jpg"
+import hp3 from "../../assets/haldi3.jpg"
+// import hp4 from "../../assets/haldi4.jpg"
+import mp1 from "../../assets/mehndi1.jpg"
+import mp2 from "../../assets/mehndi2.jpg"
+import mp3 from "../../assets/mehndi3.jpg"
+import rp from "../../assets/ringImg.jpg"
+import wp1 from "../../assets/weddingImg1.jpg"
+import wp2 from "../../assets/weddingImg2.jpg"
+import wp3 from "../../assets/weddingImg3.jpg"
+import wp4 from "../../assets/weddingImg4.jpg"
+// import wp5 from "../../assets/weddingImg5.jpg"
+import wp from "../../assets/wedImg.jpg"
+
+const weddingImages = [wp1, wp2, wp3, wp4];
+
+const initialServices = [
+  { title: "Haldi", image: hp3 },
+  { title: "Mehndi", image: mp3 },
+  { title: "Catering", image: rp },
+  { title: "Decoration", image: wp2 },
+  { title: "Music & DJ", image: hp1 },
+  { title: "Bridal Makeup", image: mp1 },
+  { title: "Event Planning", image: mp2 },
+  { title: "Transportation", image: wp },
 ];
 
-const services = [
-  { title: "Photography", description: "Capture every moment beautifully.", image: "https://source.unsplash.com/400x300/?photography" },
-  { title: "Decoration", description: "Elegant wedding themes & designs.", image: "https://source.unsplash.com/400x300/?wedding-decoration" },
-  { title: "Music & DJ", description: "Make your wedding lively with the best DJs.", image: "https://source.unsplash.com/400x300/?dj" },
-  { title: "Catering", description: "Delicious food for your special day.", image: "https://source.unsplash.com/400x300/?catering" }
+
+
+const packages = [
+  { title: "Basic Package", price: "$5000" },
+  { title: "Premium Package", price: "$10000" },
+  { title: "Luxury Package", price: "$20000" },
 ];
 
-const testimonials = [
-  { name: "John Doe", review: "Amazing experience! The decorations and photography were top-notch." },
-  { name: "Sarah Smith", review: "Our wedding was magical. The music was perfect!" }
-];
+function WeddingPlanner() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-// Slick slider settings for sliding services
-const sliderSettings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 3,
-  slidesToScroll: 1,
-  autoplay: true,
-  autoplaySpeed: 2000,
-  responsive: [
-    { breakpoint: 960, settings: { slidesToShow: 2 } },
-    { breakpoint: 600, settings: { slidesToShow: 1 } }
-  ]
-};
+  const handleLogoClick = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
-const WeddingPlanner = () => {
+  const [services, setServices] = useState(initialServices);
+  const [loading, setLoading] = useState(false);
+  const scrollContainerRef = useRef(null);
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState([]);
+
+  const handleSearch = () => {
+    // Filter services based on the search query
+    const filteredResults = services.filter((service) =>
+      service.title.toLowerCase().includes(query.toLowerCase())
+    );    
+    setResults(filteredResults);
+  };
+
+  const loadMoreServices = () => {
+    setLoading(true);
+    setTimeout(() => {
+      const newServices = services.map((service) => ({
+        ...service,
+        title: service.title + " (New)",
+      }));
+      setServices((prev) => [...prev, ...newServices]);
+      setLoading(false);
+    }, 1000);
+  };
+
+  const handleScroll = () => {
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    if (scrollLeft + clientWidth >= scrollWidth - 5 && !loading) {
+      loadMoreServices();
+    }
+  };
+
   return (
-    <Box sx={{ width: "100%", overflowX: "hidden" }}>
-      
+    <Box sx={{ width: "100vw", maxWidth: "100%", overflowX: "hidden" }}>
       {/* Navbar */}
-      <AppBar position="sticky" color="primary">
+      <AppBar
+        position="sticky"
+        sx={{ background: "#fff", color: "#000", width: "100vw" }}
+      >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Typography variant="h6" sx={{ cursor: "pointer" }}>
-            Wedding Planner
+          <Typography
+            variant="h6"
+            sx={{ cursor: "pointer" }}
+            onClick={handleLogoClick}
+          >
+            WeddingPlanner
           </Typography>
-          <SearchIcon sx={{ cursor: "pointer" }} />
-          <Button color="inherit">Sign In / Sign Up</Button>
+
+          {/* Search Icon */}
+          <Box display="flex" alignItems="center">
+            <InputBase
+              placeholder="Search..."
+              inputProps={{ "aria-label": "search" }}
+              style={{
+                border: "1px solid #ccc",
+                padding: "4px 8px",
+                borderRadius: "4px",
+              }}
+            />
+            <IconButton onClick={handleSearch}>
+              <SearchIcon />
+            </IconButton>
+          </Box>
+
+          {/* Auth Buttons */}
+          <Box>
+            {isLoggedIn ? (
+              <Button
+                variant="contained"
+                color="error"
+                onClick={() => setIsLoggedIn(false)}
+              >
+                <LogoutIcon /> Logout
+              </Button>
+            ) : (
+              <>
+                <Button variant="outlined" sx={{ marginRight: 1 }}>
+                  Sign In
+                </Button>
+                <Button variant="contained">Sign Up</Button>
+              </>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Carousel */}
-      <Box sx={{ width: "100%", height: "400px", overflow: "hidden", mt: 2 }}>
-        <Carousel showThumbs={false} autoPlay infiniteLoop>
-          {images.map((src, index) => (
-            <img key={index} src={src} alt="Wedding" style={{ width: "100%", height: "400px", objectFit: "cover" }} />
+      {/* Wedding Carousel */}
+      <Box sx={{ width: "100vw", textAlign: "center", marginY: 4 }}>
+        <Carousel autoPlay infiniteLoop showThumbs={false}>
+          {weddingImages.map((img, index) => (
+            <Box
+              key={index}
+              component="img"
+              src={img}
+              alt={`Wedding ${index + 1}`}
+              sx={{ width: "100%", height: "600px", objectFit: "cover" }}
+            />
           ))}
         </Carousel>
       </Box>
 
-      {/* Sliding Services Section */}
-      <Typography variant="h4" sx={{ mt: 4, textAlign: "center" }}>Our Services</Typography>
-      <Box sx={{ maxWidth: "90%", mx: "auto", mt: 2 }}>
-        <Slider {...sliderSettings}>
+      {/* Services Section with Marquee */}
+      <Box sx={{ marginTop: 10 }}>
+        <Typography variant="h5" sx={{ textAlign: "center", marginY: 2 }}>
+          Our Services
+        </Typography>
+        <Box
+          ref={scrollContainerRef}
+          onScroll={handleScroll}
+          sx={{
+            display: "flex",
+            overflowX: "auto",
+            gap: 2,
+            scrollSnapType: "x mandatory",
+            p: 2,
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
           {services.map((service, index) => (
-            <Card key={index} sx={{ mx: 2 }}>
-              <CardMedia component="img" height="200" image={service.image} alt={service.title} />
-              <CardContent>
-                <Typography variant="h6">{service.title}</Typography>
-                <Typography variant="body2">{service.description}</Typography>
-              </CardContent>
-            </Card>
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.2 }}
+            >
+              <Card
+                key={index}
+                sx={{
+                  minWidth: 200,
+                  maxWidth: 200,
+                  flexShrink: 0,
+                  scrollSnapAlign: "start",
+                  boxShadow: 3,
+                  transition: "transform 0.3s ease-in-out",
+                  "&:hover": { transform: "scale(1.05)" },
+                }}
+              >
+                <CardMedia
+                  component="img"
+                  image={service.image}
+                  sx={{ height: 150, objectFit: "cover" }}
+                />
+                <CardContent sx={{ textAlign: "center" }}>
+                  <Typography variant="subtitle1">{service.title}</Typography>
+                </CardContent>
+              </Card>
+            </motion.div>
           ))}
-        </Slider>
+
+          {loading && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                minWidth: 200,
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
+        </Box>
       </Box>
 
-      {/* Gallery */}
-      <Typography variant="h4" sx={{ mt: 4, textAlign: "center" }}>Gallery</Typography>
-      <Grid container spacing={3} sx={{ mt: 2, px: 2 }}>
-        {images.map((img, index) => (
-          <Grid item xs={12} md={3} key={index}>
-            <Card>
-              <CardMedia component="img" height="200" image={img} alt="Wedding Gallery" />
+      {/* Packages Section with Hover Animation */}
+      <Typography variant="h5" sx={{ textAlign: "center", marginY: 2 }}>
+        Wedding Packages
+      </Typography>
+      <Grid
+        container
+        spacing={2}
+        sx={{ display: "flex", justifyContent: "center" }}
+      >
+        {packages.map((pkg, index) => (
+          <Grid item key={index} xs={12} sm={6} md={4}>
+            <Card
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                boxShadow: 3,
+                position: "relative",
+                overflow: "hidden",
+                transition: "transform 0.3s ease-in-out",
+                height: 300,
+                "&:hover": { transform: "scale(1.05)" },
+              }}
+            >
+              <CardContent
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
+                  color: "#fff",
+                  textAlign: "center",
+                  opacity: 0,
+                  transition: "opacity 0.3s ease-in-out",
+                  padding: 2,
+                  "&:hover": { opacity: 1 },
+                }}
+              >
+                <Typography variant="h5">{pkg.title}</Typography>
+                <Typography variant="h6">{pkg.price}</Typography>
+              </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
 
-      {/* Testimonials */}
-      <Typography variant="h4" sx={{ mt: 4, textAlign: "center" }}>Testimonials</Typography>
-      <Grid container spacing={3} sx={{ mt: 2, px: 2 }}>
-        {testimonials.map((testimonial, index) => (
-          <Grid item xs={12} md={6} key={index}>
-            <Card sx={{ padding: 2 }}>
-              <Typography variant="h6">{testimonial.name}</Typography>
-              <Typography variant="body2">{testimonial.review}</Typography>
-            </Card>
-          </Grid>
-        ))}
+      {/* Features Section */}
+      <Typography
+        variant="h5"
+        sx={{
+          textAlign: "center",
+          marginY: 3,
+          fontWeight: "bold",
+          color: "#333",
+        }}
+      >
+        Popular Features
+      </Typography>
+
+      <Grid
+        container
+        spacing={2}
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          overflowX: "auto", // For horizontal scrolling
+          paddingBottom: 3, // Space at the bottom to make it look cleaner
+        }}
+      >
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            sx={{
+              padding: 3,
+              textAlign: "center",
+              boxShadow: 3,
+              borderRadius: 2,
+              transition: "transform 0.3s, box-shadow 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "600", color: "#555" }}>
+              Best Sold Package
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: "#777" }}>
+              Luxury Package
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            sx={{
+              padding: 3,
+              textAlign: "center",
+              boxShadow: 3,
+              borderRadius: 2,
+              transition: "transform 0.3s, box-shadow 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "600", color: "#555" }}>
+              Most Popular Venue
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: "#777" }}>
+              Grand Palace
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            sx={{
+              padding: 3,
+              textAlign: "center",
+              boxShadow: 3,
+              borderRadius: 2,
+              transition: "transform 0.3s, box-shadow 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "600", color: "#555" }}>
+              Exclusive Theme
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: "#777" }}>
+              Royal Theme
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            sx={{
+              padding: 3,
+              textAlign: "center",
+              boxShadow: 3,
+              borderRadius: 2,
+              transition: "transform 0.3s, box-shadow 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "600", color: "#555" }}>
+              Best Catering Service
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: "#777" }}>
+              Gourmet Delights
+            </Typography>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={4}>
+          <Card
+            sx={{
+              padding: 3,
+              textAlign: "center",
+              boxShadow: 3,
+              borderRadius: 2,
+              transition: "transform 0.3s, box-shadow 0.3s",
+              "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: 6,
+              },
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: "600", color: "#555" }}>
+              Top Photographer
+            </Typography>
+            <Typography variant="subtitle1" sx={{ color: "#777" }}>
+              Moments Captured
+            </Typography>
+          </Card>
+        </Grid>
       </Grid>
 
-      {/* Contact Form */}
-      <Typography variant="h4" sx={{ mt: 4, textAlign: "center" }}>Contact Us</Typography>
-      <Box sx={{ maxWidth: 500, mx: "auto", mt: 2, px: 2 }}>
-        <TextField label="Name" variant="outlined" fullWidth sx={{ mb: 2 }} />
-        <TextField label="Email" variant="outlined" fullWidth sx={{ mb: 2 }} />
-        <Button variant="contained" color="primary" fullWidth>Submit</Button>
+      {/* Contact Us Section */}
+      <Box
+        sx={{
+          textAlign: "center",
+          backgroundColor: "#f9f9f9",
+          padding: 3,
+          mt: 4,
+        }}
+      >
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          Contact Us
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            maxWidth: 400,
+            mx: "auto",
+          }}
+        >
+          <TextField label="First Name" variant="outlined" fullWidth />
+          <TextField label="Email" type="email" variant="outlined" fullWidth />
+          <TextField
+            label="Message"
+            multiline
+            rows={4}
+            variant="outlined"
+            fullWidth
+          />
+          <Button variant="contained" color="primary">
+            Send Message
+          </Button>
+        </Box>
       </Box>
 
       {/* Footer */}
-      <Box sx={{ textAlign: "center", mt: 4, py: 2, bgcolor: "primary.main", color: "white" }}>
-        <Typography variant="body2">&copy; 2025 Wedding Planner. All rights reserved.</Typography>
+      <Box
+        sx={{
+          textAlign: "center",
+          backgroundColor: "#222",
+          color: "#fff",
+          padding: 2,
+          marginTop: 4,
+        }}
+      >
+        <Typography variant="body2">
+          &copy; 2025 WeddingPlanner | Connect with us:
+        </Typography>
+        <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 1 }}>
+          <IconButton
+            href="https://www.facebook.com"
+            target="_blank"
+            sx={{ color: "#fff" }}
+          >
+            <Facebook />
+          </IconButton>
+          <IconButton
+            href="https://www.instagram.com"
+            target="_blank"
+            sx={{ color: "#fff" }}
+          >
+            <Instagram />
+          </IconButton>
+          <IconButton
+            href="https://www.twitter.com"
+            target="_blank"
+            sx={{ color: "#fff" }}
+          >
+            <Twitter />
+          </IconButton>
+          <IconButton
+            href="https://www.linkedin.com"
+            target="_blank"
+            sx={{ color: "#fff" }}
+          >
+            <LinkedIn />
+          </IconButton>
+        </Box>
       </Box>
-
     </Box>
   );
-};
+}
 
 export default WeddingPlanner;
