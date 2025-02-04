@@ -10,9 +10,7 @@ import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
 import AdminSignup from "./pages/admin/Signup"
 import AdminSignIn from "./pages/admin/Signin"
 
-import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
-import AdminSignup from "./pages/admin/Signup"
-import AdminSignIn from "./pages/admin/Signin"
+
 
 
 const App = () => {
