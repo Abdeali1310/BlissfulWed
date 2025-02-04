@@ -14,6 +14,7 @@ import weddingImage from "../../assets/weddign2.jpeg";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
+import BackgroundImage from '../../assets/BG1.jpg';
 
 const signinSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -52,7 +53,11 @@ export default function Signin() {
   };
 
   return (
-    <div className="h-screen w-screen bg-[#fec5ea] flex justify-center items-center">
+    // <div className="h-screen w-screen bg-[#fec5ea] flex justify-center items-center">
+    <div
+    className="min-h-screen w-full flex justify-center items-center bg-cover bg-center bg-no-repeat"
+    style={{ backgroundImage: `url(${BackgroundImage})` }}
+  >
       <Container maxWidth="xl">
         <ToastContainer />
         <Grid container spacing={4} alignItems="center" justifyContent="center">
@@ -130,6 +135,6 @@ export default function Signin() {
           </Grid>
         </Grid>
       </Container>
-    </div>
+    {/* </div> */}</div>
   );
 }
