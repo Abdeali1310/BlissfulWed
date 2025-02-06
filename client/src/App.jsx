@@ -16,6 +16,10 @@ import ContactUs from "./components/ContactUs"
 import PrivacyPolicy from "./templates/PrivacyPolicy"
 import Gallery from "./pages/Gallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
+import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"; 
+import AdminSignup from "./pages/admin/Signup"; 
+import AdminSignIn from "./pages/admin/Signin";
+
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
