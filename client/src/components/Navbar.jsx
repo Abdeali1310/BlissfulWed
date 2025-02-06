@@ -25,7 +25,8 @@ const Navbar = () => {
   const [anchorElPackage, setAnchorElPackage] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  const handleOpenServices = (event) => setAnchorElServices(event.currentTarget);
+  const handleOpenServices = (event) =>
+    setAnchorElServices(event.currentTarget);
   const handleCloseServices = () => setAnchorElServices(null);
 
   const handleOpenPopular = (event) => setAnchorElPopular(event.currentTarget);
@@ -40,7 +41,10 @@ const Navbar = () => {
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: "#E73895", color: "white", }}>
+    <AppBar
+      position="static"
+      sx={{ backgroundColor: "#E73895", color: "white" }}
+    >
       <Toolbar>
         <IconButton
           edge="start"
@@ -56,7 +60,14 @@ const Navbar = () => {
           BlissfulWed
         </Typography>
 
-        <Box sx={{ flexGrow: 1, display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Box
+          sx={{
+            flexGrow: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
           <SearchBar>
             <InputBase
               placeholder="Search…"
@@ -76,7 +87,10 @@ const Navbar = () => {
         >
           {["Basic", "Premium", "Luxury"].map((item) => (
             <MenuItem key={item} onClick={handleClosePackage}>
-              <Link to={`/package/${item.toLowerCase()}`} style={{ textDecoration: "none", color: "inherit" }}>
+              <Link
+                to={`/package/${item.toLowerCase()}`}
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                 {item}
               </Link>
             </MenuItem>
@@ -84,12 +98,23 @@ const Navbar = () => {
         </Menu>
 
         <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
-          <Link to="/services" style={{ textDecoration: "none", color: "inherit" }}>
-            <Typography aria-haspopup="true" onMouseEnter={handleOpenServices} sx={{ mx: 2, cursor: "pointer" }}>
+          <Link
+            to="/services"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <Typography
+              aria-haspopup="true"
+              onMouseEnter={handleOpenServices}
+              sx={{ mx: 2, cursor: "pointer" }}
+            >
               Services
             </Typography>
           </Link>
-          <Menu anchorEl={anchorElServices} open={Boolean(anchorElServices)} onClose={handleCloseServices}>
+          <Menu
+            anchorEl={anchorElServices}
+            open={Boolean(anchorElServices)}
+            onClose={handleCloseServices}
+          >
             {[
               "Haldi",
               "Mehndi",
@@ -97,46 +122,83 @@ const Navbar = () => {
               "Decoration",
               "Music & DJ",
               "Bridal Makeup",
+              "Groom Wear",
               "Photography",
             ].map((item) => (
               <MenuItem key={item} onClick={handleCloseServices}>
-                <Link to={`/services/${item.toLowerCase().replace(/\s+/g, "-")}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <Link
+                  to={`/services/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
                   {item}
                 </Link>
               </MenuItem>
             ))}
           </Menu>
 
-          <Link to="/popular" style={{ textDecoration: "none", color: "inherit" }}>
-            <Typography aria-haspopup="true" onMouseEnter={handleOpenPopular} sx={{ mx: 2, cursor: "pointer" }}>
+          <Link
+            to="/popular"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <Typography
+              aria-haspopup="true"
+              onMouseEnter={handleOpenPopular}
+              sx={{ mx: 2, cursor: "pointer" }}
+            >
               Popular
             </Typography>
           </Link>
-          <Menu anchorEl={anchorElPopular} open={Boolean(anchorElPopular)} onClose={handleClosePopular}>
-            {["Catering", "Music & Dance", "Bridal Makeup", "Photography"].map((item) => (
-              <MenuItem key={item} onClick={handleClosePopular}>
-                <Link to={`/popular/${item.toLowerCase().replace(/\s+/g, "-")}`} style={{ textDecoration: "none", color: "inherit" }}>
-                  {item}
-                </Link>
-              </MenuItem>
-            ))}
+          <Menu
+            anchorEl={anchorElPopular}
+            open={Boolean(anchorElPopular)}
+            onClose={handleClosePopular}
+          >
+            {["Catering", "Music & Dance", "Bridal Makeup", "Photography"].map(
+              (item) => (
+                <MenuItem key={item} onClick={handleClosePopular}>
+                  <Link
+                    to={`/popular/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    {item}
+                  </Link>
+                </MenuItem>
+              )
+            )}
           </Menu>
 
-          <Link to="/gallery" style={{ textDecoration: "none", color: "inherit" }}>
-            <Typography aria-haspopup="true" onMouseEnter={handleOpenGallery} sx={{ mx: 2, cursor: "pointer" }}>
+          <Link
+            to="/gallery"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            <Typography
+              aria-haspopup="true"
+              onMouseEnter={handleOpenGallery}
+              sx={{ mx: 2, cursor: "pointer" }}
+            >
               Gallery
             </Typography>
           </Link>
-          <Menu anchorEl={anchorElGallery} open={Boolean(anchorElGallery)} onClose={handleCloseGallery}>
+          <Menu
+            anchorEl={anchorElGallery}
+            open={Boolean(anchorElGallery)}
+            onClose={handleCloseGallery}
+          >
             <MenuItem onClick={handleCloseGallery}>
-              <Link to="/gallery/album" style={{ textDecoration: "none", color: "inherit" }}>
+              <Link
+                to="/gallery/album"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
                 Album
               </Link>
             </MenuItem>
           </Menu>
         </Box>
 
-        <IconButton color="inherit" sx={{ display: { xs: "block", md: "block" } }}>
+        <IconButton
+          color="inherit"
+          sx={{ display: { xs: "block", md: "block" } }}
+        >
           <AccountCircle />
         </IconButton>
       </Toolbar>
@@ -144,15 +206,22 @@ const Navbar = () => {
       <Drawer anchor="left" open={mobileOpen} onClose={toggleDrawer}>
         <Box sx={{ width: 250 }}>
           <List>
-            {["Home", "Services", "Popular", "Gallery", "Packages"].map((text) => (
-              <ListItem button key={text} onClick={toggleDrawer}>
-                <Link to={`/${text.toLowerCase()}`} style={{ textDecoration: "none", color: "inherit" }}>
-                  {text}
-                </Link>
-              </ListItem>
-            ))}
+            {["Home"].map(
+              (text) => (
+                <ListItem button key={text} onClick={toggleDrawer}>
+                  <Link
+                    to={`/${text.toLowerCase()}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    {text}
+                  </Link>
+                </ListItem>
+              )
+            )}
           </List>
           <Divider />
+
+          {/* Services Section */}
           <List>
             <ListItem>
               <Typography variant="h6">Services</Typography>
@@ -167,19 +236,76 @@ const Navbar = () => {
               "Photography",
             ].map((service) => (
               <ListItem button key={service} onClick={toggleDrawer}>
-                <Link to={`/services/${service.toLowerCase().replace(/\s+/g, "-")}`} style={{ textDecoration: "none", color: "inherit" }}>
+                <Link
+                  to={`/services/${service.toLowerCase().replace(/\s+/g, "-")}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
                   {service}
                 </Link>
               </ListItem>
             ))}
           </List>
-          <hr />
+          <Divider />
+
+          {/* Packages Section */}
           <List>
-            <ListItem button onClick={toggleDrawer}>
-              <Link to="/profile" style={{ textDecoration: "none", color: "inherit" }}>
-                Profile
-              </Link>
+            <ListItem>
+              <Typography variant="h6">Packages</Typography>
             </ListItem>
+            {["Basic", "Standard", "Premium"].map((packageName) => (
+              <ListItem button key={packageName} onClick={toggleDrawer}>
+                <Link
+                  to={`/packages/${packageName.toLowerCase()}`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  {packageName}
+                </Link>
+              </ListItem>
+            ))}
+          </List>
+          <Divider />
+
+          {/* Albums Section */}
+          <List>
+            <ListItem>
+              <Typography variant="h6">Albums</Typography>
+            </ListItem>
+            {["Wedding", "Engagement", "Reception", "Pre-Wedding"].map(
+              (album) => (
+                <ListItem button key={album} onClick={toggleDrawer}>
+                  <Link
+                    to={`/albums/${album.toLowerCase()}`}
+                    style={{ textDecoration: "none", color: "inherit" }}
+                  >
+                    {album}
+                  </Link>
+                </ListItem>
+              )
+            )}
+          </List>
+          <Divider />
+
+          {/* Profile/Login Section */}
+          <List>
+            {localStorage.getItem("user") ? (
+              <ListItem button onClick={toggleDrawer}>
+                <Link
+                  to="/profile"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  Profile
+                </Link>
+              </ListItem>
+            ) : (
+              <ListItem button onClick={toggleDrawer}>
+                <Link
+                  to="/login"
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  Login
+                </Link>
+              </ListItem>
+            )}
           </List>
         </Box>
       </Drawer>

@@ -10,6 +10,10 @@ import AdminSignup from "./pages/admin/Signup"
 import AdminSignIn from "./pages/admin/Signin"
 import Home from "./pages/Home"
 import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
+import AboutUs from "./templates/AboutUs"
+import TermsOfService from "./templates/TermsOfService"
+import ContactUs from "./components/ContactUs"
+import PrivacyPolicy from "./templates/PrivacyPolicy"
 
 const App = () => {
   return (
@@ -23,6 +27,10 @@ const App = () => {
         <Route path="/user/forgot-password/otp-verification" element={<Verification />} />
         <Route path="/user/change-password" element={<Changepassword />} />
         <Route path="/user/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/about" element={<AboutUs />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/contact-us" element={<ContactUs />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
         <Route path="/admin/signup" element={<AdminSignup />} />
         <Route path="/admin/signin" element={<AdminSignIn />} />

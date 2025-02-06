@@ -5,6 +5,7 @@ import { Box, Grid, Typography, TextField, Button, Paper, Snackbar, Alert } from
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import axios from "axios";
 
 // Define Zod schema for validation
 const contactSchema = z.object({
@@ -28,17 +29,22 @@ const ContactUs = () => {
 
   const onSubmit = async (data) => {
     try {
-      console.log("Form Submitted:", data);
-      setToast({ open: true, message: "Message sent successfully!", severity: "success" });
-      reset(); // Reset form after successful submission
+      const response = await axios.post("http://localhost:3000/api/v1/user/contact-email", data);
+  
+      setToast({ open: true, message: response.data.message, severity: "success" });
+      reset();
     } catch (error) {
       console.error("Submission Error:", error);
-      setToast({ open: true, message: "Something went wrong. Please try again.", severity: "error" });
+      setToast({
+        open: true,
+        message: error.response?.data?.message || "Something went wrong. Please try again.",
+        severity: "error",
+      });
     }
   };
 
   return (
-    <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "80vh", p: 4 }}>
+    <Box sx={{ backgroundColor: "#f9f9f9", minHeight: "80vh", m:"auto", p: 4 }}>
       <Paper elevation={3} sx={{ maxWidth: 600, margin: "auto", p: 4, borderRadius: 2 }}>
         <Typography
           sx={{ color: "#e10098", fontFamily: "cursive", fontWeight: "bold" }}
