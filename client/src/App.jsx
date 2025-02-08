@@ -14,12 +14,14 @@ import AboutUs from "./templates/AboutUs"
 import TermsOfService from "./templates/TermsOfService"
 import ContactUs from "./components/ContactUs"
 import PrivacyPolicy from "./templates/PrivacyPolicy"
-
+import Gallery from "./pages/Gallery.jsx"
+import WeddingPackage from "./pages/WeddingPackages.jsx";
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
       <Routes>
-        <Route path="/test" element={<WeddingPlanner />} />
+        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/packages" element={<WeddingPackage />} />
         <Route path="/" element={<Home />} />
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />
