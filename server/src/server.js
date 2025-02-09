@@ -6,6 +6,7 @@ require("dotenv").config();
 const cookieParser = require('cookie-parser');
 const cors = require("cors");
 const adminRouter = require("./routers/adminRouter");
+const packageroutes =require("./routers/packageRoutes.js");
 
 const PORT = 3000;
 
@@ -22,7 +23,8 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/admin",adminRouter)
+app.use("/api/v1/admin",adminRouter);
+app.use("/api/packages",packageroutes);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

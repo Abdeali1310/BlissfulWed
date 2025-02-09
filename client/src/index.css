@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* For WebKit browsers (Chrome, Edge, Safari) */
+::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #dc589e; /* Set scrollbar backgr    ound */
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: #fff; /* Scrollbar handle */
+    border-radius: 5px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: #fff; /* Darker handle on hover */
+  }
+  
+  /* For Firefox */
+  html {
+    scrollbar-color: #d0197a grey;
+  }
+  

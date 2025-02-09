@@ -1,0 +1,37 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Container, Grid, Card, CardContent, Typography, Button } from "@mui/material";
+
+const Packages = () => {
+    const [packages, setPackages] = useState([]);
+
+    useEffect(() => {
+        axios.get("http://localhost:5000/api/packages")
+            .then(response => setPackages(response.data))
+            .catch(error => console.error(error));
+    }, []);
+
+    return (
+        <Container>
+            <Typography variant="h4" textAlign="center" my={4}>Our Packages</Typography>
+            <Grid container spacing={4}>
+                {packages.map((pkg) => (
+                    <Grid item xs={12} sm={6} md={4} key={pkg._id}>
+                        <Card>
+                            <CardContent>
+                                <Typography variant="h5">{pkg.name}</Typography>
+                                <Typography variant="h6">${pkg.price}</Typography>
+                                <Typography variant="body2">{pkg.features.join(", ")}</Typography>
+                                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                                    Buy Now
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    </Grid>
+                ))}
+            </Grid>
+        </Container>
+    );
+};
+
+export default Packages;

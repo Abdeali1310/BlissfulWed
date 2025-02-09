@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const crypto = require("crypto");
 const { signupSchema, signinSchema } = require('../utils/validation');
-const { sendOtpEmail } = require('../utils/emailService');
+const { sendOtpEmail, sendContactEmail } = require('../utils/emailService');
 
 
 async function userSignup(req, res) {
@@ -172,9 +172,9 @@ async function editProfile(req, res) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        res.status(200).json({ success:true, msg: "Profile updated successfully" });
+        res.status(200).json({ success: true, msg: "Profile updated successfully" });
     } catch (error) {
-        res.status(500).json({  success:false,message: 'Error updating profile', error });
+        res.status(500).json({ success: false, message: 'Error updating profile', error });
     }
 }
 
@@ -196,9 +196,9 @@ async function changePassword(req, res) {
         await user.save();
 
 
-        res.status(200).json({ success:true,msg: "Password changed successfully" });
+        res.status(200).json({ success: true, msg: "Password changed successfully" });
     } catch (error) {
-        res.status(500).json({ success:false, message: 'Error changing password', error });
+        res.status(500).json({ success: false, message: 'Error changing password', error });
     }
 }
 
@@ -224,7 +224,7 @@ async function forgotPassword(req, res) {
         return res.status(200).json({ success: true, message: "OTP sent to email" });
     } catch (error) {
         console.error("Forgot Password Error:", error);
-        return res.status(500).json({ success: false,message: "Internal server error" });
+        return res.status(500).json({ success: false, message: "Internal server error" });
     }
 }
 
@@ -247,30 +247,49 @@ async function otpVerification(req, res) {
             return res.status(400).json({ message: 'Invalid OTP' });
         }
 
-        return res.status(200).json({ success:true,message: 'OTP verified successfully' });
+        return res.status(200).json({ success: true, message: 'OTP verified successfully' });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ success:false,message: 'Server error' });
+        return res.status(500).json({ success: false, message: 'Server error' });
     }
 };
 
-async function resetPassword(req,res) {
+async function resetPassword(req, res) {
     const { email, newPassword } = req.body;
 
     try {
-      const user = await User.findOne({ email });
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      
-      user.password = newPassword.trim();
-      await user.save();
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
-      return res.status(200).json({ success: true, message: 'Password reset successfully' });
+
+        user.password = newPassword.trim();
+        await user.save();
+
+        return res.status(200).json({ success: true, message: 'Password reset successfully' });
     } catch (error) {
-      console.error('Error resetting password:', error);
-      return res.status(500).json({ message: 'Internal server error' });
+        console.error('Error resetting password:', error);
+        return res.status(500).json({ message: 'Internal server error' });
     }
 }
-module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword }
+
+async function contactUs(req, res) {
+    try {
+        const { name, email, subject, message } = req.body;
+
+        console.log("Received Contact Form Data:", req.body);
+
+        if (!name || !email || !message) {
+            return res.status(400).json({ message: "All fields are required." });
+        }
+
+        await sendContactEmail({ name, email, subject, message });
+
+        res.status(200).json({ message: "Your message has been sent successfully!" });
+    } catch (error) {
+        console.error("Error sending contact email:", error);
+        res.status(500).json({ message: "Failed to send your message. Please try again later." });
+    }
+}
+module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
