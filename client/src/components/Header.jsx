@@ -36,9 +36,8 @@ const Header = () => {
             alt={`Wedding ${index + 1}`}
             sx={{
               width: "100%",
-              height: "95vh",
+              height: { xs: "70vh", md: "95vh" },
               objectFit: "cover",
-              
             }}
           />
         ))}

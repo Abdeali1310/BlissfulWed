@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -13,10 +13,14 @@ import {
   List,
   ListItem,
   Divider,
+  Avatar,
+  Tooltip,
+  Button,
 } from "@mui/material";
 import { Search, Menu as MenuIcon, AccountCircle } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Navbar = () => {
   const [anchorElServices, setAnchorElServices] = useState(null);
@@ -24,6 +28,8 @@ const Navbar = () => {
   const [anchorElGallery, setAnchorElGallery] = useState(null);
   const [anchorElPackage, setAnchorElPackage] = useState(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [userProfilePic, setUserProfilePic] = useState(null);
+  const [userName, setUserName] = useState(null);
 
   const handleOpenServices = (event) =>
     setAnchorElServices(event.currentTarget);
@@ -39,6 +45,30 @@ const Navbar = () => {
   const handleClosePackage = () => setAnchorElPackage(null);
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
+  const currentUser = async () => {
+    const curr_userId = localStorage.getItem("user");
+
+    if (curr_userId) {
+      try {
+        const response = await axios.post(
+          "http://localhost:3000/api/v1/user",
+          { curr_userId },
+          {
+            withCredentials: true, // Ensure cookies are sent (if using sessions)
+          }
+        );
+
+        setUserProfilePic(response.data.user.profilePicUrl);
+        setUserName(response.data.user.username);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    }
+  };
+
+  useEffect(() => {
+    currentUser();
+  }, []);
 
   return (
     <AppBar
@@ -57,7 +87,7 @@ const Navbar = () => {
         </IconButton>
 
         <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-          BlissfulWed
+          <Link to={"/"}>BlissfulWed</Link>
         </Typography>
 
         <Box
@@ -186,38 +216,100 @@ const Navbar = () => {
           >
             <MenuItem onClick={handleCloseGallery}>
               <Link
-                to="/gallery/album"
+                to="/gallery/album/wedding"
                 style={{ textDecoration: "none", color: "inherit" }}
               >
-                Album
+                Wedding
+              </Link>
+            </MenuItem>
+
+            <MenuItem onClick={handleCloseGallery}>
+              <Link
+                to="/gallery/album/engagement"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                Engagement
+              </Link>
+            </MenuItem>
+
+            <MenuItem onClick={handleCloseGallery}>
+              <Link
+                to="/gallery/album/reception"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                Reception
+              </Link>
+            </MenuItem>
+
+            <MenuItem onClick={handleCloseGallery}>
+              <Link
+                to="/gallery/album/pre-wedding"
+                style={{ textDecoration: "none", color: "inherit" }}
+              >
+                Pre Wedding
               </Link>
             </MenuItem>
           </Menu>
         </Box>
 
-        <IconButton
-          color="inherit"
-          sx={{ display: { xs: "block", md: "block" } }}
-        >
-          <AccountCircle />
-        </IconButton>
+        <Box display="flex" flexDirection="column" alignItems="center">
+          {userProfilePic ? (
+            <Tooltip title="User Profile" arrow>
+              <IconButton color="inherit">
+                <Link to="/user/profile">
+                  <Avatar
+                    src={userProfilePic}
+                    alt="Profile"
+                    sx={{ width: 40, height: 40 }}
+                  />
+                </Link>
+              </IconButton>
+            </Tooltip>
+          ) : (
+            <Button
+              component={Link}
+              to="/user/signin"
+              variant="contained"
+              sx={{
+                backgroundColor: "#fd5da8",
+                color: "white",
+                textTransform: "none",
+                fontSize: "14px",
+                "&:hover": { backgroundColor: "#ff69b4" },
+              }}
+            >
+              Login
+            </Button>
+          )}
+
+          {userName && (
+            <Typography
+              variant="caption"
+              sx={{
+                color: "white",
+                mt: 0.5, // Adds spacing below the button/avatar
+                textAlign: "center",
+              }}
+            >
+              {userName}
+            </Typography>
+          )}
+        </Box>
       </Toolbar>
 
       <Drawer anchor="left" open={mobileOpen} onClose={toggleDrawer}>
         <Box sx={{ width: 250 }}>
           <List>
-            {["Home"].map(
-              (text) => (
-                <ListItem button key={text} onClick={toggleDrawer}>
-                  <Link
-                    to={`/${text.toLowerCase()}`}
-                    style={{ textDecoration: "none", color: "inherit" }}
-                  >
-                    {text}
-                  </Link>
-                </ListItem>
-              )
-            )}
+            {["Home"].map((text) => (
+              <ListItem button key={text} onClick={toggleDrawer}>
+                <Link
+                  to={`/`}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
+                  {text}
+                </Link>
+              </ListItem>
+            ))}
           </List>
           <Divider />
 
@@ -274,7 +366,7 @@ const Navbar = () => {
               (album) => (
                 <ListItem button key={album} onClick={toggleDrawer}>
                   <Link
-                    to={`/albums/${album.toLowerCase()}`}
+                    to={`/gallery/album/${album.toLowerCase()}`}
                     style={{ textDecoration: "none", color: "inherit" }}
                   >
                     {album}
@@ -287,25 +379,57 @@ const Navbar = () => {
 
           {/* Profile/Login Section */}
           <List>
-            {localStorage.getItem("user") ? (
-              <ListItem button onClick={toggleDrawer}>
-                <Link
-                  to="/profile"
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  Profile
-                </Link>
-              </ListItem>
-            ) : (
-              <ListItem button onClick={toggleDrawer}>
-                <Link
-                  to="/login"
-                  style={{ textDecoration: "none", color: "inherit" }}
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              mt={2}
+            >
+              {userProfilePic ? (
+                <>
+                  <Tooltip title="User Profile" arrow>
+                    <IconButton color="inherit" onClick={toggleDrawer}>
+                      <Link to="/user/profile">
+                        <Avatar
+                          src={userProfilePic}
+                          alt="Profile"
+                          sx={{ width: 40, height: 40 }}
+                        />
+                      </Link>
+                    </IconButton>
+                  </Tooltip>
+                  {userName && (
+                    <Typography
+                      variant="caption"
+                      sx={{
+                        color: "black",
+                        mt: 0.5,
+                        textAlign: "center",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {userName}
+                    </Typography>
+                  )}
+                </>
+              ) : (
+                <Button
+                  component={Link}
+                  to="/user/signin"
+                  variant="contained"
+                  sx={{
+                    backgroundColor: "#fd5da8",
+                    color: "white",
+                    textTransform: "none",
+                    fontSize: "14px",
+                    "&:hover": { backgroundColor: "#ff69b4" },
+                  }}
+                  onClick={toggleDrawer}
                 >
                   Login
-                </Link>
-              </ListItem>
-            )}
+                </Button>
+              )}
+            </Box>
           </List>
         </Box>
       </Drawer>
