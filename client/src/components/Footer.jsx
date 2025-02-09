@@ -157,7 +157,7 @@ const Footer = () => {
               Home
             </Link>
             <Link
-              href="/gallery"
+              href="/gallery/album"
               color="inherit"
               sx={{
                 display: "block",

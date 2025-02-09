@@ -6,7 +6,7 @@ const userRouter = express.Router();
 // const { storage } = require("../../cloudConfig");
 // const upload = multer({storage })
 
-userRouter.get("/",isLoggedIn,currentUser)
+userRouter.post("/",isLoggedIn,currentUser)
 userRouter.post("/signup",userSignup)
 userRouter.post("/signin",userSignin)
 userRouter.post("/contact-email",contactUs)
