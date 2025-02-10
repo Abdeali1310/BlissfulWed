@@ -1,7 +1,7 @@
 import { Route, Routes } from "react-router-dom"
 import Signup from "./pages/user/Signup"
 import Signin from "./pages/user/Signin"
-// import Home from "./pages/Home"
+import Home from "./pages/Home"
 import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
@@ -19,6 +19,8 @@ import WeddingPackage from "./pages/WeddingPackages.jsx";
 import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"; 
 import AdminSignup from "./pages/admin/Signup"; 
 import AdminSignIn from "./pages/admin/Signin";
+import Gallery from "./pages/LandingPage/Gallery"
+
 
 const App = () => {
   return (
@@ -26,6 +28,7 @@ const App = () => {
       <Routes>
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/packages" element={<WeddingPackage />} />
+        <Route path="/couple/gallery" element={<Gallery />} />
         <Route path="/" element={<Home />} />
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />

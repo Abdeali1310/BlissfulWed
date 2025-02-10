@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/v1/user", userRouter);
-app.use("/api/v1/admin",adminRouter)
+app.use("/api/v1/admin",adminRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
