@@ -9,13 +9,13 @@ import ResetPasswordPage from "./utils/Resetpassword"
 import AdminSignup from "./pages/admin/Signup"
 import AdminSignIn from "./pages/admin/Signin"
 import Home from "./pages/Home"
-import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
 import AboutUs from "./templates/AboutUs"
 import TermsOfService from "./templates/TermsOfService"
 import ContactUs from "./components/ContactUs"
 import PrivacyPolicy from "./templates/PrivacyPolicy"
 import Gallery from "./pages/Gallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
+import ServiceDetails from "./pages/Services/ServiceDetails.jsx"
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
@@ -36,6 +36,8 @@ const App = () => {
 
         <Route path="/admin/signup" element={<AdminSignup />} />
         <Route path="/admin/signin" element={<AdminSignIn />} />
+
+        <Route path="/service/:serviceType" element={<ServiceDetails />} />
       </Routes>
     </div>
   )

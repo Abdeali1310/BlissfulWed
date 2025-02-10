@@ -157,7 +157,7 @@ const Navbar = () => {
             ].map((item) => (
               <MenuItem key={item} onClick={handleCloseServices}>
                 <Link
-                  to={`/services/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                  to={`/service/${item.toLowerCase().replace(/\s+/g, "-")}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
                   {item}
@@ -329,7 +329,7 @@ const Navbar = () => {
             ].map((service) => (
               <ListItem button key={service} onClick={toggleDrawer}>
                 <Link
-                  to={`/services/${service.toLowerCase().replace(/\s+/g, "-")}`}
+                  to={`/service/${service.toLowerCase().replace(/\s+/g, "-")}`}
                   style={{ textDecoration: "none", color: "inherit" }}
                 >
                   {service}

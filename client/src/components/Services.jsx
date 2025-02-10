@@ -72,7 +72,7 @@ const Services = () => {
               transition={{ duration: 0.5, delay: (index % services.length) * 0.2 }}
             >
               <Link
-                to={`/services/${service.title.toLowerCase()}`}
+                to={`/service/${service.title.toLowerCase()}`}
                 style={{ textDecoration: "none" }}
               >
                 <Card
