@@ -3,18 +3,13 @@ const mongoose = require("mongoose");
 const reviewSchema = new mongoose.Schema({
   reviewType: { 
     type: String, 
-    enum: ["service", "package"], 
+    enum: ["Service", "Package"], 
     required: true 
   },
   reviewRef: {
     type: mongoose.Schema.Types.ObjectId, 
     required: true, 
-    refPath: "reviewTypeRef" 
-  },
-  reviewTypeRef: {
-    type: String,
-    required: true,
-    enum: ["Service", "Package"], 
+    refPath: "reviewType" // Dynamically refers to "Service" or "Package" models
   },
   userId: { 
     type: mongoose.Schema.Types.ObjectId, 

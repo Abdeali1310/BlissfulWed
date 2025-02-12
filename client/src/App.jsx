@@ -16,6 +16,7 @@ import PrivacyPolicy from "./templates/PrivacyPolicy"
 import Gallery from "./pages/Gallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
 import ServiceDetails from "./pages/Services/ServiceDetails.jsx"
+import IndividualService from "./pages/Services/IndividualService.jsx"
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
@@ -38,6 +39,7 @@ const App = () => {
         <Route path="/admin/signin" element={<AdminSignIn />} />
 
         <Route path="/service/:serviceType" element={<ServiceDetails />} />
+        <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
       </Routes>
     </div>
   )
