@@ -14,9 +14,6 @@ import ContactUs from "./components/ContactUs"
 import PrivacyPolicy from "./templates/PrivacyPolicy"
 import Gallery from "./pages/LandingPage/Gallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
-// import EventGallery from "../src/pages/LandingPage/EventGallery.jsx"
-
-
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
@@ -39,6 +36,9 @@ const App = () => {
 
         <Route path="/admin/signup" element={<AdminSignup />} />
         <Route path="/admin/signin" element={<AdminSignIn />} />
+
+        <Route path="/service/:serviceType" element={<ServiceDetails />} />
+        <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
       </Routes>
     </div>
   )

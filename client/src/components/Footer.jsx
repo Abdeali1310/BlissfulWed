@@ -34,7 +34,7 @@ const Footer = () => {
           </Typography>
           <Box>
             <Link
-              href="/services/haldi"
+              href="/service/haldi"
               color="inherit"
               sx={{
                 display: "block",
@@ -48,7 +48,7 @@ const Footer = () => {
               Haldi
             </Link>
             <Link
-              href="/services/mehndi"
+              href="/service/mehndi"
               color="inherit"
               sx={{
                 display: "block",
@@ -62,7 +62,7 @@ const Footer = () => {
               Mehndi
             </Link>
             <Link
-              href="/services/catering"
+              href="/service/catering"
               color="inherit"
               sx={{
                 display: "block",
@@ -76,7 +76,7 @@ const Footer = () => {
               Catering
             </Link>
             <Link
-              href="/services/music"
+              href="/service/music-&-dj"
               color="inherit"
               sx={{
                 display: "block",
@@ -90,7 +90,7 @@ const Footer = () => {
               Music & DJ
             </Link>
             <Link
-              href="/services/photography"
+              href="/service/photography"
               color="inherit"
               sx={{
                 display: "block",
@@ -104,7 +104,7 @@ const Footer = () => {
               Photography
             </Link>
             <Link
-              href="/services/bridal-makeup"
+              href="/service/bridal-makeup"
               color="inherit"
               sx={{
                 display: "block",
@@ -118,7 +118,7 @@ const Footer = () => {
               Bridal makeup
             </Link>
             <Link
-              href="/services/groom-wear"
+              href="/service/groom-wear"
               color="inherit"
               sx={{
                 display: "block",
