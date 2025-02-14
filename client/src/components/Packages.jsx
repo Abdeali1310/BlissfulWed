@@ -35,9 +35,21 @@ const Packages = () => {
                 Our Exclusive Wedding Packages
             </Typography>
 
-            <Grid container spacing={4}>
+            {/* Centering Grid Items */}
+            <Grid 
+                container 
+                spacing={4} 
+                justifyContent="center" // Center the grid items
+            >
                 {packages.map((pkg) => (
-                    <Grid item xs={12} sm={6} md={4} key={pkg._id}>
+                    <Grid 
+                        item 
+                        xs={12} 
+                        sm={6} 
+                        md={4} 
+                        key={pkg._id} 
+                        sx={{ display: "flex", justifyContent: "center" }} // Center each item
+                    >
                         <Card 
                             sx={{ 
                                 position: "relative", 
@@ -45,6 +57,8 @@ const Packages = () => {
                                 boxShadow: 4,
                                 overflow: "hidden",
                                 height: "300px",
+                                width: "100%", // Ensures consistent size
+                                maxWidth: "350px", // Limits max width for better alignment
                                 transition: "0.3s",
                                 "&:hover": { boxShadow: 8, transform: "scale(1.03)" }
                             }}
@@ -57,10 +71,10 @@ const Packages = () => {
                                     left: 0,
                                     width: "100%",
                                     height: "100%",
-                                    backgroundImage: `url(${packageImages[pkg.name] || BasicImage})`, // Fallback to BasicImage if name not found
+                                    backgroundImage: `url(${packageImages[pkg.name] || BasicImage})`, 
                                     backgroundSize: "cover",
                                     backgroundPosition: "center",
-                                    filter: "brightness(0.7)", // Darken the background slightly
+                                    filter: "brightness(0.7)",
                                 }}
                             />
 
@@ -70,7 +84,7 @@ const Packages = () => {
                                 zIndex: 2, 
                                 color: "#fff", 
                                 textAlign: "center",
-                                mt: "30%", // Move content down a bit
+                                mt: "30%", // Moves content down
                             }}>
                                 <Typography variant="h5" fontWeight="bold">
                                     {pkg.name}
