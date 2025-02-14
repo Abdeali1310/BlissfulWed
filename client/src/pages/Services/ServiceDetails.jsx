@@ -33,7 +33,7 @@ const ServiceDetails = () => {
       <Navbar />
 
       {/* Back Button and Title Container */}
-      <div className="w-full flex items-center mt-10 justify-between px-6 mt-4">
+      <div className="w-full flex items-center mt-10 justify-between px-6">
         <Button component={Link} to="/" className="p-0">
           <ArrowBack className="text-[#e73895] text-5xl" />
         </Button>
@@ -112,7 +112,7 @@ const ServiceDetails = () => {
                   {service.tags.map((tag, index) => (
                     <span
                       key={index}
-                      className="text-xs font-semibold px-6 py-2 bg-pink-200 font-bold text-pink-700 rounded-full"
+                      className="text-xs font-semibold px-6 py-2 bg-pink-200 text-pink-700 rounded-full"
                     >
                       {tag}
                     </span>

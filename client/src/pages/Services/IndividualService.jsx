@@ -291,7 +291,7 @@ const IndividualService = () => {
 
             <Typography
               variant="h5"
-              className="text-gray-800 font-cursive text-pink-700 text-lg leading-relaxed mb-4"
+              className=" font-cursive text-pink-700 text-lg leading-relaxed mb-4"
               style={{ fontFamily: "cursive" }}
             >
               {service.fullInfo}
