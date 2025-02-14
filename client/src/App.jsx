@@ -1,7 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import Signup from "./pages/user/Signup"
 import Signin from "./pages/user/Signin"
-import Home from "./pages/Home"
 import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
@@ -9,26 +8,22 @@ import ResetPasswordPage from "./utils/Resetpassword"
 import AdminSignup from "./pages/admin/Signup"
 import AdminSignIn from "./pages/admin/Signin"
 import Home from "./pages/Home"
-import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
 import AboutUs from "./templates/AboutUs"
 import TermsOfService from "./templates/TermsOfService"
 import ContactUs from "./components/ContactUs"
 import PrivacyPolicy from "./templates/PrivacyPolicy"
-import Gallery from "./pages/Gallery.jsx"
+import Gallery from "./pages/LandingPage/Gallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
-import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"; 
-import AdminSignup from "./pages/admin/Signup"; 
-import AdminSignIn from "./pages/admin/Signin";
-import Gallery from "./pages/LandingPage/Gallery"
+// import EventGallery from "../src/pages/LandingPage/EventGallery.jsx"
 
 
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
       <Routes>
-        <Route path="/gallery" element={<Gallery />} />
+        <Route path="/gallery/album" element={<Gallery />} />
         <Route path="/packages" element={<WeddingPackage />} />
-        <Route path="/couple/gallery" element={<Gallery />} />
+        {/* <Route path="/couple/gallery" element={<Gallery />} /> */}
         <Route path="/" element={<Home />} />
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />
@@ -40,6 +35,7 @@ const App = () => {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        {/* <Route path="/gallery/album/:event" element={<EventGallery />} /> */}
 
         <Route path="/admin/signup" element={<AdminSignup />} />
         <Route path="/admin/signin" element={<AdminSignIn />} />
