@@ -13,6 +13,7 @@ import TermsOfService from "./templates/TermsOfService"
 import ContactUs from "./components/ContactUs"
 import PrivacyPolicy from "./templates/PrivacyPolicy"
 import Gallery from "./pages/LandingPage/Gallery.jsx"
+import EventGallery from "./pages/LandingPage/EventGallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
 import ServiceDetails from "./pages/Services/ServiceDetails.jsx"
 import IndividualService from "./pages/Services/IndividualService.jsx"
@@ -35,7 +36,7 @@ const App = () => {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        {/* <Route path="/gallery/album/:event" element={<EventGallery />} /> */}
+        <Route path="/gallery/album/:event" element={<EventGallery />} />
 
         <Route path="/admin/signup" element={<AdminSignup />} />
         <Route path="/admin/signin" element={<AdminSignIn />} />

@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Card, CardActionArea, CardMedia, Typography, Grid, Container, Box } from "@mui/material";
+import {
+  Card,
+  CardActionArea,
+  CardMedia,
+  Typography,
+  Grid,
+  Container,
+  Box,
+} from "@mui/material";
 import { motion } from "framer-motion";
 import axios from "axios";
 
@@ -12,9 +20,16 @@ const Gallery = () => {
   const fetchImages = async () => {
     try {
       const res = await axios.get("http://localhost:3000/api/gallery");
-      setWeddingEvents(res.data);
+      // Check if the response is an array, if not, set an empty array
+      if (Array.isArray(res.data)) {
+        setWeddingEvents(res.data);
+      } else {
+        console.error("API did not return an array:", res.data);
+        setWeddingEvents([]);
+      }
     } catch (error) {
       console.error("Error fetching images:", error);
+      setWeddingEvents([]); // Set to empty array on error
     }
   };
 
@@ -29,7 +44,8 @@ const Gallery = () => {
         minHeight: "100vh",
         width: "100%",
         overflowX: "hidden",
-        background: "linear-gradient(to bottom right, #ffe1e8, #ffbedb, #ff99cc)",
+        background:
+          "linear-gradient(to bottom right, #ffe1e8, #ffbedb, #ff99cc)",
         backgroundSize: "cover",
         backgroundPosition: "center",
         py: { xs: 3, sm: 4, md: 5 },
@@ -56,7 +72,7 @@ const Gallery = () => {
               sm={6}
               md={4}
               lg={3}
-              key={event.id}
+              key={event._id}
               sx={{ display: "flex", justifyContent: "center" }}
             >
               <motion.div
@@ -76,7 +92,10 @@ const Gallery = () => {
                     height: { xs: 300, sm: 350, md: 400 },
                   }}
                 >
-                  <CardActionArea component={Link} to={`/gallery/album/${event.id}`}>
+                  <CardActionArea
+                    component={Link}
+                    to={`/gallery/album/${event._id}`}
+                  >
                     <Box sx={{ position: "relative", height: "100%" }}>
                       <CardMedia
                         component="img"
