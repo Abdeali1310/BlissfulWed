@@ -13,6 +13,24 @@ router.get("/", async (req, res) => {
     }
 });
 
+// Get a specific package by name
+router.get("/:packageName", async (req, res) => {
+    try {
+        const packageName = req.params.packageName.replace(/-/g, ' '); // Convert hyphens to spaces
+
+        // Case-insensitive search in MongoDB
+        const packageData = await Package.findOne({ name: { $regex: `^${packageName}$`, $options: "i" } });
+
+        if (!packageData) {
+            return res.status(404).json({ message: "Package not found" });
+        }
+
+        res.json(packageData);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
 // Add a package (admin only)
 router.post("/", async (req, res) => {
     try {
