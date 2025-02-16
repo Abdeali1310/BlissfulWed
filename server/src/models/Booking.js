@@ -29,6 +29,13 @@ const BookingSchema = new mongoose.Schema({
     type: String, // Example: "10:00 AM - 12:00 PM"
     
   },
+  contact:{
+    type:Number,
+  },
+  address:{
+    type:String,
+    required: true
+  },
   date: {
     type: Date,
     required: true,

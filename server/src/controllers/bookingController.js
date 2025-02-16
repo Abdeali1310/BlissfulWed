@@ -5,12 +5,12 @@ const User = require("../models/User");
 // ✅ 1. Create a Booking
 async function createBooking(req, res) {
     try {
-        const { type, serviceId, packageId, date, timeSlot, noOfGuests, totalAmount } = req.body;
+        const { type,address,contact, serviceId, packageId, date, timeSlot, noOfGuests, totalAmount } = req.body;
         const userId = req.userId;
         console.log(type);
-        
-        
-        
+
+
+
         if (!["Service", "Package"].includes(type)) {
             return res.status(400).json({ message: "Invalid booking type. Must be 'Service' or 'Package'." });
         }
@@ -20,12 +20,10 @@ async function createBooking(req, res) {
 
         if (type == "Service") {
             service = await Service.findById(serviceId);
-            console.log(service);
-            console.log(service.serviceType);
-            
-            
+
+
             if (!service) return res.status(404).json({ message: "Service not found" });
-        } 
+        }
         // else if (type === "Package") {
         //     package = await Package.findById(packageId);
         //     if (!package) return res.status(404).json({ message: "Package not found" });
@@ -59,7 +57,7 @@ async function createBooking(req, res) {
                 status: "Booked",
             });
             console.log(isAlreadyBooked);
-            
+
             if (isAlreadyBooked) {
                 return res.status(400).json({ message: "This service is already booked at this time." });
             }
@@ -86,7 +84,9 @@ async function createBooking(req, res) {
             date,
             timeSlot: type === "Service" ? timeSlot ?? null : null,
             noOfGuests: guestRequiredServices.includes(service.serviceType.charAt(0).toUpperCase() + service.serviceType.slice(1)) ? noOfGuests : 0,
+            address,
             totalAmount,
+            contact,
             status: "Pending",
         });
 
@@ -110,7 +110,7 @@ async function getBookingById(req, res) {
     try {
         const { bookingId } = req.params;
         console.log(bookingId);
-        
+
         const booking = await Booking.findById(bookingId).populate("service user", "name email serviceType");
 
         if (!booking) return res.status(404).json({ message: "Booking not found" });
@@ -135,7 +135,7 @@ async function getAllBookings(req, res) {
             bookings = await Booking.find({ user: userId }).populate("service", "name");
         }
 
-        res.status(200).json({success:true,booking:bookings});
+        res.status(200).json({ success: true, booking: bookings });
     } catch (error) {
         console.error("Error fetching bookings:", error);
         res.status(500).json({ message: "Server Error" });
@@ -199,4 +199,25 @@ async function cancelBooking(req, res) {
     }
 };
 
-module.exports = { createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking }
+//get booked dates
+const getBookedDates = async (req, res) => {
+    try {
+        const { serviceId } = req.params; // Get serviceId from query params
+        
+        if (!serviceId) {
+            return res.status(400).json({ message: "Service ID is required" });
+        }
+
+        // Find all bookings for this service ID
+        const bookings = await Booking.find({ service: serviceId }).select("date");
+
+        // Extract booked dates and format them as YYYY-MM-DD
+        const bookedDates = bookings.map(booking => booking.date.toISOString().split("T")[0]);
+
+        res.json({ bookedDates });
+    } catch (error) {
+        console.error("Error fetching booked dates:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+module.exports = { createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking, getBookedDates }
