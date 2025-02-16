@@ -326,6 +326,7 @@ const Navbar = () => {
               "Music & DJ",
               "Bridal Makeup",
               "Photography",
+              "Groom Wear"
             ].map((service) => (
               <ListItem button key={service} onClick={toggleDrawer}>
                 <Link

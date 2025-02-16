@@ -17,14 +17,12 @@ import EventGallery from "./pages/LandingPage/EventGallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
 import ServiceDetails from "./pages/Services/ServiceDetails.jsx"
 import IndividualService from "./pages/Services/IndividualService.jsx"
-
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
       <Routes>
         <Route path="/gallery/album" element={<Gallery />} />
         <Route path="/packages" element={<WeddingPackage />} />
-        {/* <Route path="/couple/gallery" element={<Gallery />} /> */}
         <Route path="/" element={<Home />} />
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />
@@ -43,6 +41,8 @@ const App = () => {
 
         <Route path="/service/:serviceType" element={<ServiceDetails />} />
         <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
+
+        <Route path="/booking" element={<BookingPage />} />
       </Routes>
     </div>
   )
