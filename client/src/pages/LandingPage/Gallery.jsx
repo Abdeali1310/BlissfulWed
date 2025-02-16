@@ -1,141 +1,143 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import {
-  Card,
-  CardActionArea,
-  CardMedia,
-  Typography,
-  Grid,
-  Container,
-  Box,
-} from "@mui/material";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Card, CardActionArea, CardMedia, Typography, Grid, Container, Box, IconButton } from "@mui/material";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { motion } from "framer-motion";
-import axios from "axios";
+import rp from "../../assets/ringImg.jpg";
+import wedImg1 from "../../assets/weddingImg2.jpg";
+import preWed from "../../assets/pre-wedding.jpg";
+import receptionPic from "../../assets/reception1.jpg";
+
+const categories = [
+  { name: "Wedding", image: wedImg1 },
+  { name: "Pre-Wedding", image: preWed },
+  { name: "Reception", image: receptionPic },
+  { name: "Engagement", image: rp },
+];
+
+// Framer Motion Variants for Animation
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.3,
+      ease: "easeOut",
+    },
+  },
+};
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.6,
+      ease: "easeOut",
+    },
+  },
+};
 
 const Gallery = () => {
-  // State for Images
-  const [weddingEvents, setWeddingEvents] = useState([]);
-
-  // Fetch Images from Backend
-  const fetchImages = async () => {
-    try {
-      const res = await axios.get("http://localhost:3000/api/gallery");
-      // Check if the response is an array, if not, set an empty array
-      if (Array.isArray(res.data)) {
-        setWeddingEvents(res.data);
-      } else {
-        console.error("API did not return an array:", res.data);
-        setWeddingEvents([]);
-      }
-    } catch (error) {
-      console.error("Error fetching images:", error);
-      setWeddingEvents([]); // Set to empty array on error
-    }
-  };
-
-  // Call fetchImages when component mounts
-  useEffect(() => {
-    fetchImages();
-  }, []);
+  const navigate = useNavigate();
 
   return (
     <Box
       sx={{
         minHeight: "100vh",
         width: "100%",
-        overflowX: "hidden",
-        background:
-          "linear-gradient(to bottom right, #ffe1e8, #ffbedb, #ff99cc)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
+        background: "linear-gradient(to bottom right, #e6e6ff, #f9f9ff)",
         py: { xs: 3, sm: 4, md: 5 },
+        px: { xs: 2, sm: 3, md: 5 },
+        position: "relative",
       }}
     >
-      <Container maxWidth="lg" sx={{ py: 3, textAlign: "center" }}>
-        <Typography
-          variant="h4"
-          sx={{
-            fontWeight: "bold",
-            color: "#9e3d64",
-            mb: 4,
-            textShadow: "2px 2px 4px rgba(0,0,0,0.2)",
-            fontSize: { xs: "1.8rem", sm: "2.2rem", md: "2.5rem" },
-          }}
-        >
-          Wedding Gallery
-        </Typography>
-        <Grid container spacing={4} justifyContent="center">
-          {weddingEvents.map((event, index) => (
-            <Grid
-              item
-              xs={12}
-              sm={6}
-              md={4}
-              lg={3}
-              key={event._id}
-              sx={{ display: "flex", justifyContent: "center" }}
-            >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.97 }}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.2, duration: 0.6 }}
-                style={{ width: "100%" }}
-              >
-                <Card
-                  sx={{
-                    borderRadius: 4,
-                    boxShadow: 4,
-                    overflow: "hidden",
-                    width: "100%",
-                    height: { xs: 300, sm: 350, md: 400 },
-                  }}
-                >
-                  <CardActionArea
-                    component={Link}
-                    to={`/gallery/album/${event._id}`}
+      {/* Back Button */}
+      <IconButton
+        onClick={() => navigate(-1)}
+        sx={{
+          position: "absolute",
+          top: 20,
+          left: 20,
+          color: "#5a4b94",
+          backgroundColor: "#e6e6ff",
+          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
+          "&:hover": {
+            backgroundColor: "#d4d4f5",
+          },
+        }}
+      >
+        <ArrowBackIcon />
+      </IconButton>
+
+      <Container maxWidth="lg" sx={{ textAlign: "center" }}>
+        <motion.div initial="hidden" animate="visible" variants={containerVariants}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontWeight: "bold",
+              color: "#5a4b94",
+              mb: 4,
+              textShadow: "1px 1px 5px rgba(0,0,0,0.2)",
+            }}
+          >
+            Choose Your Album
+          </Typography>
+          <Grid container spacing={4} justifyContent="center">
+            {categories.map((category) => (
+              <Grid item xs={12} sm={6} md={3} key={category.name}>
+                <motion.div variants={cardVariants}>
+                  <Card
+                    sx={{
+                      borderRadius: 3,
+                      boxShadow: "0 4px 15px rgba(0, 0, 0, 0.2)",
+                      overflow: "hidden",
+                      transition: "transform 0.3s",
+                      "&:hover": {
+                        boxShadow: "0 8px 20px rgba(0, 0, 0, 0.3)",
+                        transform: "translateY(-5px)",
+                      },
+                    }}
                   >
-                    <Box sx={{ position: "relative", height: "100%" }}>
+                    <CardActionArea
+                      component={Link}
+                      to={`/gallery/album/${category.name.toLowerCase()}`}
+                    >
                       <CardMedia
                         component="img"
-                        image={event.image}
-                        alt={event.title}
+                        image={category.image}
+                        alt={category.name}
                         sx={{
-                          height: "100%",
-                          width: "100%",
-                          objectFit: "cover",
+                          height: "280px",  // Uniform Height for all images
+                          objectFit: "cover", // Maintains image aspect ratio
                         }}
                       />
                       <Box
                         sx={{
-                          position: "absolute",
-                          bottom: 0,
-                          width: "100%",
-                          color: "#fff",
-                          background: "rgba(0,0,0,0.3)",
+                          p: 2,
                           textAlign: "center",
-                          py: 1,
+                          background: "#f3efff",
+                          borderTop: "1px solid #e0dfff",
                         }}
                       >
                         <Typography
                           variant="h6"
                           sx={{
+                            color: "#6a0dad",
                             fontWeight: "bold",
-                            textTransform: "uppercase",
-                            letterSpacing: 1,
                           }}
                         >
-                          {event.title}
+                          {category.name}
                         </Typography>
                       </Box>
-                    </Box>
-                  </CardActionArea>
-                </Card>
-              </motion.div>
-            </Grid>
-          ))}
-        </Grid>
+                    </CardActionArea>
+                  </Card>
+                </motion.div>
+              </Grid>
+            ))}
+          </Grid>
+        </motion.div>
       </Container>
     </Box>
   );

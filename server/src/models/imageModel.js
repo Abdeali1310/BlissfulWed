@@ -12,7 +12,7 @@ const imageSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: [ 'couple', 'guests', 'family', 'moments','ceremony'],
+    enum: [ 'All', 'couple', 'guests', 'family','ceremony'],
     default: 'couple'
   },
   createdAt: {
