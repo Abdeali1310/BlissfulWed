@@ -19,7 +19,6 @@ import ServiceDetails from "./pages/Services/ServiceDetails.jsx"
 import IndividualService from "./pages/Services/IndividualService.jsx"
 import BookingPage from "./pages/Booking.jsx"
 import Packages from "./components/Packages.jsx";
-
 import PackageDetails from "./components/PackageDetails.jsx";
 const App = () => {
   return (
@@ -51,6 +50,15 @@ const App = () => {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/gallery/album/:category" element={<EventGallery />} />
+
+        <Route path="/admin/signup" element={<AdminSignup />} />
+        <Route path="/admin/signin" element={<AdminSignIn />} />
+
+        <Route path="/service/:serviceType" element={<ServiceDetails />} />
+        <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
+
+        <Route path="/booking" element={<BookingPage />} />
       </Routes>
     </div>
   );
