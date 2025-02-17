@@ -8,11 +8,8 @@ const cors = require("cors");
 const adminRouter = require("./routers/adminRouter");
 const serviceRouter = require("./routers/serviceRouter");
 const reviewRouter = require("./routers/reviewRouter");
-<<<<<<< HEAD
 const galleryRouter = require("./routers/galleryRouter")
-=======
 const bookingRouter = require("./routers/bookingRouter");
->>>>>>> 0356e523735c882f9084940603b5f2428ea8932d
 
 const PORT = process.env.PORT;
 
@@ -30,14 +27,11 @@ app.get("/", (req, res) => {
 
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin",adminRouter)
-<<<<<<< HEAD
 app.use("/api/gallery",galleryRouter);
 
-=======
 app.use("/api/v1/service",serviceRouter);
 app.use("/api/v1/review",reviewRouter);
 app.use("/api/v1/booking",bookingRouter);
->>>>>>> 0356e523735c882f9084940603b5f2428ea8932d
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

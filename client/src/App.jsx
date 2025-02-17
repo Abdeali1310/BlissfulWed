@@ -17,6 +17,7 @@ import EventGallery from "./pages/LandingPage/EventGallery.jsx"
 import WeddingPackage from "./pages/WeddingPackages.jsx";
 import ServiceDetails from "./pages/Services/ServiceDetails.jsx"
 import IndividualService from "./pages/Services/IndividualService.jsx"
+import BookingPage from "./pages/Booking.jsx"
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">

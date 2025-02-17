@@ -1,7 +1,7 @@
 // seeders/imageSeeder.js
 const mongoose = require('mongoose');
 const Image = require('../models/imageModel');  // Adjust the path as needed
-const MONGO_URI = "mongodb+srv://blissfulwed8:UInGWjPyu4aIffz4@cluster0.pezd8.mongodb.net/blissfulwedDB?retryWrites=true&w=majority";
+const MONGO_URI = "mongodb+srv://blissfulwed8:UInGWjPyu4aIffz4@cluster0.pezd8.mongodb.net/blissfulwedDB?retryWrites=true&w=majority&appName=Cluster0";
 
 //
 // Sample Image Data
