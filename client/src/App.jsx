@@ -18,6 +18,9 @@ import WeddingPackage from "./pages/WeddingPackages.jsx";
 import ServiceDetails from "./pages/Services/ServiceDetails.jsx"
 import IndividualService from "./pages/Services/IndividualService.jsx"
 import BookingPage from "./pages/Booking.jsx"
+import Packages from "./components/Packages.jsx";
+
+import PackageDetails from "./components/PackageDetails.jsx";
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
@@ -25,28 +28,32 @@ const App = () => {
         <Route path="/gallery/album" element={<Gallery />} />
         <Route path="/packages" element={<WeddingPackage />} />
         <Route path="/" element={<Home />} />
+        <Route path="/gallery" element={<Gallery />} />
+        
+        {/* Package Routes */}
+        <Route path="/packages" element={<Packages />} />
+        <Route path="/packages/:packageName" element={<PackageDetails />} />
+
+        {/* User Authentication */}
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/signin" element={<Signin />} />
         <Route path="/user/forgot-password" element={<ForgotPassword />} />
         <Route path="/user/forgot-password/otp-verification" element={<Verification />} />
         <Route path="/user/change-password" element={<Changepassword />} />
         <Route path="/user/reset-password" element={<ResetPasswordPage />} />
+
+        {/* Admin Authentication */}
+        <Route path="/admin/signup" element={<AdminSignup />} />
+        <Route path="/admin/signin" element={<AdminSignIn />} />
+
+        {/* Other Pages */}
         <Route path="/about" element={<AboutUs />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/contact-us" element={<ContactUs />} />
         <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/gallery/album/:category" element={<EventGallery />} />
-
-        <Route path="/admin/signup" element={<AdminSignup />} />
-        <Route path="/admin/signin" element={<AdminSignIn />} />
-
-        <Route path="/service/:serviceType" element={<ServiceDetails />} />
-        <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
-
-        <Route path="/booking" element={<BookingPage />} />
       </Routes>
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

@@ -1,0 +1,4 @@
+PORT=3000
+DB_URL=mongodb+srv://blissfulwed8:UInGWjPyu4aIffz4@cluster0.pezd8.mongodb.net/blissfulwedDB?retryWrites=true&w=majority&appName=Cluster0
+JWT_SECRET=mysecret
+COOKIE_SECRET=mycookiesecret

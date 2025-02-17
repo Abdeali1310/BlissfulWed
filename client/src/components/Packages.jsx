@@ -1,97 +1,113 @@
-/* eslint-disable no-unused-vars */
-import React from "react";
-import { Box, Typography, Card, CardContent, CardMedia, Grid } from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { Box, Typography, Card, CardContent, Grid, CardMedia } from "@mui/material";
+import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion"; // Import framer-motion for animations
 
 // Import images
 import basicImg from "../assets/basic.png";
 import premiumImg from "../assets/premium.jpg";
 import luxuryImg from "../assets/luxury.jpg";
 
-const packages = [
-  { title: "Basic Package", price: "3,50,000", image: basicImg, type: "basic" },
-  { title: "Premium Package", price: "6,00,000", image: premiumImg, type: "premium" },
-  { title: "Luxury Package", price: "10,50,000", image: luxuryImg, type: "luxury" },
-];
+// Map package names to images
+const packageImages = {
+  "basic package": basicImg,
+  "premium package": premiumImg,
+  "luxury package": luxuryImg,
+};
 
-const WeddingPackages = () => {
+const Packages = () => {
+  const [packages, setPackages] = useState([]);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/packages")
+      .then((res) => res.json())
+      .then((data) => setPackages(data))
+      .catch((error) => console.error("Error fetching packages:", error));
+  }, []);
+
   return (
-    <Box sx={{ marginTop: 10, padding: "2rem" }}>
+    <Box
+      sx={{
+        marginY: 5,
+        paddingY: 5,
+        paddingX: 5,
+        marginTop: "8rem",
+        paddingBottom: "8rem",
+        background: "linear-gradient(to bottom, #fff8e1, #ffecb3)",
+        borderRadius: 3,
+        boxShadow: 3,
+      }}
+    >
       <Typography
         variant="h4"
         sx={{
-          color: "#e10098",
-          fontFamily: "cursive",
-          fontWeight: "bold",
           textAlign: "center",
-          marginY: 2,
-          marginX: 2,
-          paddingTop: 3,
-          marginBottom: "2.5rem",
+          marginBottom: 6,
+          fontWeight: "bold",
+          fontFamily: "cursive",
+          color: "#e10098",
         }}
       >
-        Wedding Packages
+        Our Wedding Packages
       </Typography>
 
-      <Grid container spacing={2} sx={{ display: "flex", justifyContent: "center", flexWrap: "wrap" }}>
-        {packages.map((pkg, index) => (
-          <Grid item key={index} xs={12} sm={6} md={4}>
-            <Link to={`/package/${pkg.type}`} style={{ textDecoration: "none" }}>
-              {/* Use motion.div for animation */}
+      <Grid container spacing={3} justifyContent="center">
+        {packages.map((pkg, index) => {
+          const formattedName = pkg.name.toLowerCase(); // Convert to lowercase
+          return (
+            <Grid item key={index} xs={12} sm={6} md={4} lg={3}>
               <motion.div
-                initial={{ opacity: 0, y: 50 }} // Start with opacity 0 and move it from bottom
-                whileInView={{ opacity: 1, y: 0 }} // Fade in and move up when it comes into view
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, ease: "easeInOut" }}
               >
-                <Card
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    boxShadow: 3,
-                    position: "relative",
-                    overflow: "hidden",
-                    transition: "transform 0.3s ease-in-out",
-                    height: 300,
-                    "&:hover": { transform: "scale(1.05)" },
-                  }}
+                <Link
+                  to={`/packages/${formattedName.replace(/\s+/g, "-")}`}
+                  style={{ textDecoration: "none" }}
                 >
-                  <CardMedia
-                    component="img"
-                    alt={pkg.title}
-                    image={pkg.image}
+                  <Card
                     sx={{
-                      height: "full",
-                      objectFit: "cover",
-                      width: "100%",
-                    }}
-                  />
-                  <CardContent
-                    sx={{
-                      position: "absolute",
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                      backgroundColor: "rgba(0, 0, 0, 0.5)",
-                      color: "#fff",
                       textAlign: "center",
-                      opacity: 0, // Initially hide the price
-                      transition: "opacity 0.3s ease-in-out",
-                      padding: 2,
-                      "&:hover": { opacity: 1 }, // Show price on hover anywhere on the card
+                      borderRadius: 2,
+                      boxShadow: 3,
+                      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+                      overflow: "hidden",
+                      background: "#fff",
+                      "&:hover": {
+                        transform: "scale(1.05)",
+                        boxShadow: 6,
+                      },
                     }}
                   >
-                    <Typography variant="h5">{pkg.title}</Typography>
-                    <Typography variant="h6">&#8377;{pkg.price}</Typography>
-                  </CardContent>
-                </Card>
+                    {/* Display package image */}
+                    <CardMedia
+                      component="img"
+                      height="180"
+                      image={packageImages[formattedName] || basicImg} // Default if not found
+                      alt={pkg.name}
+                      sx={{ objectFit: "cover" }}
+                    />
+
+                    <CardContent sx={{ padding: 3 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: "600",
+                          color: "#5A3825",
+                        }}
+                      >
+                        {pkg.name}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
-            </Link>
-          </Grid>
-        ))}
+            </Grid>
+          );
+        })}
       </Grid>
     </Box>
   );
 };
 
-export default WeddingPackages;
+export default Packages;
