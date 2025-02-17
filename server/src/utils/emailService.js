@@ -4,8 +4,8 @@ require('dotenv').config();
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER, 
-    pass: process.env.EMAIL_PASS, 
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
   },
 });
 
@@ -32,4 +32,32 @@ async function sendOtpEmail(email, otp) {
   }
 }
 
-module.exports = { sendOtpEmail };
+async function sendContactEmail({ name, email, subject, message }) {
+  const mailOptions = {
+    from: email,
+    to: process.env.EMAIL_USER,
+    subject: subject || "New Contact Form Submission",
+    text: `Hello,
+
+You have received a new message from your website's contact form:
+
+Name: ${name}
+Email: ${email}
+
+Message:
+${message}
+
+Please respond at your earliest convenience.`,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Contact email sent from ${email}`);
+  } catch (error) {
+    console.error("Error sending contact email:", error);
+    throw new Error("Failed to send contact email");
+  }
+}
+
+
+module.exports = { sendOtpEmail, sendContactEmail };
