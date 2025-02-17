@@ -28,7 +28,7 @@ const services = [
   { title: "Music-&-DJ", image: hp1 },
   { title: "Bridal-Makeup", image: mp1 },
   { title: "Photography", image: p1 },
-  { title: "Grooms-Wear", image: g1 },
+  { title: "Groom-Wear", image: g1 },
 ];
 
 const Services = () => {

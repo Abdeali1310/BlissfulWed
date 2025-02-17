@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import {
@@ -88,7 +88,7 @@ const IndividualService = () => {
         },
         { withCredentials: true }
       );
-      
+
       // Clear the form after successful submission
       setReview("");
       setRating(5);
@@ -100,7 +100,6 @@ const IndividualService = () => {
       setTimeout(() => {
         window.location.reload();
       }, 1500);
-      
     } catch (error) {
       console.error("Error submitting review:", error.response?.data || error);
       toast.error("Failed to submit review. Please try again.", {
@@ -291,7 +290,7 @@ const IndividualService = () => {
 
             <Typography
               variant="h5"
-              className="text-gray-800 font-cursive text-pink-700 text-lg leading-relaxed mb-4"
+              className=" font-cursive text-pink-700 text-lg leading-relaxed mb-4"
               style={{ fontFamily: "cursive" }}
             >
               {service.fullInfo}
@@ -319,6 +318,8 @@ const IndividualService = () => {
             </div>
 
             <Button
+              component={Link}
+              to={`/booking?type=service&serviceType=${serviceType}&serviceId=${serviceId}`}
               variant="contained"
               color="secondary"
               className="bg-pink-700 text-white absolute py-3 text-lg"
