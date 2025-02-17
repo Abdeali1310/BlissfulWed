@@ -9,7 +9,7 @@ router.get("/", async (req, res) => {
         const packages = await Package.find();
         res.json(packages);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
 });
 
@@ -27,19 +27,41 @@ router.get("/:packageName", async (req, res) => {
 
         res.json(packageData);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
     }
 });
 
 // Add a package (admin only)
 router.post("/", async (req, res) => {
     try {
-        const newPackage = new Package(req.body);
+        const { name, price, description, features } = req.body;
+
+        // Validate request body
+        if (!name || !price || !description || !features) {
+            return res.status(400).json({ message: "All fields are required" });
+        }
+
+        // Ensure `features` follows the expected structure
+        const requiredFeatureCategories = ["Decorations", "Photography", "Catering", "Entertainment", "AdditionalServices"];
+        const hasValidFeatures = requiredFeatureCategories.every(category => Array.isArray(features[category]));
+
+        if (!hasValidFeatures) {
+            return res.status(400).json({ message: "Features must include all categories with array values" });
+        }
+
+        // Normalize package name (e.g., always store in lowercase)
+        const newPackage = new Package({
+            name: name.trim(),
+            price,
+            description,
+            features
+        });
+
         const savedPackage = await newPackage.save();
         res.status(201).json(savedPackage);
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(400).json({ message: "Failed to create package", error: error.message });
     }
 });
 
-module.exports = router; // ✅ Correct for CommonJS
+module.exports = router;
