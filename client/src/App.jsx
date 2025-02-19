@@ -5,7 +5,6 @@ import ForgotPassword from "./utils/Forgotpassword"
 import Verification from "./utils/Verification"
 import Changepassword from "./utils/Changepassword"
 import ResetPasswordPage from "./utils/Resetpassword"
-import WeddingPlanner from "./pages/LandingPage/WeddingPlanner"
 import AdminSignup from "./pages/admin/Signup"
 import AdminSignIn from "./pages/admin/Signin"
 import Home from "./pages/Home"
@@ -21,6 +20,8 @@ import IndividualService from "./pages/Services/IndividualService.jsx"
 import BookingPage from "./pages/Booking.jsx"
 import Packages from "./components/Packages.jsx";
 import PackageDetails from "./components/PackageDetails.jsx";
+import Payment from "./pages/Payment.jsx"
+import PaymentStatus from "./pages/PaymentStatus.jsx"
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
@@ -60,6 +61,10 @@ const App = () => {
         <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
 
         <Route path="/booking" element={<BookingPage />} />
+
+        {/* payment */}
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/payment-status" element={<PaymentStatus />} />
       </Routes>
     </div>
   );

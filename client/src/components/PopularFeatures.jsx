@@ -8,13 +8,14 @@ import planningImg from "../assets/planning.avif";
 import themeImg from "../assets/theme.jpg";
 import cateringImg from "../assets/catering2.jpg";
 import photographyImg from "../assets/photography.jpg";
+import { Link } from "react-router-dom";
 
 const features = [
-  { title: "Best Sold Package", subtitle: "Luxury Package", image: bestSoldImg },
-  { title: "Wedding Planning Service", subtitle: "Seamless & Stress-Free", image: planningImg },
-  { title: "Exclusive Theme", subtitle: "Royal Theme", image: themeImg },
-  { title: "Best Catering Service", subtitle: "Gourmet Delights", image: cateringImg },
-  { title: "Top Photographer", subtitle: "Moments Captured", image: photographyImg },
+  { title: "Best Sold Package", redirect:"/packages/luxury-package", subtitle: "Luxury Package", image: bestSoldImg },
+  { title: "Haldi Service",redirect:"/service/haldi", subtitle: "Seamless & Stress-Free", image: planningImg },
+  { title: "Exclusive Theme",redirect:"/service/decoration/67ab5aefa8ef6ca75f626dfd", subtitle: "Royal Theme", image: themeImg },
+  { title: "Best Catering Service",redirect:"/service/catering", subtitle: "Gourmet Delights", image: cateringImg },
+  { title: "Top Photographer", redirect:"/service/photography", subtitle: "Moments Captured", image: photographyImg },
 ];
 
 const PopularFeatures = () => {
@@ -53,6 +54,7 @@ const PopularFeatures = () => {
               whileInView={{ opacity: 1, y: 0 }} // Fade in and move up when it comes into view
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
+              <Link to={feature.redirect}>
               <Card
                 sx={{
                   textAlign: "center",
@@ -85,6 +87,7 @@ const PopularFeatures = () => {
                   </Typography>
                 </CardContent>
               </Card>
+              </Link>
             </motion.div>
           </Grid>
         ))}

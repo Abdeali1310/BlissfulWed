@@ -183,11 +183,11 @@ const Navbar = () => {
             open={Boolean(anchorElPopular)}
             onClose={handleClosePopular}
           >
-            {["Catering", "Music & Dance", "Bridal Makeup", "Photography"].map(
+            {["Catering", "Music-&-dj", "Bridal-Makeup", "Photography"].map(
               (item) => (
                 <MenuItem key={item} onClick={handleClosePopular}>
                   <Link
-                    to={`/popular/${item.toLowerCase().replace(/\s+/g, "-")}`}
+                    to={`/service/${item.toLowerCase().replace(/\s+/g, "-")}`}
                     style={{ textDecoration: "none", color: "inherit" }}
                   >
                     {item}

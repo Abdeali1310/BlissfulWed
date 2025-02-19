@@ -93,7 +93,7 @@ const ServiceDetails = () => {
                     </div>
 
                     <Typography variant="body2" className="text-gray-600 mt-1">
-                      ⭐ {service.rating} ({service.reviewsCount} reviews)
+                      ⭐ {service.rating}
                     </Typography>
                   </CardContent>
 

@@ -6,7 +6,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 
 import weddingImg4 from '../assets/weddingImg4.jpg';
 import weddingImg2 from '../assets/carousel.avif';
-import weddingImg3 from '../assets/weddingImg3.jpg';
+import weddingImg3 from '../assets/weddingImg3.avif';
 import weddingImg1 from '../assets/carousel2.avif';
 import weddingImg5 from '../assets/carousel3.avif';
 

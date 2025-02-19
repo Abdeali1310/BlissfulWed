@@ -109,7 +109,6 @@ async function createBooking(req, res) {
 async function getBookingById(req, res) {
     try {
         const { bookingId } = req.params;
-        console.log(bookingId);
 
         const booking = await Booking.findById(bookingId).populate("service user", "name email serviceType");
 

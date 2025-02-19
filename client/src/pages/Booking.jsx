@@ -131,11 +131,14 @@ export default function BookingPage() {
       );
 
       if (response.data.success) {
+        console.log(response.data);
+        
         toast.success(
           "Your Booking is successfully noted. Kindly complete payment to confirm booking"
         );
-        setTimeout(() => {
-          navigate("/payment");
+        const bookingId = response.data.booking._id;
+        setTimeout(async () => {
+          navigate(`/payment?finalPrice=${finalPrice}&bookingId=${bookingId}`);
         }, 1500);
       } else {
         toast.error("Failed to book your service. Try again");
@@ -230,14 +233,26 @@ export default function BookingPage() {
               {["Catering", "Music-", "Decoration"].includes(
                 capitalizedServiceType
               ) && (
-                <input
-                  type="number"
-                  placeholder="Number of Guests"
-                  value={noOfGuests}
-                  min={100}
-                  onChange={(e) => setNoOfGuests(parseInt(e.target.value))}
-                  className="border p-2 rounded"
-                />
+                <div className="flex gap-2 items-center">
+                  <div>No. of guests : </div>
+                  <input
+                    type="number"
+                    placeholder="Number of Guests"
+                    value={noOfGuests}
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value, 10);
+                      if (isNaN(value) || value > 100 || value < 500) {
+                        setNoOfGuests(value);
+                      }
+                    }}
+                    className="border p-2 rounded"
+                  />
+                  {noOfGuests < 100 || noOfGuests > 500 && (
+                    <p className="text-red-500 text-sm">
+                      Number of guests must be more than 100 or less than 500.
+                    </p>
+                  )}
+                </div>
               )}
 
               <input
