@@ -16,11 +16,12 @@ import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
 import PhoneIphoneIcon from "@mui/icons-material/PhoneIphone";
 import AccountBalanceWalletIcon from "@mui/icons-material/AccountBalanceWallet";
+
 const Payment = () => {
   let url = window.location.href;
   const queryParams = new URL(url).searchParams;
 
-  const finalPrice = queryParams.get("finalPrice");
+  const finalPrice = parseFloat(queryParams.get("finalPrice"));
   const bookingId = queryParams.get("bookingId");
   const advancePayment = Math.floor((finalPrice * 0.35).toFixed(2));
 
@@ -28,10 +29,16 @@ const Payment = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState("upi");
+  const [paymentType, setPaymentType] = useState("advance");
 
-  const handleChange = (event) => {
+  const handlePaymentMethodChange = (event) => {
     setPaymentMethod(event.target.value);
   };
+
+  const handlePaymentTypeChange = (event) => {
+    setPaymentType(event.target.value);
+  };
+
   useEffect(() => {
     const fetchBookingDetails = async () => {
       try {
@@ -56,6 +63,9 @@ const Payment = () => {
   if (error) return <p className="text-center text-red-500">{error}</p>;
   if (!booking)
     return <p className="text-center text-gray-500">No booking found.</p>;
+
+  const payableAmount = paymentType === "advance" ? advancePayment : finalPrice;
+
   const handlePayment = async () => {
     try {
       const response = await axios.post(
@@ -64,9 +74,9 @@ const Payment = () => {
           userId: booking.user._id,
           bookingId: booking._id,
           totalAmount: finalPrice,
-          advanceAmount: advancePayment,
-          remainingAmount: finalPrice - advancePayment,
-          dueDate: moment().add(3, "days").format("YYYY-MM-DD"),
+          advanceAmount: paymentType === "advance" ? advancePayment : finalPrice,
+          remainingAmount: paymentType === "advance" ? finalPrice - advancePayment : 0,
+          dueDate: paymentType === "advance" ? moment().add(3, "days").format("YYYY-MM-DD") : null,
           paymentMethod: paymentMethod.toUpperCase(),
         },
         { withCredentials: true }
@@ -80,8 +90,9 @@ const Payment = () => {
       alert("Payment failed. Please try again.");
     }
   };
+
   return (
-    <div className="lg:flex justify-center items-center  w-full min-h-screen bg-pink-50 p-6">
+    <div className="lg:flex justify-center items-center w-full min-h-screen bg-pink-50 p-6">
       <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-8 shadow-xl rounded-lg bg-white p-6">
         {/* Booking Details */}
         <div className="p-6 bg-pink-100 rounded-lg shadow-md">
@@ -131,30 +142,52 @@ const Payment = () => {
             Payment Details
           </p>
 
-          <div className="space-y-3">
+          <Box className="p-5 bg-white rounded-xl shadow-lg max-w-lg mx-auto">
+            <FormControl component="fieldset">
+              <FormLabel
+                component="legend"
+                className="text-lg font-semibold mb-3"
+              >
+                Select Payment Type
+              </FormLabel>
+              <RadioGroup value={paymentType} onChange={handlePaymentTypeChange}>
+                <FormControlLabel
+                  value="advance"
+                  control={<Radio />}
+                  label="Pay Advance (35%)"
+                />
+                <FormControlLabel
+                  value="full"
+                  control={<Radio />}
+                  label="Pay Full Amount"
+                />
+              </RadioGroup>
+            </FormControl>
+          </Box>
+
+          <div className="space-y-3 mt-5">
             <p className="text-gray-700 text-lg">
-              <strong>Final Price:</strong>{" "}
-              <span className="text-2xl">₹{finalPrice}</span>
+              <strong>Final Price:</strong> ₹{finalPrice} (* including taxes)
             </p>
-            <p className="text-gray-700 text-lg font-bold">
-              <strong>Advance Payment (35%):</strong>{" "}
-              <span className="text-[#e73895] text-2xl">₹{advancePayment}</span>
-            </p>
-            <p className="text-gray-700 text-lg font-bold">
-              <strong>Remaining Payment:</strong>{" "}
-              <span className="text-[#e73895] text-2xl">
-                ₹{finalPrice - advancePayment}
-              </span>
-            </p>
-            <p className="text-sm font-bold mt-5 mb-12">
-              Note: Remaining payment needs to be made within 2-3 days after
-              service completion.
-            </p>
+            {paymentType === "advance" && (
+              <>
+                <p className="text-gray-700 text-lg font-bold">
+                  <strong>Advance Payment (35%):</strong>{" "}
+                  <span className="text-[#e73895] text-2xl">
+                    ₹{advancePayment}
+                  </span>
+                </p>
+                <p className="text-gray-700 text-lg font-bold">
+                  <strong>Remaining Payment:</strong>{" "}
+                  <span className="text-[#e73895] text-2xl">
+                    ₹{finalPrice - advancePayment}
+                  </span>
+                </p>
+              </>
+            )}
           </div>
-          <Box
-            className="p-5 bg-white rounded-xl shadow-lg max-w-lg mx-auto"
-            style={{ marginTop: "2rem" }}
-          >
+
+          <Box className="p-5 bg-white rounded-xl shadow-lg max-w-lg mx-auto mt-5">
             <FormControl component="fieldset">
               <FormLabel
                 component="legend"
@@ -162,7 +195,7 @@ const Payment = () => {
               >
                 Select Payment Method
               </FormLabel>
-              <RadioGroup value={paymentMethod} onChange={handleChange}>
+              <RadioGroup value={paymentMethod} onChange={handlePaymentMethodChange}>
                 <FormControlLabel
                   value="upi"
                   control={<Radio />}
@@ -196,19 +229,15 @@ const Payment = () => {
               </RadioGroup>
             </FormControl>
           </Box>
+
           <Button
             variant="contained"
             className="w-full py-3 mt-6 text-lg font-semibold bg-pink-600 hover:bg-red-900"
-            style={{ backgroundColor: "#e73895", marginTop: "3rem" }}
+            style={{ backgroundColor: "#e73895" }}
             onClick={handlePayment}
           >
-            Proceed to Pay
-            <span className="ml-3 text-xl">₹{advancePayment}</span>
+            Proceed to Pay ₹{payableAmount}
           </Button>
-
-          <p className="text-[#e73895] font-cursive text-xl font-bold text-center mt-4">
-            Note: You need to pay 35% in advance before confirming your booking.
-          </p>
         </div>
       </div>
     </div>

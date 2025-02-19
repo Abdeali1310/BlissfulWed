@@ -25,7 +25,7 @@ const paymentSchema = new mongoose.Schema({
     },
     dueDate: {
         type: Date,
-        required: true,
+        
     },
     paymentMethod: {
         type: String,
@@ -44,6 +44,12 @@ const paymentSchema = new mongoose.Schema({
         type: String,
         enum: ["Pending", "Partially Paid", "Paid", "Failed"],
         default: "Pending",
+    },
+    payment_link_id:{
+        type:String,
+    },
+    order_id:{
+        type:String,
     },
     refundStatus: {
         type: String,
