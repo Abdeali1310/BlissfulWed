@@ -122,8 +122,9 @@ async function createPayment(req, res) {
         paymentStatus: "Pending",
       });
 
+      bookingData.status = "Booked";
       await newPayment.save();
-
+      await bookingData.save();
       res.json({ success: true, paymentUrl: paymentLink });
     } else {
       throw new Error("Failed to generate payment session ID from Cashfree");
@@ -190,5 +191,24 @@ async function verifyPayment(req, res) {
   }
 }
 
+async function getPaymentDetails(req,res){
+  try {
+    const { order_id } = req.query;
 
-module.exports = { createPayment, verifyPayment }
+    if (!order_id) {
+        return res.status(400).json({ success: false, message: "Order ID is required" });
+    }
+
+    const payment = await Payment.findOne({ transactionId: order_id }).populate("userId bookingId");
+
+    if (!payment) {
+        return res.status(404).json({ success: false, message: "Payment not found" });
+    }
+
+    res.json({ success: true, payment });
+} catch (error) {
+    res.status(500).json({ success: false, message: "Server error", error });
+}
+}
+
+module.exports = { createPayment, verifyPayment, getPaymentDetails }

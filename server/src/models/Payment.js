@@ -45,12 +45,7 @@ const paymentSchema = new mongoose.Schema({
         enum: ["Pending", "Partially Paid", "Paid", "Failed"],
         default: "Pending",
     },
-    payment_link_id:{
-        type:String,
-    },
-    order_id:{
-        type:String,
-    },
+    
     refundStatus: {
         type: String,
         enum: ["Not Requested", "Requested", "Approved", "Declined", "Refunded"],
