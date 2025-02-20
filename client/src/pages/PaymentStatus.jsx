@@ -12,165 +12,130 @@ const PaymentStatus = () => {
   const [status, setStatus] = useState("Checking...");
   const [loading, setLoading] = useState(true);
   const [paymentDetails, setPaymentDetails] = useState(null);
+  const [invoiceDetails, setInvoiceDetails] = useState(null);
+
   useEffect(() => {
-    if (!orderId) {
-      setStatus("Invalid order ID");
-      setLoading(false);
-      return;
-    }
+    const fetchPaymentData = async () => {
+      if (!orderId) {
+        setStatus("Invalid order ID");
+        setLoading(false);
+        return;
+      }
 
-    axios
-      .get(`http://localhost:3000/api/v1/payment/verify?order_id=${orderId}`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        if (res.data.success) {
-          setStatus(res.data.paymentStatus);
-        } else {
-          setStatus("Failed");
-        }
-      })
-      .catch(() => setStatus("Error verifying payment"))
-      .finally(() => setLoading(false));
+      try {
+        // Verify payment status
+        const paymentRes = await axios.get(
+          `http://localhost:3000/api/v1/payment/verify?order_id=${orderId}`,
+          { withCredentials: true }
+        );
+        setStatus(paymentRes.data.success ? paymentRes.data.paymentStatus : "Failed");
 
-    axios
-      .get(`http://localhost:3000/api/v1/payment/details?order_id=${orderId}`, {
-        withCredentials: true,
-      })
-      .then((res) => {
-        if (res.data.success) {
-          setPaymentDetails(res.data.payment);
-        } else {
-          setStatus("Payment verification failed");
+        // Fetch payment details
+        const detailsRes = await axios.get(
+          `http://localhost:3000/api/v1/payment/details?order_id=${orderId}`,
+          { withCredentials: true }
+        );
+
+        if (detailsRes.data.success) {
+          setPaymentDetails(detailsRes.data.payment);
+
+          // Create invoice only if payment details exist
+          const invoiceRes = await axios.post(
+            "http://localhost:3000/api/v1/invoice/create",
+            {
+              userId: detailsRes.data.payment.userId._id,
+              bookingId: detailsRes.data.payment.bookingId._id,
+              totalAmount: detailsRes.data.payment.totalAmount,
+              advanceAmount: detailsRes.data.payment.advanceAmount,
+              remainingAmount: detailsRes.data.payment.remainingAmount,
+              dueDate: detailsRes.data.payment.dueDate,
+              paymentMethod: detailsRes.data.payment.paymentMethod,
+              transactionId: detailsRes.data.payment.transactionId,
+            },
+            { withCredentials: true }
+          );
+
+          if (invoiceRes.data.invoice) {
+            const invoiceDetailsRes = await axios.get(
+              "http://localhost:3000/api/v1/invoice/get-invoice",
+              { withCredentials: true }
+            );
+            setInvoiceDetails(invoiceDetailsRes.data.invoice);
+          }
         }
-      })
-      .catch((error) => {
-        console.error("Payment verification error:", error);
+      } catch (error) {
+        console.error("Error fetching payment or invoice details:", error);
         setStatus("Error verifying payment");
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPaymentData();
   }, [orderId]);
+
   const generateInvoice = () => {
-    if (!paymentDetails) return;
+    if (!invoiceDetails) return;
 
     const doc = new jsPDF();
 
-    // Set background color (light pink)
-    doc.setFillColor(255, 230, 240); // Soft pink
-    doc.rect(0, 0, 210, 297, "F"); // Covers the full A4 page
+    // Set background color
+    doc.setFillColor(255, 230, 240);
+    doc.rect(0, 0, 210, 297, "F");
 
-    // Set brand colors
-    doc.setTextColor(153, 51, 102); // Soft pinkish-purple for branding
-    doc.setFont("times", "italic"); // Cursive-style font for elegance
+    doc.setTextColor(153, 51, 102);
+    doc.setFont("times", "italic");
     doc.setFontSize(20);
-
-    // Title
     doc.text("BlissfulWed Invoice", 105, 20, null, null, "center");
 
-    // Reset font for details
     doc.setFont("helvetica", "bold");
     doc.setFontSize(16);
     doc.setTextColor(50, 50, 50);
 
-    // Invoice details
-    let yPos = 50; // Initial y position for text
-    const lineHeight = 10; // Spacing between lines
-
-    const boxStartY = 50;
-    const boxPadding = 5;
-    const boxWidth = 170;
-    const boxHeight = 8;
-    const labelX = 25;
-    const valueX = 100;
-
-    // Invoice details array
+    let yPos = 50;
     const details = [
-      { label: "Invoice ID:", value: paymentDetails.transactionId || "N/A" },
-      { label: "Booking ID:", value: paymentDetails.bookingId?._id },
-      { label: "Total Amount:", value: `${paymentDetails.totalAmount}` },
-      { label: "Advance Paid:", value: `${paymentDetails.advanceAmount}` },
+      { label: "Invoice ID:", value: invoiceDetails._id || "N/A" },
+      { label: "Booking ID:", value: invoiceDetails.bookingId?._id },
+      { label: "Customer Name:", value: invoiceDetails.userId?.username },
+      { label: "Customer Email:", value: invoiceDetails.userId?.email },
+      { label: "Customer Contact:", value: invoiceDetails.userId?.contact },
+      { label: "Event Address:", value: invoiceDetails.bookingId?.address },
       {
-        label: "Remaining Amount:",
-        value: `${paymentDetails.remainingAmount}`,
+        label: "Event Date:",
+        value: new Date(invoiceDetails.bookingDate).toLocaleDateString(),
       },
-      { label: "Payment Method:", value: paymentDetails.paymentMethod },
-      { label: "Payment Status:", value: paymentDetails.paymentStatus },
+      { label: "Total Amount:", value: `${invoiceDetails.totalAmount}` },
+      { label: "Advance Paid:", value: `${invoiceDetails.advanceAmount}` },
+      { label: "Remaining Amount:", value: `${invoiceDetails.remainingAmount}` },
+      { label: "Payment Method:", value: invoiceDetails.paymentMethod },
+      { label: "Payment Status:", value: invoiceDetails.paymentStatus },
       {
         label: "Paid At:",
-        value: new Date(paymentDetails.paidAt).toLocaleString(),
+        value: invoiceDetails.paidAt,
       },
       {
         label: "Due Date:",
-        value: paymentDetails.dueDate
-          ? new Date(paymentDetails.dueDate).toLocaleDateString()
+        value: invoiceDetails.dueDate
+          ? new Date(invoiceDetails.dueDate).toLocaleDateString()
           : "N/A",
       },
     ];
 
-    yPos = boxStartY;
-
     details.forEach(({ label, value }) => {
-      // Draw a light gray background box
-      doc.setFillColor(255, 230, 240); // Light gray
-      doc.rect(20, yPos - boxPadding, boxWidth, boxHeight, "F");
-
-      // Draw label
-      doc.setFont("helvetica", "bold");
       doc.setTextColor(50, 50, 50);
-      doc.text(label, labelX, yPos);
+      doc.setFont("helvetica", "bold");
+      doc.text(label, 25, yPos);
 
-      // Draw value
       doc.setFont("helvetica", "normal");
       doc.setTextColor(80, 80, 80);
-      doc.text(value.toString(), valueX, yPos);
+      doc.text(value.toString(), 100, yPos);
 
-      yPos += lineHeight + 5; // Extra spacing for readability
+      yPos += 10;
     });
 
-    // Booking & Cancellation details
-    if (paymentDetails.bookingDate) {
-      doc.text(
-        `Booking Date: ${new Date(
-          paymentDetails.bookingDate
-        ).toLocaleDateString()}`,
-        20,
-        yPos
-      );
-      yPos += lineHeight;
-    }
-
-    if (paymentDetails.cancellationStatus !== "Not Cancelled") {
-      doc.text(
-        `Cancellation Status: ${paymentDetails.cancellationStatus}`,
-        20,
-        yPos
-      );
-      yPos += lineHeight;
-      if (paymentDetails.cancellationReason) {
-        doc.text(`Reason: ${paymentDetails.cancellationReason}`, 20, yPos);
-        yPos += lineHeight;
-      }
-    }
-
-    if (paymentDetails.refundStatus !== "Not Requested") {
-      doc.text(`Refund Status: ${paymentDetails.refundStatus}`, 20, yPos);
-      yPos += lineHeight;
-      if (paymentDetails.refundAmount > 0) {
-        doc.text(`Refund Amount: ${paymentDetails.refundAmount}`, 20, yPos);
-        yPos += lineHeight;
-      }
-    }
-
-    // Footer message
     doc.setTextColor(153, 51, 102);
     doc.setFont("times", "italic");
-    doc.text(
-      "Thank you for choosing BlissfulWed!",
-      105,
-      280,
-      null,
-      null,
-      "center"
-    );
+    doc.text("Thank you for choosing BlissfulWed!", 105, 280, null, null, "center");
 
     doc.save("BlissfulWed_Invoice.pdf");
   };
@@ -180,12 +145,12 @@ const PaymentStatus = () => {
       return <div className="loader"></div>;
     }
 
-    let image, message, button, a;
+    let image, message, button;
 
     if (status === "Paid") {
       image = paidIcon;
-      message = "Your payment has been successfully done!";
-      a = (
+      message = "Your payment has been successfully completed!";
+      button = (
         <button
           onClick={generateInvoice}
           className="mt-4 px-6 py-2 bg-green-500 text-white font-semibold rounded-md"
@@ -193,41 +158,39 @@ const PaymentStatus = () => {
           Download Invoice
         </button>
       );
-      button = (
-        <a
-          href="/"
-          className="px-6 py-3 bg-pink-600 text-white rounded-lg shadow-lg mt-4"
-        >
-          Go to Home
-        </a>
-      );
     } else if (status === "Failed") {
       image = failedIcon;
       message = "Payment failed. Please try again.";
-      button,
-        (a = (
-          <a
-            href="/booking/payment"
-            className="px-6 py-3 bg-red-600 text-white rounded-lg shadow-lg mt-4"
-          >
-            Retry Payment
-          </a>
-        ));
+      button = (
+        <a
+          href="/booking/payment"
+          className="px-6 py-3 bg-red-600 text-white rounded-lg shadow-lg mt-4"
+        >
+          Retry Payment
+        </a>
+      );
     } else {
       image = pendingIcon;
       message =
-        "Your payment is pending. If the amount is deducted and payment is unsuccessful, no worries—you will receive your refund within 4-5 business days.";
+        "Your payment is pending. If the amount is deducted but payment is unsuccessful, you will receive a refund within 4-5 business days.";
     }
 
     return (
-      <div className="flex flex-col items-center text-center">
-        <img src={image} alt={status} className="w-48 h-48 mb-4" />
-        <h1 className="text-3xl font-bold text-pink-700 font-cursive">
-          {message}
-        </h1>
-        {a}
-        {button}
-      </div>
+      <>
+        <div className="flex relative flex-col items-center text-center">
+          <img src={image} alt={status} className="w-48 h-48 mb-4" />
+          <h1 className="text-3xl font-bold text-pink-700 font-cursive">
+            {message}
+          </h1>
+          {button}
+          <a href="/" className="px-6 py-3 bg-pink-600 text-white rounded-lg shadow-lg mt-4">
+            Go to Home
+          </a>
+        </div>
+        <p className="text-[red] absolute bottom-5 text-2xl font-bold">
+          Note: Do not refresh this page
+        </p>
+      </>
     );
   };
 
