@@ -50,7 +50,7 @@ const getInvoice = async (req, res) => {
             })
             .populate({
                 path: "bookingId",
-                select: "address", // Get only the address from Booking
+                select: "address date", // Get only the address from Booking
             });
 
         if (!invoice) return res.status(404).json({ message: "Invoice not found" });

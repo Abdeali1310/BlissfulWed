@@ -102,7 +102,7 @@ const PaymentStatus = () => {
       { label: "Event Address:", value: invoiceDetails.bookingId?.address },
       {
         label: "Event Date:",
-        value: new Date(invoiceDetails.bookingDate).toLocaleDateString(),
+        value: new Date(invoiceDetails.bookingId.date).toLocaleDateString(),
       },
       { label: "Total Amount:", value: `${invoiceDetails.totalAmount}` },
       { label: "Advance Paid:", value: `${invoiceDetails.advanceAmount}` },
