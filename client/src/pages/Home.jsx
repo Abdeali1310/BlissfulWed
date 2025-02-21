@@ -2,9 +2,11 @@ import ContactUs from "../components/ContactUs"
 import Footer from "../components/Footer"
 import Header from "../components/Header"
 import Navbar from "../components/Navbar"
-import WeddingPackages from "../components/Packages"
+import Packages from "../components/Packages"
 import PopularFeatures from "../components/PopularFeatures"
 import Services from "../components/Services"
+import Faq from "../utils/Faq"
+import WhyUs from "../utils/WhyUs"
 
 const Home = () => {
   return (
@@ -13,8 +15,10 @@ const Home = () => {
       <Navbar />
       <Header />
       <Services />
-      <WeddingPackages />
+      <Packages />
       <PopularFeatures />
+      <WhyUs />
+      <Faq />
       <ContactUs />
       <Footer />
     </div>

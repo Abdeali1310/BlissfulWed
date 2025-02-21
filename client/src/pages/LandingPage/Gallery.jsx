@@ -10,7 +10,7 @@ import receptionPic from "../../assets/reception1.jpg";
 
 const categories = [
   { name: "Wedding", image: wedImg1 },
-  { name: "Pre-Wedding", image: preWed },
+  { name: "Pre-Wedding", image: preWed }, 
   { name: "Reception", image: receptionPic },
   { name: "Engagement", image: rp },
 ];
@@ -51,6 +51,7 @@ const Gallery = () => {
         py: { xs: 3, sm: 4, md: 5 },
         px: { xs: 2, sm: 3, md: 5 },
         position: "relative",
+        overflow: "hidden", // Preventing overflow here
       }}
     >
       {/* Back Button */}
@@ -109,8 +110,9 @@ const Gallery = () => {
                         image={category.image}
                         alt={category.name}
                         sx={{
-                          height: "280px",  // Uniform Height for all images
+                          height: "280px", // Uniform Height for all images
                           objectFit: "cover", // Maintains image aspect ratio
+                          width: "100%", // Ensures full-width
                         }}
                       />
                       <Box

@@ -128,7 +128,7 @@ const Payment = () => {
               <strong>Contact:</strong> {booking.contact}
             </p>
             <p className="text-gray-700 text-lg">
-              <strong>No. of Guests:</strong> {booking.noOfGuests}
+              <strong>No. of Guests:</strong> {booking.noOfGuests ? booking.noOfGuests : "100"}
             </p>
             <p className="text-gray-700 text-lg">
               <strong>Booking Status:</strong> {booking.status}

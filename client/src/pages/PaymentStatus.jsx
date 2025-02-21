@@ -56,8 +56,9 @@ const PaymentStatus = () => {
           );
 
           if (invoiceRes.data.invoice) {
+            const invoice = invoiceRes.data.invoice;
             const invoiceDetailsRes = await axios.get(
-              "http://localhost:3000/api/v1/invoice/get-invoice",
+              `http://localhost:3000/api/v1/invoice/get-invoice?invoiceId=${invoice._id}&bookingId=${invoice.bookingId}&userId=${invoice.userId}`,
               { withCredentials: true }
             );
             setInvoiceDetails(invoiceDetailsRes.data.invoice);
@@ -96,6 +97,7 @@ const PaymentStatus = () => {
     const details = [
       { label: "Invoice ID:", value: invoiceDetails._id || "N/A" },
       { label: "Booking ID:", value: invoiceDetails.bookingId?._id },
+      // {label: "Event Name:", value: }
       { label: "Customer Name:", value: invoiceDetails.userId?.username },
       { label: "Customer Email:", value: invoiceDetails.userId?.email },
       { label: "Customer Contact:", value: invoiceDetails.userId?.contact },
@@ -195,7 +197,7 @@ const PaymentStatus = () => {
   };
 
   return (
-    <div className="flex h-full w-full justify-center items-center h-screen bg-pink-50">
+    <div className="flex h-full w-full justify-center items-center bg-pink-50">
       {renderContent()}
     </div>
   );

@@ -33,9 +33,8 @@ const Packages = () => {
         paddingX: 5,
         marginTop: "8rem",
         paddingBottom: "8rem",
-        background: "linear-gradient(to bottom, #fff8e1, #ffecb3)",
+        background: "rgb(249 249 249)",
         borderRadius: 3,
-        boxShadow: 3,
       }}
     >
       <Typography
