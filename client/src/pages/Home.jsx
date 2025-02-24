@@ -6,6 +6,7 @@ import Packages from "../components/Packages"
 import PopularFeatures from "../components/PopularFeatures"
 import Services from "../components/Services"
 import Faq from "../utils/Faq"
+import Map from "../utils/Map"
 import WhyUs from "../utils/WhyUs"
 
 const Home = () => {
@@ -20,6 +21,7 @@ const Home = () => {
       <WhyUs />
       <Faq />
       <ContactUs />
+      <Map />
       <Footer />
     </div>
   )

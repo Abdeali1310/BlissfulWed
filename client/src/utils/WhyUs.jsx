@@ -15,6 +15,7 @@ const WhyUs = () => {
         backgroundColor: "#f8f8f8",
         opacity: inView ? 1 : 0,
         transition: "opacity 1s ease-in-out", // Fade-in effect
+        marginTop:12,
       }}
       ref={ref}
     >

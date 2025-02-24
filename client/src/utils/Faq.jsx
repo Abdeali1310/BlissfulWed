@@ -14,27 +14,27 @@ const Faq = () => {
     {
       question: "What services do you offer?",
       answer:
-        "We offer full wedding planning services, catering, decor, coordination, and more.",
+        "We offer full wedding planning services, catering, decor, Music-&-DJ, Photography and more.",
     },
     {
       question: "How far in advance should we book?",
       answer:
-        "It's best to book at least 4 to 8 months before your wedding date to ensure availability and secure your preferred vendors.",
+        "It's best to book at least 4 to 8 months before your wedding date to ensure availability and secure your preferred service.",
     },
     {
       question: "Can you assist with destination weddings?",
       answer:
-        "Absolutely! We specialize in destination weddings and have a network of trusted vendors to ensure a smooth and unforgettable experience.",
+        "Absolutely! We have a network of trusted vendors who can ensure a smooth and unforgettable experience.",
     },
     {
       question: "Do you handle wedding rehearsals?",
       answer:
-        "Yes, we help coordinate your wedding rehearsal to ensure that everything runs smoothly on the big day.",
+        "Yes, we help coordinate your wedding rehearsal to ensure that everything runs smoothly on the big day.(You need to contact admin)",
     },
     {
       question: "What is the booking process?",
       answer:
-        "You can book a consultation with us, and once you decide to move forward, we’ll sign a contract and start planning immediately.",
+        "You can book a service with us, and once you decide to move forward, we’ll sign a contract and start planning immediately.",
     },
   ];
 
@@ -47,8 +47,8 @@ const Faq = () => {
         backgroundColor: "#fff",
         borderRadius: 4,
         boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-        marginTop: 4,
-        marginBottom: 4,
+        marginTop: 16,
+        marginBottom: 16,
       }}
     >
       <Typography

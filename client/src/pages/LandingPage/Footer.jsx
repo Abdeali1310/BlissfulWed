@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import { Box, Grid, Typography, IconButton, Link } from '@mui/material';
 import FacebookIcon from '@mui/icons-material/Facebook';
@@ -7,7 +8,7 @@ import LinkedInIcon from '@mui/icons-material/LinkedIn';
 
 const Footer = () => {
   return (
-    <Box sx={{ backgroundColor: '#f8f8f8', p: 3, mt: 4 }}>
+    <Box sx={{ backgroundColor: '#f8f8f8', p: 3 }}>
       <Grid container spacing={2} justifyContent="space-between" alignItems="center">
         {/* Social Media Links */}
         <Grid item xs={12} md={4} textAlign={{ xs: 'center', md: 'left' }}>
