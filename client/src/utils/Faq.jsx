@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import { Box, Typography, IconButton } from "@mui/material";
 import { ExpandMore as ExpandMoreIcon, ExpandLess as ExpandLessIcon } from "@mui/icons-material";
@@ -60,7 +61,7 @@ const Faq = () => {
           color: "#EC4899",
           fontFamily: "cursive",
           letterSpacing: 2,
-          textTransform: "uppercase",
+          textTransform: "capitalize",
           transition: "opacity 1s ease-in-out, transform 1s",
         }}
       >

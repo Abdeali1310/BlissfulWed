@@ -34,6 +34,14 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female', 'other'],
         required: true
     },
+    hasSpun:{
+        type:Boolean,
+        default:false,
+    },
+    prize:{
+        type:Object,
+        default:null,
+    },
     city: {
         type: String,
         required: true,

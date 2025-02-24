@@ -1,21 +1,57 @@
+/* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Button, CardContent, Typography, Chip, CircularProgress } from "@mui/material";
+import {
+  Button,
+  CardContent,
+  Typography,
+  Chip,
+  CircularProgress,
+} from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import axios from "axios";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import haldi from "../../assets/haldi.mp4";
+import mehndi from "../../assets/mehndi.mp4";
+import catering from "../../assets/catering.mp4";
+import decoration from "../../assets/decoration.mp4";
+import music from "../../assets/music-&-dj.mp4";
+import bride from "../../assets/bridal-makeup.mp4";
+import groom from "../../assets/groom-wear.mp4";
+import photography from "../../assets/photography.mp4";
+
+// Mapping serviceType to video files
+const videoMap = {
+  haldi: haldi,
+  mehndi: mehndi,
+  catering: catering,
+  decoration: decoration,
+  "music-&-dj": music,
+  "bridal-makeup": bride,
+  "groom-wear": groom,
+  photography: photography,
+};
 
 const ServiceDetails = () => {
   const { serviceType } = useParams();
+  console.log("Service Type:", serviceType);
+
   const [services, setServices] = useState([]);
-  const [loading, setLoading] = useState(true); // ✅ Loader state
+  const [loading, setLoading] = useState(true);
+
+  // Get the correct video source
+  const videoSrc = videoMap[serviceType] || null;
+  if (!videoSrc) {
+    console.warn(`No video found for: ${serviceType}`);
+  }
+  console.log("Video Source:", videoSrc);
 
   async function fetchService() {
     try {
-      setLoading(true); // Start loading
+      setLoading(true);
       const res = await axios.get(
         `http://localhost:3000/api/v1/service/${serviceType}`
       );
@@ -23,7 +59,7 @@ const ServiceDetails = () => {
     } catch (err) {
       console.error("Error fetching services:", err);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   }
 
@@ -32,13 +68,27 @@ const ServiceDetails = () => {
   }, [serviceType]);
 
   return (
-    <div className="min-h-full overflow-y-scroll w-full bg-pink-100 flex flex-col">
+    <div className="relative min-h-screen w-full flex flex-col">
       <Navbar />
+      {/* Background Video */}
 
-      {/* Back Button and Title Container */}
-      <div className="w-full flex items-center mt-10 justify-between px-6">
+
+      {videoSrc && (
+    <video 
+      autoPlay 
+      loop 
+      muted 
+      playsInline 
+      className="absolute top-20 left-0 w-screen overflow-y-hidden min-h-full h-[363vh] md:h-[200vh] lg:h-[142vh] xl:h-[129vh] object-cover z-0"
+    >
+      <source src={videoSrc} type="video/mp4" />
+    </video>
+  
+      )}
+      {/* Back Button and Title */}
+      <div className="w-full flex items-center mt-10 justify-between px-6 relative z-10">
         <Button component={Link} to="/" className="p-0">
-          <ArrowBack className="text-[#e73895] text-5xl" />
+          <ArrowBack className="text-white text-5xl" />
         </Button>
         <motion.h1
           initial={{ opacity: 0, y: 50 }}
@@ -57,9 +107,13 @@ const ServiceDetails = () => {
           <CircularProgress color="secondary" size={50} />
         </div>
       ) : (
-        <><div className="w-full flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mt-16 mb-24">
+        <>
+          <div className="w-full flex flex-wrap justify-center gap-8 max-w-6xl mx-auto mt-16 mb-24 relative z-10">
             {services.map((service) => (
-              <Link to={`/service/${serviceType}/${service._id}`} key={service._id}>
+              <Link
+                to={`/service/${serviceType}/${service._id}`}
+                key={service._id}
+              >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
                   className="relative shadow-lg rounded-xl overflow-hidden bg-white transition-transform duration-300 flex flex-col items-center text-center w-[300px]"
@@ -68,13 +122,19 @@ const ServiceDetails = () => {
                     <Chip
                       label="Bestseller"
                       className="absolute top-2 left-2 px-3 py-1 font-semibold"
-                      style={{ backgroundColor: "#FFD1DC", color: "#B00050", fontFamily: "cursive" }} />
+                      style={{
+                        backgroundColor: "#FFD1DC",
+                        color: "#B00050",
+                        fontFamily: "cursive",
+                      }}
+                    />
                   )}
 
                   <img
                     src={service.cardImage}
                     alt={serviceType}
-                    className="w-full h-56 object-cover" />
+                    className="w-full h-56 object-cover"
+                  />
 
                   <CardContent className="p-4 flex flex-col items-center">
                     <Typography variant="body1">
@@ -84,11 +144,19 @@ const ServiceDetails = () => {
                     </Typography>
 
                     <div className="flex items-center space-x-3 mt-2">
-                      <Typography variant="h6" className="text-gray-500 line-through">
+                      <Typography
+                        variant="h6"
+                        className="text-gray-500 line-through"
+                      >
                         ₹{service.price}
                       </Typography>
-                      <Typography variant="h5" className="text-pink-700 font-bold">
-                        ₹{service.price - (service.price * service.discount) / 100}
+                      <Typography
+                        variant="h5"
+                        className="text-pink-700 font-bold"
+                      >
+                        ₹
+                        {service.price -
+                          (service.price * service.discount) / 100}
                       </Typography>
                     </div>
 
@@ -122,8 +190,11 @@ const ServiceDetails = () => {
                 <div className="w-[300px]"></div>
               </>
             )}
-          </div><Footer /></>
-      )}</div>
+          </div>
+          <Footer />
+        </>
+      )}
+    </div>
   );
 };
 

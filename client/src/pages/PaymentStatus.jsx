@@ -97,11 +97,14 @@ const PaymentStatus = () => {
     const details = [
       { label: "Invoice ID:", value: invoiceDetails._id || "N/A" },
       { label: "Booking ID:", value: invoiceDetails.bookingId?._id },
-      // {label: "Event Name:", value: }
+      {label : "Event Type:", value: invoiceDetails.bookingId?.service?.serviceType},
       { label: "Customer Name:", value: invoiceDetails.userId?.username },
       { label: "Customer Email:", value: invoiceDetails.userId?.email },
       { label: "Customer Contact:", value: invoiceDetails.userId?.contact },
-      { label: "Event Address:", value: invoiceDetails.bookingId?.address },
+      {
+        label: "Event Address:",
+        value: doc.splitTextToSize(invoiceDetails.bookingId?.address || "N/A", 100),
+      },
       {
         label: "Event Date:",
         value: new Date(invoiceDetails.bookingId.date).toLocaleDateString(),
@@ -113,7 +116,7 @@ const PaymentStatus = () => {
       { label: "Payment Status:", value: invoiceDetails.paymentStatus },
       {
         label: "Paid At:",
-        value: invoiceDetails.paidAt,
+        value: (invoiceDetails.paidAt),
       },
       {
         label: "Due Date:",
@@ -130,9 +133,16 @@ const PaymentStatus = () => {
 
       doc.setFont("helvetica", "normal");
       doc.setTextColor(80, 80, 80);
-      doc.text(value.toString(), 100, yPos);
 
-      yPos += 10;
+      if (Array.isArray(value)) {
+        value.forEach((line, index) => {
+          doc.text(line, 100, yPos + index * 7);
+        });
+        yPos += value.length * 7;
+      } else {
+        doc.text(value.toString(), 100, yPos);
+        yPos += 10;
+      }
     });
 
     doc.setTextColor(153, 51, 102);

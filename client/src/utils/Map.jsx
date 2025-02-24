@@ -21,11 +21,12 @@ const Map = () => {
         fontSize: "2rem",
         fontWeight: "bold",
         marginBottom: "1.5rem",
+        marginTop:"5rem",
       }}>
         Where to find us?
       </h2>
 
-      <div style={{ position: "relative", height: "500px", width: "100%" }}>
+      <div className="h-[350px] lg:h-[500px] relative w-full">
         <MapContainer
           center={marker}
           zoom={14}

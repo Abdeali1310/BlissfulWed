@@ -143,7 +143,7 @@ async function userProfile(req, res) {
 
 async function editProfile(req, res) {
     const { userId } = req.params;
-    const { username, email, bio, contact, city } = req.body;
+    const { username, email, bio, contact, city, hasSpun, prize } = req.body;
 
     const profilePicUrl = req.file
         ? req.file.path
@@ -163,7 +163,9 @@ async function editProfile(req, res) {
                 bio,
                 profilePicUrl,
                 contact,
-                city
+                city,
+                hasSpun,
+                prize,
             },
             { new: true }
         );
@@ -292,4 +294,33 @@ async function contactUs(req, res) {
         res.status(500).json({ message: "Failed to send your message. Please try again later." });
     }
 }
-module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
+
+
+async function updateSpin(req, res) {
+    try {
+        const { userId, prize } = req.body;
+
+        if (!userId || !prize) {
+            return res.status(400).json({ message: "User ID and prize are required." });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        if (user.hasSpun) {
+            return res.status(400).json({ message: "User has already spun the wheel." });
+        }
+
+        user.hasSpun = true;
+        user.prize = prize;
+        await user.save();
+
+        res.status(200).json({ message: "Spin updated successfully.", prize });
+    } catch (error) {
+        console.error("Error updating spin:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+}
+module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }

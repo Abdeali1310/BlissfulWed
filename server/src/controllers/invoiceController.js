@@ -46,11 +46,15 @@ const getInvoice = async (req, res) => {
         const invoice = await Invoice.findOne(filter)
             .populate({
                 path: "userId",
-                select: "username email contact", // Get only these fields from User
+                select: "username email contact",
             })
             .populate({
                 path: "bookingId",
-                select: "address date", // Get only the address from Booking
+                select: "address date type service package",
+                populate: [
+                    { path: "service", select: "serviceType" }, // Populate service name if type is "Service"
+                    { path: "package", select: "name" }, // Populate package name if type is "Package"
+                ],
             });
 
         if (!invoice) return res.status(404).json({ message: "Invoice not found" });
@@ -61,4 +65,5 @@ const getInvoice = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error" });
     }
 };
+
 module.exports = { createInvoice, getInvoice };

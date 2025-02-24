@@ -1,5 +1,5 @@
 const express = require("express");
-const { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs } = require("../controllers/userController");
+const { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, updateSpin } = require("../controllers/userController");
 const { isLoggedIn } = require("../middlewares/userAuth");
 const userRouter = express.Router();
 // const multer  = require('multer')
@@ -16,6 +16,6 @@ userRouter.put("/changePassword/:userId",isLoggedIn,changePassword)
 userRouter.post("/forgotPassword",forgotPassword)
 userRouter.post("/forgotPassword/otpVerification",otpVerification)
 userRouter.post("/resetPassword",resetPassword)
-
+userRouter.put("/update-spin",isLoggedIn,updateSpin)
 // userRouter.put("/profile/edit/:userId",upload.single('profilePic'),editProfile)
 module.exports = userRouter;

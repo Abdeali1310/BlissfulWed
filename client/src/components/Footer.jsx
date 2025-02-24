@@ -9,8 +9,9 @@ const Footer = () => {
       sx={{
         backgroundColor: "#E73895",
         color: "white",
-        padding: "40px 20px",
+        padding: "60px 20px",
         display: "flex",
+        zIndex:1,
         flexDirection: "column",
         alignItems: "center",
       }}

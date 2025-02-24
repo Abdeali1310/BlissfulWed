@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React from "react";
 import { Grid, Typography, Box } from "@mui/material";
 import { useInView } from "react-intersection-observer";
@@ -20,15 +21,15 @@ const WhyUs = () => {
       ref={ref}
     >
       <Typography
-        variant="h3"
+        variant="h4"
         align="center"
         sx={{
           marginBottom: 6,
           fontWeight: "bold",
           color: "#EC4899", // Changed to pinkish tone as per theme
           fontFamily: "cursive", 
-          textTransform: "uppercase",
-          letterSpacing: 2,
+          textTransform: "capitalized",
+          letterSpacing: 1,
           opacity: inView ? 1 : 0,
           transition: "opacity 1s ease-in-out, transform 1s",
           transform: inView ? "translateY(0)" : "translateY(-30px)",
