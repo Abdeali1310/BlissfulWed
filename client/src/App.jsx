@@ -23,6 +23,8 @@ import PackageDetails from "./components/PackageDetails.jsx";
 import Payment from "./pages/Payment.jsx"
 import PaymentStatus from "./pages/PaymentStatus.jsx"
 import Spinner from "./extras/Spinner.jsx"
+import UserPfp from "./pages/user/UserPfp.jsx"
+
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
@@ -66,6 +68,9 @@ const App = () => {
         {/* payment */}
         <Route path="/payment" element={<Payment />} />
         <Route path="/payment-status" element={<PaymentStatus />} />
+
+        {/* userProfile */}
+        <Route path="/user/profile" element={<UserPfp />} />
 
         <Route path="/spinner" element={<Spinner />} />
       </Routes>

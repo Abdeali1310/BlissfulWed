@@ -28,6 +28,9 @@ app.get("/", (req, res) => {
     res.json({ msg: "Hello" });
 })
 
+//user profile
+app.use("/uploads",express.static("uploads"));
+
 app.use("/api/v1/user", userRouter);
 app.use("/api/v1/admin",adminRouter)
 app.use("/api/gallery",galleryRouter);
