@@ -22,6 +22,8 @@ import Packages from "./components/Packages.jsx";
 import PackageDetails from "./components/PackageDetails.jsx";
 import Payment from "./pages/Payment.jsx"
 import PaymentStatus from "./pages/PaymentStatus.jsx"
+import UserPfp from "./pages/user/UserPfp.jsx"
+import UserPfpEdit from "./pages/user/UserPfpEdit.jsx"
 const App = () => {
   return (
     <div className="flex w-screen h-screen bg-[#f9f9f9] overflow-x-hidden">
@@ -59,6 +61,9 @@ const App = () => {
 
         <Route path="/service/:serviceType" element={<ServiceDetails />} />
         <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
+
+        <Route path="/user/profile" element={<UserPfp />} />
+        <Route path="profile/edit" element={<UserPfpEdit />} />
 
         <Route path="/booking" element={<BookingPage />} />
 

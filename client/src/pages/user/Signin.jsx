@@ -38,19 +38,23 @@ export default function Signin() {
         data,
         { withCredentials: true }
       );
-      console.log(res);
-      
-      if (res.data.token) {
+  
+      if (res.data.token) { 
         toast.success("Successfully Signed In!");
-        localStorage.setItem("user", res.data.user);
+        console.log("Token received:", res.data.token);  // ✅ Debugging log
+  
+        localStorage.setItem("token", res.data.token);  // Store token
+        localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user details
+  
         setTimeout(() => {
-            navigate("/")
+          navigate("/")
         }, 1000);
       }
     } catch (error) {
+      console.error("Signin error:", error.response?.data || error.message);
       toast.error("Invalid username or password");
     }
-  };
+  };  
 
   return (
     // <div className="h-screen w-screen bg-[#fec5ea] flex justify-center items-center">

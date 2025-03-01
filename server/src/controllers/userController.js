@@ -138,12 +138,27 @@ async function currentUser(req, res) {
 
 //auth check
 async function userProfile(req, res) {
-    res.status(200).send({ message: "Hello", userId: req.userId });
+  try {
+      const user = await User.findById(req.userId)
+          .populate("weddingDetails.previouslyBookedEvents")
+          .populate("weddingDetails.upcomingEvents")
+          .populate("reviews")
+          .exec();
+
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({ success: true, user });
+  } catch (error) {
+      res.status(500).json({ success: false, message: "Error fetching profile", error });
+  }
 }
+
 
 async function editProfile(req, res) {
     const { userId } = req.params;
-    const { username, email, bio, contact, city } = req.body;
+    const { username, email, bio, contact, city, dateOfEvent } = req.body;
 
     const profilePicUrl = req.file
         ? req.file.path
@@ -163,7 +178,8 @@ async function editProfile(req, res) {
                 bio,
                 profilePicUrl,
                 contact,
-                city
+                city,
+                "weddingDetails.dateOfEvent": dateOfEvent,
             },
             { new: true }
         );
@@ -177,6 +193,7 @@ async function editProfile(req, res) {
         res.status(500).json({ success: false, message: 'Error updating profile', error });
     }
 }
+
 
 async function changePassword(req, res) {
     const { userId } = req.params;
@@ -292,4 +309,18 @@ async function contactUs(req, res) {
         res.status(500).json({ message: "Failed to send your message. Please try again later." });
     }
 }
-module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
+
+async function getPaymentHistory(req, res) {
+  try {
+      const user = await User.findById(req.userId);
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
+
+      res.status(200).json({ success: true, paymentHistory: user.paymentHistory });
+  } catch (error) {
+      res.status(500).json({ success: false, message: "Error fetching payment history", error });
+  }
+}
+
+module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, getPaymentHistory }
