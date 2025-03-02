@@ -1,136 +1,174 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { TextField, Button, Card, CardContent, Typography } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+} from "@mui/material";
 
 const UserPfpEdit = () => {
-    const [formData, setFormData] = useState({
-        username: "",
-        email: "",
-        bio: "",
-        contact: "",
-        city: "",
-        dateOfEvent: "",
-    });
-    const [error, setError] = useState(null);
-    const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    bio: "",
+    contact: "",
+    city: "",
+    dateOfEvent: "",
+  });
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchProfile = async () => {
-            const token = localStorage.getItem("token");
-            try {
-                const res = await axios.get("http://localhost:5000/api/user/profile", {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                setFormData(res.data.user);
-            } catch (error) {
-                setError("Failed to fetch profile.");
-            }
-        };
-        fetchProfile();
-    }, []);
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const res = await axios.get("http://localhost:5000/api/user/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setFormData(res.data.user);
+      } catch (error) {
+        setError("Failed to fetch profile.");
+      }
     };
+    fetchProfile();
+  }, []);
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem("token");
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-        try {
-            await axios.put(`http://localhost:3000/api/user/profile/edit/${formData._id}`, formData, {
-                headers: { Authorization: `Bearer ${token}` },
-            });
-            alert("Profile updated successfully!");
-            navigate("/profile");
-        } catch (error) {
-            setError("Error updating profile.");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    try {
+      await axios.put(
+        `http://localhost:3000/api/user/profile/edit/${formData._id}`,
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-    };
+      );
+      alert("Profile updated successfully!");
+      navigate("/profile");
+    } catch (error) {
+      setError("Error updating profile.");
+    }
+  };
 
-    return (
-        <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
-            <Card className="w-full max-w-lg shadow-lg rounded-xl">
-                <CardContent className="p-6">
-                    <Typography variant="h5" className="text-center font-semibold text-gray-800 mb-4">
-                        Edit Profile
-                    </Typography>
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        height: "100vh", // Full viewport height
+        width: "100vw", // Full viewport width
+        backgroundColor: "#f7f8fc",
+        padding: 2,
+      }}
+    >
+      <Card sx={{ width: 380, boxShadow: 3, borderRadius: 2 }}>
+        <CardContent sx={{ padding: 3 }}>
+          <Typography
+            variant="h6"
+            sx={{ textAlign: "center", fontWeight: "bold", mb: 2 }}
+          >
+            Edit Profile
+          </Typography>
 
-                    {error && <Typography className="text-red-500 text-center">{error}</Typography>}
+          {error && (
+            <Typography sx={{ color: "red", textAlign: "center", mb: 2 }}>
+              {error}
+            </Typography>
+          )}
 
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <TextField
-                            label="Username"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            label="Email"
-                            name="email"
-                            type="email"
-                            value={formData.email}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            label="Bio"
-                            name="bio"
-                            value={formData.bio}
-                            onChange={handleChange}
-                            multiline
-                            rows={3}
-                            fullWidth
-                        />
-                        <TextField
-                            label="Contact"
-                            name="contact"
-                            value={formData.contact}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            label="City"
-                            name="city"
-                            value={formData.city}
-                            onChange={handleChange}
-                            fullWidth
-                        />
-                        <TextField
-                            label="Date of Event"
-                            name="dateOfEvent"
-                            type="date"
-                            value={formData.dateOfEvent}
-                            onChange={handleChange}
-                            fullWidth
-                            InputLabelProps={{ shrink: true }}
-                        />
+          <form onSubmit={handleSubmit}>
+            <TextField
+              label="Username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              fullWidth
+              margin="dense"
+            />
+            <TextField
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              fullWidth
+              margin="dense"
+              disabled={true} // 🔒 Prevents editing
+              sx={{ backgroundColor: "#f0f0f0", borderRadius: 1 }}
+            />
 
-                        <div className="flex justify-between mt-4">
-                            <Button
-                                variant="contained"
-                                color="primary"
-                                className="w-1/2 mr-2"
-                                type="submit"
-                            >
-                                Save Changes
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                className="w-1/2 ml-2"
-                                onClick={() => navigate("/profile")}
-                            >
-                                Cancel
-                            </Button>
-                        </div>
-                    </form>
-                </CardContent>
-            </Card>
-        </div>
-    );
+            <TextField
+              label="Bio"
+              name="bio"
+              value={formData.bio}
+              onChange={handleChange}
+              multiline
+              rows={2}
+              fullWidth
+              margin="dense"
+            />
+            <TextField
+              label="Contact"
+              name="contact"
+              value={formData.contact}
+              onChange={handleChange}
+              fullWidth
+              margin="dense"
+            />
+            <TextField
+              label="City"
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              fullWidth
+              margin="dense"
+            />
+            <TextField
+              label="Date of Event"
+              name="dateOfEvent"
+              type="date"
+              value={formData.dateOfEvent}
+              onChange={handleChange}
+              fullWidth
+              margin="dense"
+              InputLabelProps={{ shrink: true }}
+            />
+
+            <Box
+              sx={{ display: "flex", justifyContent: "space-between", mt: 3 }}
+            >
+              <Button
+                variant="contained"
+                color="primary"
+                sx={{ width: "48%" }}
+                type="submit"
+              >
+                Save
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                sx={{ width: "48%" }}
+                onClick={() => navigate("/profile")}
+              >
+                Cancel
+              </Button>
+            </Box>
+          </form>
+        </CardContent>
+      </Card>
+    </Box>
+  );
 };
 
 export default UserPfpEdit;

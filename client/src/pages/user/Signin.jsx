@@ -38,6 +38,7 @@ export default function Signin() {
         data,
         { withCredentials: true }
       );
+      console.log("Api response:",res.data)
   
       if (res.data.token) { 
         toast.success("Successfully Signed In!");
@@ -45,8 +46,11 @@ export default function Signin() {
   
         localStorage.setItem("token", res.data.token);  // Store token
         localStorage.setItem("user", JSON.stringify(res.data.user)); // Store user details
+        console.log("Token stored:", localStorage.getItem("token")); 
   
         setTimeout(() => {
+          localStorage.setItem("token", res.data.token);
+        console.log("Token saved after delay:", localStorage.getItem("token"));
           navigate("/")
         }, 1000);
       }

@@ -9,34 +9,24 @@ const UserPfp = () => {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const fetchProfile = async () => {
+    const fetchUserProfile = async () => {
+        try {
           const token = localStorage.getItem("token");
-          console.log("Retrieved token:", token);  // ✅ Debugging log
+          if (!token) throw new Error("No token found");
       
-          if (!token) {
-            setError("No authentication token found. Please log in.");
-            setLoading(false);
-            return;
-          }
+          const res = await axios.get("http://localhost:3000/api/v1/user", {
+            headers: {
+              Authorization: `Bearer ${token}`, // Send token in header
+            },
+            withCredentials: true, // Ensure cookies are included
+          });
       
-          try {
-            const res = await axios.get("http://localhost:3000/api/v1/user/profile", {
-              headers: { Authorization: `Bearer ${token}` },
-              withCredentials: true,
-            });
+          console.log("User profile:", res.data);
+        } catch (error) {
+          console.error("Error fetching user profile:", error);
+        }
+      };
       
-            setUser(res.data.user);
-          } catch (error) {
-            console.error("Error fetching profile:", error.response?.data?.message || error.message);
-            setError("Failed to fetch profile.");
-          } finally {
-            setLoading(false);
-          }
-        };
-      
-        fetchProfile();
-      }, []);      
     
 
     if (loading) return <div className="flex justify-center items-center h-screen"><CircularProgress /></div>;
@@ -49,36 +39,36 @@ const UserPfp = () => {
                     {/* Profile Header */}
                     <div className="flex flex-col items-center">
                         <Avatar 
-                            src={user.profilePicUrl} 
+                            src={user?.profilePicUrl} 
                             alt="Profile Picture"
                             className="w-24 h-24 border-2 border-gray-300"
                         />
                         <Typography variant="h5" className="mt-2 font-semibold text-gray-800">
-                            {user.username}
+                            {user?.username}
                         </Typography>
                         <Typography variant="body2" className="text-gray-500">
-                            {user.email}
+                            {user?.email}
                         </Typography>
                     </div>
 
                     {/* Profile Details */}
                     <div className="mt-4 space-y-3">
-                        <Typography variant="body1"><strong>Contact:</strong> {user.contact}</Typography>
-                        <Typography variant="body1"><strong>City:</strong> {user.city}</Typography>
-                        <Typography variant="body1"><strong>Bio:</strong> {user.bio}</Typography>
-                        <Typography variant="body1"><strong>Gender:</strong> {user.gender}</Typography>
+                        <Typography variant="body1"><strong>Contact:</strong> {user?.contact}</Typography>
+                        <Typography variant="body1"><strong>City:</strong> {user?.city}</Typography>
+                        <Typography variant="body1"><strong>Bio:</strong> {user?.bio}</Typography>
+                        <Typography variant="body1"><strong>Gender:</strong> {user?.gender}</Typography>
                     </div>
 
                     {/* Wedding Details */}
                     <div className="mt-4 bg-gray-200 p-3 rounded-lg">
                         <Typography variant="h6" className="font-semibold">Wedding Details</Typography>
-                        <Typography variant="body1"><strong>Date of Event:</strong> {user.weddingDetails?.dateOfEvent || "Not Set"}</Typography>
+                        <Typography variant="body1"><strong>Date of Event:</strong> {user?.weddingDetails?.dateOfEvent || "Not Set"}</Typography>
                     </div>
 
                     {/* Payment History */}
                     <div className="mt-4 bg-gray-200 p-3 rounded-lg">
                         <Typography variant="h6" className="font-semibold">Payment History</Typography>
-                        {user.paymentHistory.length > 0 ? (
+                        {user?.paymentHistory?.length > 0 ? (
                             user.paymentHistory.map((payment, index) => (
                                 <div key={index} className="mt-2 p-2 bg-white rounded-md shadow-sm">
                                     <Typography variant="body2"><strong>Amount:</strong> ${payment.amount}</Typography>
