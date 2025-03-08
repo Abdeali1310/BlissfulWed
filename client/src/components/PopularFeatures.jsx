@@ -23,7 +23,7 @@ const PopularFeatures = () => {
     <Box
       sx={{
         marginY: 5,
-        paddingY: 5,
+        paddingY: 10,
         paddingX: 5,
         marginTop:"8rem",
         paddingBottom:"8rem",
@@ -36,7 +36,7 @@ const PopularFeatures = () => {
         variant="h4"
         sx={{
           textAlign: "center",
-          marginBottom: 6,
+          marginBottom: 8,
           fontWeight: "bold",
           fontFamily:"cursive",
           color: "#e10098", 
@@ -74,7 +74,7 @@ const PopularFeatures = () => {
                   alt={feature.title}
                   sx={{
                     width: "100%",
-                    height: 180,
+                    height: 300,
                     objectFit: "cover",
                   }}
                 />

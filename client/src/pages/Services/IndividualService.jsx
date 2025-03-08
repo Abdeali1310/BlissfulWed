@@ -19,6 +19,7 @@ import {
 import { motion } from "framer-motion";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
+import ImageCarousel from "./ImageCarousel";
 
 const IndividualService = () => {
   const { serviceType, serviceId } = useParams();
@@ -231,14 +232,7 @@ const IndividualService = () => {
 
             {/* Three Big Images Below */}
             <div className="flex gap-6 mt-10 overflow-x-scroll scrollbar-hide">
-              {service.images.slice(0, 3).map((img, index) => (
-                <img
-                  key={index}
-                  src={img}
-                  alt={`Service ${index + 1}`}
-                  className="w-[300px] h-[300px] object-cover rounded-lg cursor-pointer hover:opacity-80 transition-all"
-                />
-              ))}
+              <ImageCarousel images={service.images.slice(0, 3)} />
             </div>
           </div>
 
@@ -295,6 +289,25 @@ const IndividualService = () => {
             >
               {service.fullInfo}
             </Typography>
+
+            {service.menu ? (
+              <Typography
+                variant="body1"
+                sx={{
+                  marginTop:"2rem",
+                  color: "gray",
+                  fontSize: "1.25rem",
+                  fontFamily:"cursive"
+                }}
+              >
+                <span style={{ fontWeight: "bold", color: "#C2185B" }}>
+                  Menu:
+                </span>{" "}
+                {service.menu}
+              </Typography>
+            ) : (
+              ""
+            )}
             <div className="relative mt-3 mb-5">
               <Chip
                 label={service.duration}
@@ -400,14 +413,15 @@ const IndividualService = () => {
                         alt={r.userId.username}
                         className="w-12 h-12 rounded-full object-cover"
                       />
-                      <Typography variant="h6" className="font-semibold">
-                        {r.userId.username}
-                      </Typography>
-                    </div>
-
-                    {/* Rating Stars */}
-                    <div className="mt-2">
-                      <Rating value={r.rating} readOnly />
+                      <div className="font-semibold flex flex-col gap-1 items-start">
+                        <p className="font-semibold text-xl">
+                          {r.userId.username}
+                        </p>
+                        {/* Rating Stars */}
+                        <div className="">
+                          <Rating value={r.rating} readOnly />
+                        </div>
+                      </div>
                     </div>
 
                     {/* Comment */}

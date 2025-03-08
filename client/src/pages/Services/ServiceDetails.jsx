@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Button,
@@ -65,25 +65,35 @@ const ServiceDetails = () => {
 
   useEffect(() => {
     fetchService();
+    if (!sessionStorage.getItem("reloaded")) {
+      sessionStorage.setItem("reloaded", "true");
+      window.location.reload();
+    }
   }, [serviceType]);
 
+  const location = useLocation();
+
   return (
-    <div className="relative min-h-screen w-full flex flex-col">
+    <div
+      key={location.pathname}
+      className="relative min-h-screen w-full flex flex-col"
+    >
       <Navbar />
       {/* Background Video */}
-
-
       {videoSrc && (
-    <video 
-      autoPlay 
-      loop 
-      muted 
-      playsInline 
-      className="absolute top-20 left-0 w-screen overflow-y-hidden min-h-full h-[363vh] md:h-[200vh] lg:h-[142vh] xl:h-[129vh] object-cover z-0"
-    >
-      <source src={videoSrc} type="video/mp4" />
-    </video>
-  
+        <div className="absolute top-20 left-0 w-screen overflow-hidden min-h-full h-[363vh] md:h-[200vh] lg:h-[142vh] xl:h-[129vh] z-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover"
+          >
+            <source src={videoSrc} type="video/mp4" />
+          </video>
+          {/* Overlay for cool dark effect */}
+          <div className="absolute inset-0 bg-black opacity-20"></div>
+        </div>
       )}
       {/* Back Button and Title */}
       <div className="w-full flex items-center mt-10 justify-between px-6 relative z-10">
@@ -155,8 +165,7 @@ const ServiceDetails = () => {
                         className="text-pink-700 font-bold"
                       >
                         ₹
-                        {service.price -
-                          (service.price * service.discount) / 100}
+                        {service.price - (service.price * service.discount) / 100}
                       </Typography>
                     </div>
 
@@ -167,7 +176,7 @@ const ServiceDetails = () => {
 
                   {/* Tags Section */}
                   {service.tags?.length > 0 && (
-                    <div className="flex flex-wrap justify-center gap-2 pb-2 w-full ">
+                    <div className="flex flex-wrap justify-center gap-2 pb-2 w-full">
                       {service.tags.map((tag, index) => (
                         <span
                           key={index}

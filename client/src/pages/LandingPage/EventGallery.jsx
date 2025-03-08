@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
@@ -38,7 +39,7 @@ const EventGallery = () => {
     <Box
       sx={{
         minHeight: "100vh",
-        background: "linear-gradient(to bottom right, #ddefff, #f2f2ff)",
+        background: "linear-gradient(to bottom right,rgb(230, 91, 237),rgb(255, 180, 249))",
         py: { xs: 2, sm: 4, md: 5 },
         px: { xs: 1, sm: 2, md: 3 },
         position: "relative",
