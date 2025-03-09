@@ -295,7 +295,27 @@ async function contactUs(req, res) {
     }
 }
 
-
+const deleteUserById = async (req, res) => {
+    try {
+      const { userId } = req.params;
+  
+      // Ensure the ID is valid
+      if (!userId) return res.status(400).json({ error: "User ID is required" });
+        console.log("hh");
+        console.log(userId);
+        
+        
+      // Delete the user and return a response
+      const deletedUser = await User.findByIdAndDelete(userId);
+  
+      if (!deletedUser) return res.status(404).json({ error: "User not found" });
+  
+      return res.status(200).json({ message: "User deleted successfully", deletedUser });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  };
 async function updateSpin(req, res) {
     try {
         const { userId, prize } = req.body;
@@ -323,4 +343,28 @@ async function updateSpin(req, res) {
         res.status(500).json({ message: "Internal server error." });
     }
 }
-module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
+
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find(); // Fetch all users
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching users", error });
+    }
+};
+
+const getUserById = async (req, res) => {
+    try {
+        const { userId } = req.params; // Extract userId from route params
+        const user = await User.findById(userId); // Find user by ID
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching user", error });
+    }
+};
+module.exports = { deleteUserById,getUserById,getAllUsers,userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }

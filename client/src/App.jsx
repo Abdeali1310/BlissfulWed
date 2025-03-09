@@ -76,7 +76,9 @@ const App = () => {
         <Route path="/payment-status" element={<PaymentStatus />} />
 
         <Route path="/spinner" element={<Spinner />} />
-          <Route path="/admin-dashboard" element={<AdminPanel />} />
+        
+        {/* payment */}
+        <Route path="/admin-dashboard" element={<AdminPanel />} />
       </Routes>
     </div>
   );

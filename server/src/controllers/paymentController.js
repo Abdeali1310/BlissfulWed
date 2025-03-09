@@ -100,7 +100,7 @@ async function createPayment(req, res) {
           "send_sms": false,
           "send_email": true
         },
-        
+
       };
       const paymentLinkResponse = await axios.post(
         'https://sandbox.cashfree.com/pg/links',  // Use the correct endpoint
@@ -174,8 +174,8 @@ async function verifyPayment(req, res) {
       if (!payment) {
         return res.status(404).json({ success: false, message: "Payment not found" });
       }
-       payment.paymentStatus = "Paid";
-       await payment.save()
+      payment.paymentStatus = "Paid";
+      await payment.save()
       return res.json({
         success: true,
         paymentStatus: payment.paymentStatus,
@@ -191,24 +191,43 @@ async function verifyPayment(req, res) {
   }
 }
 
-async function getPaymentDetails(req,res){
+async function getPaymentDetails(req, res) {
   try {
     const { order_id } = req.query;
 
     if (!order_id) {
-        return res.status(400).json({ success: false, message: "Order ID is required" });
+      return res.status(400).json({ success: false, message: "Order ID is required" });
     }
 
     const payment = await Payment.findOne({ transactionId: order_id }).populate("userId bookingId");
 
     if (!payment) {
-        return res.status(404).json({ success: false, message: "Payment not found" });
+      return res.status(404).json({ success: false, message: "Payment not found" });
     }
 
     res.json({ success: true, payment });
-} catch (error) {
+  } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
-}
+  }
 }
 
-module.exports = { createPayment, verifyPayment, getPaymentDetails }
+const getPaymentByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    
+    // Fetch all payments associated with the user
+    const payments = await Payment.find({ userId: userId })
+      .populate("bookingId", "date status totalAmount")
+      .sort({ createdAt: -1 });
+
+    if (!payments.length) {
+      return res.status(404).json({ message: "No payments found for this user." });
+    }
+
+    return res.status(200).json({ payments });
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+module.exports = { getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }

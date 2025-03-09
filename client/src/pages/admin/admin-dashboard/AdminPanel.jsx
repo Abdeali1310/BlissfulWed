@@ -23,6 +23,8 @@ import {
 import { Drawer, IconButton } from "@mui/material";
 import Navbar from "./components/Navbar";
 import Settings from "./components/Settings";
+import UserProfile from "./pages/UserProfile";
+import UserList from "./pages/UserList";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -30,6 +32,7 @@ const AdminDashboard = () => {
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
+  
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -93,10 +96,7 @@ const AdminDashboard = () => {
               </button>
             ))}
           </nav>
-          <button onClick={toggleDarkMode} className="mt-6 flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg text-white">
-          {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
+          
       </div>
 
       {/* MUI Drawer for Mobile */}
@@ -124,10 +124,7 @@ const AdminDashboard = () => {
               </button>
             ))}
           </nav>
-          <button onClick={toggleDarkMode} className="mt-6 flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg text-white">
-          {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
+          
         </div>
       </Drawer>
       <div className="flex flex-col">
@@ -195,12 +192,22 @@ const PackagesTab = () => (
   </div>
 );
 
-const UsersMgmtTab = () => (
-  <div>
-    <h1 className="text-2xl font-bold">Users Management</h1>
-    <p className="mt-2">Manage user accounts and permissions.</p>
-  </div>
-);
+const UsersMgmtTab = () => {
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">Users Management</h1>
+      <p className="mt-2">Manage user accounts and permissions.</p>
+
+      {selectedUser ? (
+        <UserProfile userId={selectedUser} goBack={() => setSelectedUser(null)} />
+      ) : (
+        <UserList onUserSelect={(id) => setSelectedUser(id)} />
+      )}
+    </div>
+  );
+};
 
 const GalleryMgmtTab = () => (
   <div>

@@ -5,7 +5,7 @@ const User = require("../models/User");
 // ✅ 1. Create a Booking
 async function createBooking(req, res) {
     try {
-        const { type,address,contact, serviceId, packageId, date, timeSlot, noOfGuests, totalAmount } = req.body;
+        const { type, address, contact, serviceId, packageId, date, timeSlot, noOfGuests, totalAmount } = req.body;
         const userId = req.userId;
         console.log(type);
 
@@ -202,7 +202,7 @@ async function cancelBooking(req, res) {
 const getBookedDates = async (req, res) => {
     try {
         const { serviceId } = req.params; // Get serviceId from query params
-        
+
         if (!serviceId) {
             return res.status(400).json({ message: "Service ID is required" });
         }
@@ -219,4 +219,26 @@ const getBookedDates = async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 };
-module.exports = { createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking, getBookedDates }
+
+const getBookingByUserId = async (req, res) => {
+    try {
+        const { userId } = req.params;
+
+        // Find all bookings of the user and populate related fields
+        const bookings = await Booking.find({ user: userId })
+            .populate("service", "name description price") // Populate service details
+            .populate("package", "name details price") // Populate package details
+            .sort({ createdAt: -1 });
+
+        if (!bookings.length) {
+            return res.status(404).json({ message: "No bookings found for this user." });
+        }
+
+        
+        return res.status(200).json({ bookings });
+    } catch (error) {
+        console.error("Error fetching bookings:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+module.exports = { getBookingByUserId, createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking, getBookedDates }
