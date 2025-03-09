@@ -24,4 +24,7 @@
   html {
     scrollbar-color: #d0197a grey;
   }
-  
+  html.dark {
+    background-color: #111;
+    color: white;
+  }

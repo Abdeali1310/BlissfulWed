@@ -77,7 +77,7 @@ const SearchBox = ({ placeholder = "Search services..." }) => {
                 <img
                   src={service.cardImage}
                   alt={service.serviceType}
-                  className="w-10 h-10 rounded-md object-cover"
+                  className="w-16 h-16 rounded-md object-cover"
                 />
                 <div>
                   <p className="font-medium font-cursive text-[#E73895]">{service.serviceType.toUpperCase()}</p>
