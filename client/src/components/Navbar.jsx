@@ -21,6 +21,7 @@ import { Search, Menu as MenuIcon, AccountCircle } from "@mui/icons-material";
 import { styled } from "@mui/material/styles";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import SearchBox from "../templates/SearchBox";
 
 const Navbar = () => {
   const [anchorElServices, setAnchorElServices] = useState(null);
@@ -30,7 +31,9 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [userProfilePic, setUserProfilePic] = useState(null);
   const [userName, setUserName] = useState(null);
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  
   const handleOpenServices = (event) =>
     setAnchorElServices(event.currentTarget);
   const handleCloseServices = () => setAnchorElServices(null);
@@ -98,13 +101,7 @@ const Navbar = () => {
             alignItems: "center",
           }}
         >
-          <SearchBar>
-            <InputBase
-              placeholder="Search…"
-              sx={{ ml: 1, flex: 1, width: { xs: "250px", md: "500px" } }}
-            />
-            <Search sx={{ color: "white" }} />
-          </SearchBar>
+          <SearchBox />
         </Box>
 
         <Box sx={{ mx: 2, cursor: "pointer" }} onMouseEnter={handleOpenPackage}>

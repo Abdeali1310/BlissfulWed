@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const bcrypt = require('bcryptjs');
-const Service = require("./Service");
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -35,6 +34,14 @@ const userSchema = new mongoose.Schema({
         enum: ['male', 'female', 'other'],
         required: true
     },
+    hasSpun:{
+        type:Boolean,
+        default:false,
+    },
+    prize:{
+        type:Object,
+        default:null,
+    },
     city: {
         type: String,
         required: true,
@@ -45,27 +52,6 @@ const userSchema = new mongoose.Schema({
     resetOtpExpiry: {
         type: Date 
     },
-
-    // Wedding Details
-    weddingDetails: {
-        dateOfEvent: { type: Date },
-        previouslyBookedEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
-        upcomingEvents: [{ type: mongoose.Schema.Types.ObjectId, ref: "Service" }],
-    },
-
-    // Payment History
-    paymentHistory: [
-        {
-            amount: Number,
-            date: Date,
-            transactionId: String,
-            status: { type: String, enum: ["success", "failed", "pending"], default: "pending" },
-        },
-    ],
-
-    // Reviews
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
-
 }, { timestamps: true })
 
 //password hashing

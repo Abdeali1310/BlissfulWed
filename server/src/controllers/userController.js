@@ -138,27 +138,12 @@ async function currentUser(req, res) {
 
 //auth check
 async function userProfile(req, res) {
-  try {
-      const user = await User.findById(req.userId)
-          .populate("weddingDetails.previouslyBookedEvents")
-          .populate("weddingDetails.upcomingEvents")
-          .populate("reviews")
-          .exec();
-
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
-
-      res.status(200).json({ success: true, user });
-  } catch (error) {
-      res.status(500).json({ success: false, message: "Error fetching profile", error });
-  }
+    res.status(200).send({ message: "Hello", userId: req.userId });
 }
-
 
 async function editProfile(req, res) {
     const { userId } = req.params;
-    const { username, email, bio, contact, city, dateOfEvent } = req.body;
+    const { username, email, bio, contact, city, hasSpun, prize } = req.body;
 
     const profilePicUrl = req.file
         ? req.file.path
@@ -179,7 +164,8 @@ async function editProfile(req, res) {
                 profilePicUrl,
                 contact,
                 city,
-                "weddingDetails.dateOfEvent": dateOfEvent,
+                hasSpun,
+                prize,
             },
             { new: true }
         );
@@ -193,7 +179,6 @@ async function editProfile(req, res) {
         res.status(500).json({ success: false, message: 'Error updating profile', error });
     }
 }
-
 
 async function changePassword(req, res) {
     const { userId } = req.params;
@@ -310,17 +295,32 @@ async function contactUs(req, res) {
     }
 }
 
-async function getPaymentHistory(req, res) {
-  try {
-      const user = await User.findById(req.userId);
-      if (!user) {
-          return res.status(404).json({ message: "User not found" });
-      }
 
-      res.status(200).json({ success: true, paymentHistory: user.paymentHistory });
-  } catch (error) {
-      res.status(500).json({ success: false, message: "Error fetching payment history", error });
-  }
+async function updateSpin(req, res) {
+    try {
+        const { userId, prize } = req.body;
+
+        if (!userId || !prize) {
+            return res.status(400).json({ message: "User ID and prize are required." });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        if (user.hasSpun) {
+            return res.status(400).json({ message: "User has already spun the wheel." });
+        }
+
+        user.hasSpun = true;
+        user.prize = prize;
+        await user.save();
+
+        res.status(200).json({ message: "Spin updated successfully.", prize });
+    } catch (error) {
+        console.error("Error updating spin:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
 }
-
-module.exports = { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, getPaymentHistory }
+module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
