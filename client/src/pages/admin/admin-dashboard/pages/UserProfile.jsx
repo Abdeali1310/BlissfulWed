@@ -47,19 +47,31 @@ const UserProfile = ({ userId, goBack }) => {
 
   const fetchUserData = async () => {
     try {
-      const [userRes, bookingRes, paymentRes] = await Promise.all([
-        axios.get(`http://localhost:3000/api/v1/user/${userId}`),
-        axios.get(`http://localhost:3000/api/v1/booking/user/${userId}`),
-        axios.get(`http://localhost:3000/api/v1/payment/user/${userId}`),
-      ]);
-
+      const userRes = await axios.get(`http://localhost:3000/api/v1/user/${userId}`);
       setUser(userRes.data);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setUser(null); // Ensures it doesn't stay in the loading state
+      return;
+    }
+  
+    try {
+      const bookingRes = await axios.get(`http://localhost:3000/api/v1/booking/user/${userId}`);
       setBookings(bookingRes.data.bookings || []);
+    } catch (error) {
+      console.error("Error fetching booking data:", error);
+      setBookings([]); // Set empty array so charts won't render
+    }
+  
+    try {
+      const paymentRes = await axios.get(`http://localhost:3000/api/v1/payment/user/${userId}`);
       setPayments(paymentRes.data.payments || []);
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching payment data:", error);
+      setPayments([]); // Set empty array so charts won't render
     }
   };
+  
 
   useEffect(() => {
     fetchUserData();
@@ -98,6 +110,12 @@ const UserProfile = ({ userId, goBack }) => {
     ],
   };
 
+  if (!user)
+    return <p style={{ textAlign: "center", marginTop: "20px" }}>Loading...</p>;
+
+  const hasBookings = bookings.length > 0;
+  const hasPayments = payments.length > 0;
+
   return (
     <Box
       sx={{
@@ -116,7 +134,7 @@ const UserProfile = ({ userId, goBack }) => {
         }}
       >
         <Grid container spacing={4}>
-          {/* User Info - Always Full Width on Small Screens */}
+          {/* User Info */}
           <Grid item xs={12} md={4}>
             <Box textAlign="center">
               <Avatar
@@ -141,121 +159,139 @@ const UserProfile = ({ userId, goBack }) => {
             </Box>
           </Grid>
 
-          {/* Booking & Payment Tables - Now Full Width on Smaller Screens */}
+          {/* Conditional Rendering for Booking & Payment Data */}
           <Grid item xs={12} md={8}>
-            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
-              📅 Bookings
-            </Typography>
-            <Box sx={{ overflowX: "auto" }}>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Date</TableCell>
-                      <TableCell>Time Slot</TableCell>
-                      <TableCell>Type</TableCell>
-                      <TableCell>Guests</TableCell>
-                      <TableCell>Contact</TableCell>
-                      <TableCell>Address</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Total Amount</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {bookings.map((booking) => (
-                      <TableRow key={booking._id}>
-                        <TableCell>
-                          {new Date(booking.date).toDateString()}
-                        </TableCell>
-                        <TableCell>{booking.timeSlot || "N/A"}</TableCell>
-                        <TableCell>{booking.type}</TableCell>
-                        <TableCell>{booking.noOfGuests || "N/A"}</TableCell>
-                        <TableCell>{booking.contact || "N/A"}</TableCell>
-                        <TableCell>{booking.address}</TableCell>
-                        <TableCell>{booking.status}</TableCell>
-                        <TableCell>₹{booking.totalAmount}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+            {hasBookings || hasPayments ? (
+              <>
+                {hasBookings && (
+                  <>
+                    <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
+                      📅 Bookings
+                    </Typography>
+                    <TableContainer component={Paper} sx={{maxHeight:"30%"}}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Time Slot</TableCell>
+                            <TableCell>Type</TableCell>
+                            <TableCell>Guests</TableCell>
+                            <TableCell>Contact</TableCell>
+                            <TableCell>Address</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Total Amount</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {bookings.map((booking) => (
+                            <TableRow key={booking._id}>
+                              <TableCell>
+                                {new Date(booking.date).toDateString()}
+                              </TableCell>
+                              <TableCell>{booking.timeSlot || "N/A"}</TableCell>
+                              <TableCell>{booking.type}</TableCell>
+                              <TableCell>
+                                {booking.noOfGuests || "N/A"}
+                              </TableCell>
+                              <TableCell>{booking.contact || "N/A"}</TableCell>
+                              <TableCell>{booking.address}</TableCell>
+                              <TableCell>{booking.status}</TableCell>
+                              <TableCell>₹{booking.totalAmount}</TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </>
+                )}
 
-            <Divider sx={{ my: 3 }} />
-            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 2 }}>
-              💰 Payments
-            </Typography>
-            <Box sx={{ overflowX: "auto" }}>
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Advance Paid</TableCell>
-                      <TableCell>Remaining</TableCell>
-                      <TableCell>Total Amount</TableCell>
-                      <TableCell>Due Date</TableCell>
-                      <TableCell>Payment Method</TableCell>
-                      <TableCell>Status</TableCell>
-                      <TableCell>Refund Status</TableCell>
-                      <TableCell>Cancellation</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {payments.map((payment) => (
-                      <TableRow key={payment._id}>
-                        <TableCell>₹{payment.advanceAmount}</TableCell>
-                        <TableCell>₹{payment.remainingAmount}</TableCell>
-                        <TableCell>₹{payment.totalAmount}</TableCell>
-                        <TableCell>
-                          {payment.dueDate
-                            ? new Date(payment.dueDate).toDateString()
-                            : "N/A"}
-                        </TableCell>
-                        <TableCell>{payment.paymentMethod}</TableCell>
-                        <TableCell
-                          sx={{
-                            color:
-                              payment.paymentStatus === "Paid"
-                                ? "green"
-                                : payment.paymentStatus === "Pending"
-                                ? "red"
-                                : "orange",
-                          }}
-                        >
-                          {payment.paymentStatus}
-                        </TableCell>
-                        <TableCell>{payment.refundStatus}</TableCell>
-                        <TableCell>
-                          {payment.cancellationStatus !== "Not Cancelled"
-                            ? payment.cancellationStatus
-                            : "No Cancellation"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Box>
+                {hasPayments && (
+                  <>
+                    <Divider sx={{ my: 3 }} />
+                    <Typography variant="h5" sx={{ fontWeight: "bold" }}>
+                      💰 Payments
+                    </Typography>
+                    <TableContainer component={Paper} sx={{maxHeight:"100vh"}}>
+                      <Table>
+                        <TableHead>
+                          <TableRow>
+                            <TableCell>Advance Paid</TableCell>
+                            <TableCell>Remaining</TableCell>
+                            <TableCell>Total Amount</TableCell>
+                            <TableCell>Due Date</TableCell>
+                            <TableCell>Payment Method</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Refund Status</TableCell>
+                            <TableCell>Cancellation</TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {payments.map((payment) => (
+                            <TableRow key={payment._id}>
+                              <TableCell>₹{payment.advanceAmount}</TableCell>
+                              <TableCell>₹{payment.remainingAmount}</TableCell>
+                              <TableCell>₹{payment.totalAmount}</TableCell>
+                              <TableCell>
+                                {payment.dueDate
+                                  ? new Date(payment.dueDate).toDateString()
+                                  : "N/A"}
+                              </TableCell>
+                              <TableCell>{payment.paymentMethod}</TableCell>
+                              <TableCell
+                                sx={{
+                                  color:
+                                    payment.paymentStatus === "Paid"
+                                      ? "green"
+                                      : payment.paymentStatus === "Pending"
+                                      ? "red"
+                                      : "orange",
+                                }}
+                              >
+                                {payment.paymentStatus}
+                              </TableCell>
+                              <TableCell>{payment.refundStatus}</TableCell>
+                              <TableCell>
+                                {payment.cancellationStatus !== "Not Cancelled"
+                                  ? payment.cancellationStatus
+                                  : "No Cancellation"}
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </TableContainer>
+                  </>
+                )}
+              </>
+            ) : (
+              <Typography variant="h6" sx={{ textAlign: "center", mt: 4 }}>
+                No booking or payment data found.
+              </Typography>
+            )}
           </Grid>
 
-          {/* Charts - Now Full Width on Small Screens */}
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" sx={{ textAlign: "center", mb: 2 }}>
-              💰 Payment Breakdown
-            </Typography>
-            <Box sx={{ width: "100%", maxWidth: 400, margin: "auto" }}>
-              <Pie data={pieData} />
-            </Box>
-          </Grid>
+          {/* Charts - Only Render if Data Exists */}
+          {hasPayments && (
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" sx={{ textAlign: "center", mb: 2 }}>
+                💰 Payment Breakdown
+              </Typography>
+              <Box sx={{ width: "100%", maxWidth: 400, margin: "auto" }}>
+                <Pie data={pieData} />
+              </Box>
+            </Grid>
+          )}
 
-          <Grid item xs={12} md={6}>
-            <Typography variant="h6" sx={{ textAlign: "center", mb: 2 }}>
-              📊 Booking Trends
-            </Typography>
-            <Box sx={{ width: "100%", maxWidth: 400, margin: "auto" }}>
-              <Bar data={barData} />
-            </Box>
-          </Grid>
+          {hasBookings && (
+            <Grid item xs={12} md={6}>
+              <Typography variant="h6" sx={{ textAlign: "center", mb: 2 }}>
+                📊 Booking Trends
+              </Typography>
+              <Box sx={{ width: "100%", maxWidth: 400, margin: "auto" }}>
+                <Bar data={barData} />
+              </Box>
+            </Grid>
+          )}
 
           {/* Back Button */}
           <Grid item xs={12} textAlign="center">
@@ -272,7 +308,6 @@ const UserProfile = ({ userId, goBack }) => {
             </Button>
           </Grid>
         </Grid>
-        ;
       </Card>
     </Box>
   );

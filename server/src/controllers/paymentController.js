@@ -230,4 +230,23 @@ const getPaymentByUserId = async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 };
-module.exports = { getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }
+
+const getAllPaymentDetails = async (req, res) => {
+  try {
+      const userId = req.userId;
+
+      let payments;
+      if (userId) {
+        payments = await Payment.find({ user: userId }).populate("booking", "eventType amount status");
+      } else {
+        payments = await Payment.find().populate("bookingId", "serviceType");
+      }
+      
+      res.status(200).json({ success: true, payments });
+  } catch (error) {
+      console.error("Error fetching payments:", error);
+      res.status(500).json({ message: "Server Error" });
+  }
+};
+
+module.exports = {getAllPaymentDetails, getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }

@@ -25,14 +25,30 @@ import Navbar from "./components/Navbar";
 import Settings from "./components/Settings";
 import UserProfile from "./pages/UserProfile";
 import UserList from "./pages/UserList";
+import { useDispatch } from "react-redux";
+import { fetchUsers } from "../../../redux/slices/userSlice";
+import { fetchPayments } from "../../../redux/slices/paymentSlice";
+import { fetchBookings } from "../../../redux/slices/bookingSlice";
+import { fetchReviews } from "../../../redux/slices/reviewSlice";
+import { fetchServices } from "../../../redux/slices/serviceSlice";
+import DashboardHome from "./components/DashboardHome";
 
 const AdminDashboard = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+    dispatch(fetchPayments());
+    dispatch(fetchBookings());
+    dispatch(fetchReviews());
+    dispatch(fetchServices());
+  }, [dispatch]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
-  
+
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -49,7 +65,11 @@ const AdminDashboard = () => {
     { id: "services", label: "Services", icon: <FaConciergeBell size={20} /> },
     { id: "packages", label: "Packages", icon: <FaBox size={20} /> },
     { id: "users", label: "Users Management", icon: <FaUsers size={20} /> },
-    { id: "payment", label: "Payment Management", icon: <FaDollarSign size={20} /> },
+    {
+      id: "payment",
+      label: "Payment Management",
+      icon: <FaDollarSign size={20} />,
+    },
     { id: "reviews", label: "Reviews & Feedback", icon: <FaStar size={20} /> },
     {
       id: "reports",
@@ -78,25 +98,28 @@ const AdminDashboard = () => {
       <div className="hidden lg:flex w-[35vh] bg-pink-500 text-white p-5 flex-col">
         <h2 className="text-2xl font-bold mb-6">BlissfulWed</h2>
         <nav className="space-y-2">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setIsDrawerOpen(false);
-                }}
-                className={`flex items-center gap-3 w-full px-4 py-2 rounded-lg transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? darkMode ? "bg-gray-700" : "bg-pink-700"
-                    : darkMode ? "hover:bg-gray-600" : "hover:bg-pink-800"
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-          
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setIsDrawerOpen(false);
+              }}
+              className={`flex items-center gap-3 w-full px-4 py-2 rounded-lg transition-all duration-200 ${
+                activeTab === tab.id
+                  ? darkMode
+                    ? "bg-gray-700"
+                    : "bg-pink-700"
+                  : darkMode
+                  ? "hover:bg-gray-600"
+                  : "hover:bg-pink-800"
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {/* MUI Drawer for Mobile */}
@@ -124,7 +147,6 @@ const AdminDashboard = () => {
               </button>
             ))}
           </nav>
-          
         </div>
       </Drawer>
       <div className="flex flex-col">
@@ -153,7 +175,7 @@ const AdminDashboard = () => {
 const DashboardTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Dashboard</h1>
-    <p className="mt-2">Overview of all activities and stats.</p>
+    <DashboardHome />
   </div>
 );
 
@@ -201,7 +223,10 @@ const UsersMgmtTab = () => {
       <p className="mt-2">Manage user accounts and permissions.</p>
 
       {selectedUser ? (
-        <UserProfile userId={selectedUser} goBack={() => setSelectedUser(null)} />
+        <UserProfile
+          userId={selectedUser}
+          goBack={() => setSelectedUser(null)}
+        />
       ) : (
         <UserList onUserSelect={(id) => setSelectedUser(id)} />
       )}

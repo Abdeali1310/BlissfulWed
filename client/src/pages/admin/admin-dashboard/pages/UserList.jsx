@@ -32,7 +32,7 @@ const UserList = ({ onUserSelect }) => {
   const fetchUsers = async () => {
     try {
       const response = await axios.get("http://localhost:3000/api/v1/user");
-      setUsers(response.data);
+      setUsers(response.data.users);
     } catch (error) {
       console.error("Error fetching users:", error);
     }

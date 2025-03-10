@@ -10,6 +10,7 @@ bookingRouter.get("/booked-dates/:serviceId",isLoggedIn,getBookedDates);
 bookingRouter.put("/:bookingId",isLoggedIn,updateBookingStatus)
 bookingRouter.delete("/:bookingId",isLoggedIn,cancelBooking)
 bookingRouter.get("/user/:userId",getBookingByUserId)
+bookingRouter.get("/admin/booking",getAllBookings);
 
 
 module.exports = bookingRouter;

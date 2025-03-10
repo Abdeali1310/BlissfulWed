@@ -125,13 +125,12 @@ async function getBookingById(req, res) {
 async function getAllBookings(req, res) {
     try {
         const userId = req.userId;
-        const isAdmin = req.adminId;
 
         let bookings;
-        if (isAdmin) {
-            bookings = await Booking.find().populate("service user", "name email");
-        } else {
+        if (userId) {
             bookings = await Booking.find({ user: userId }).populate("service", "name");
+        } else {
+            bookings = await Booking.find().populate("service user", "name email");
         }
 
         res.status(200).json({ success: true, booking: bookings });

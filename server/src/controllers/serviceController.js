@@ -37,4 +37,19 @@ const getServiceById = async (req, res) => {
 };
 
 
-module.exports = { getServiceByType, getServiceById};
+const getAllServices = async (req, res) => {
+  try {
+    const services = await Service.find(); // Fetch all services from the database
+    res.status(200).json({
+      success: true,
+      services: services,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch services",
+      error: error.message,
+    });
+  }
+};
+module.exports = {getAllServices, getServiceByType, getServiceById};
