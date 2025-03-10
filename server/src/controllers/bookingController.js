@@ -130,7 +130,7 @@ async function getAllBookings(req, res) {
         if (userId) {
             bookings = await Booking.find({ user: userId }).populate("service", "name");
         } else {
-            bookings = await Booking.find().populate("service user", "name email");
+            bookings = await Booking.find().populate("service user", "username email serviceType");
         }
 
         res.status(200).json({ success: true, booking: bookings });
@@ -197,6 +197,29 @@ async function cancelBooking(req, res) {
     }
 };
 
+const cancelBookingByAdmin = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        if (booking.status === "Cancelled") {
+            return res.status(400).json({ message: "Booking is already cancelled" });
+        }
+
+        booking.status = "Cancelled";
+        await booking.save();
+
+        return res.json({ success:true, booking });
+    } catch (error) {
+        console.error("Error cancelling booking:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 //get booked dates
 const getBookedDates = async (req, res) => {
     try {
@@ -233,11 +256,11 @@ const getBookingByUserId = async (req, res) => {
             return res.status(404).json({ message: "No bookings found for this user." });
         }
 
-        
+
         return res.status(200).json({ bookings });
     } catch (error) {
         console.error("Error fetching bookings:", error);
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
-module.exports = { getBookingByUserId, createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking, getBookedDates }
+module.exports = { cancelBookingByAdmin, getBookingByUserId, createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking, getBookedDates }

@@ -32,6 +32,7 @@ import { fetchBookings } from "../../../redux/slices/bookingSlice";
 import { fetchReviews } from "../../../redux/slices/reviewSlice";
 import { fetchServices } from "../../../redux/slices/serviceSlice";
 import DashboardHome from "./components/DashboardHome";
+import Bookings from "./pages/Bookings";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -189,7 +190,7 @@ const UsersTab = () => (
 const BookingsTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Bookings</h1>
-    <p className="mt-2">Manage and track customer bookings.</p>
+    <Bookings />
   </div>
 );
 

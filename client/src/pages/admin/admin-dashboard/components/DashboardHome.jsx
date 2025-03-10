@@ -37,9 +37,9 @@ const DashboardHome = () => {
   const reviews = useSelector((state) => state.reviews.reviews);
   const services = useSelector((state) => state.services.services);
 
-  const revenue =
-    payments?.reduce((acc, payment) => acc + payment.totalAmount, 0) || 0;
-
+  const revenue = bookings
+  .filter((b) => b.status === "Booked")
+  .reduce((sum, b) => sum + b.totalAmount, 0);
   // Dynamic Monthly Bookings Data
   const bookingsData = bookings
     .reduce((acc, booking) => {
