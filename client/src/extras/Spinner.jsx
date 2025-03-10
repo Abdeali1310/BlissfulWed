@@ -5,6 +5,8 @@ import { Button } from "@mui/material";
 import { FaGift, FaTimesCircle, FaMoneyBillWave } from "react-icons/fa";
 import Confetti from "react-confetti";
 import axios from "axios"; // Import Axios for API calls
+import { useNavigate } from "react-router-dom";
+import { ArrowBack } from "@mui/icons-material";
 
 const generateCouponCode = () => {
   return Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -12,14 +14,14 @@ const generateCouponCode = () => {
 
 const prizes = [
   { label: "Better Luck Next Time", icon: <FaTimesCircle className="text-red-500" />, code: "NOCASH2024" },
-  { label: "₹500 Off Coupon", icon: <FaGift className="text-yellow-500" />, code: "BLISS500" },
-  { label: "₹1000 Off Coupon", icon: <FaMoneyBillWave className="text-green-500" />, code: "BLISS1000" },
-  { label: "₹5% Off", icon: <FaGift className="text-yellow-500" />, code: "GETMEOFF5" },
+  { label: "₹500 Off Coupon", icon: <FaGift className="text-yellow-500" />, code: "AX9G5TI" },
+  { label: "₹1000 Off Coupon", icon: <FaMoneyBillWave className="text-green-500" />, code: "G9UC8IT" },
+  { label: "₹5% Off", icon: <FaGift className="text-yellow-500" />, code: "YAX97CF" },
   { label: "Better Luck Next Time", icon: <FaTimesCircle className="text-red-500" />, code: "TRYAGAIN24" },
-  { label: "₹250 Off Coupon", icon: <FaGift className="text-blue-500" />, code: "BLISS250" },
-  { label: "₹1500 Off Coupon", icon: <FaMoneyBillWave className="text-purple-500" />, code: "BLISS1500" },
-  { label: "10% Off", icon: <FaGift className="text-blue-500" />, code: "GETMEOFF10" },
-  { label: "12% Off", icon: <FaMoneyBillWave className="text-green-500" />, code: "GETMEOFF12" },
+  { label: "₹250 Off Coupon", icon: <FaGift className="text-blue-500" />, code: "PA7YE9K" },
+  { label: "₹1500 Off Coupon", icon: <FaMoneyBillWave className="text-purple-500" />, code: "YA8YI0P" },
+  { label: "10% Off", icon: <FaGift className="text-blue-500" />, code: "WT8IS9K" },
+  { label: "12% Off", icon: <FaMoneyBillWave className="text-green-500" />, code: "AU9IEN7" },
 ];
 
 const Spinner = () => {
@@ -77,12 +79,20 @@ const Spinner = () => {
       }
     }, 3000);
   };
-
+  const navigate = useNavigate();
   return (
-    <div className="flex overflow-x-hidden h-full w-full flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-400 to-purple-600">
+    <div className="flex relative overflow-x-hidden h-full w-full flex-col items-center justify-center min-h-screen bg-gradient-to-r from-pink-400 to-purple-600">
       <h1 className="text-4xl font-bold text-white mb-4">🎉 Spin & Win! 🎉</h1>
       <p className="text-lg text-white mb-6">Try your luck and win amazing rewards!</p>
-
+      <Button
+        variant=""
+        sx={{position:"absolute",top:"3rem",left:"3rem"}}
+        color="primary"
+        className="mb-4 bg-pink-100 hover:bg-pink-600 text-white rounded"
+        onClick={() => navigate("/")}
+      >
+        <p className="text-2xl font-black "> <ArrowBack /></p>
+      </Button>
       <div className="relative flex items-center justify-center w-72 h-72">
         <div
           className="w-64 h-64 rounded-full border-[10px] border-gray-300 flex items-center justify-center transition-transform duration-[3s] ease-out relative overflow-hidden"
@@ -137,7 +147,6 @@ const Spinner = () => {
               <p className="text-gray-700">You've won <strong>{selectedPrize.label}</strong>!</p>
               <p className="text-lg font-semibold mt-2 bg-gray-200 p-2 rounded">{selectedPrize.code}</p>
               <p className="text-gray-500 text-sm mt-1">Use this coupon on checkout.</p>
-<p className="mt-5 font-bold text-sm">Note: Payment amount should be greater than ₹5000</p>
 
             </>
           ) : (
