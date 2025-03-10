@@ -125,25 +125,48 @@ async function userSignin(req, res) {
     }
 }
 
-//current user
+// Current User
 async function currentUser(req, res) {
     if (req.userId) {
-        const id = req.userId;
-        const user = await User.findById(id);
-        return res.send({ user: user })
+        try {
+            const user = await User.findById(req.userId)
+                .populate('events')  // Fetch event history
+                .populate('payments'); // Fetch payment history
+
+            if (!user) {
+                return res.status(404).json({ msg: "User not found" });
+            }
+
+            return res.status(200).json({ user });
+        } catch (error) {
+            return res.status(500).json({ msg: "Server error", error });
+        }
     } else {
-        return res.status(411).json({ msg: "Sign in required" })
+        return res.status(401).json({ msg: "Sign in required" });
     }
 }
 
-//auth check
+// Fetch User Profile
 async function userProfile(req, res) {
-    res.status(200).send({ message: "Hello", userId: req.userId });
+    try {
+        const user = await User.findById(req.userId)
+            .populate('events')  // Include event history
+            .populate('payments'); // Include payment history
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ user });
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching profile", error });
+    }
 }
 
+// Edit Profile (without modifying email & phone number)
 async function editProfile(req, res) {
     const { userId } = req.params;
-    const { username, email, bio, contact, city, hasSpun, prize } = req.body;
+    const { username, bio, contact, city, hasSpun, prize } = req.body;
 
     const profilePicUrl = req.file
         ? req.file.path
@@ -152,33 +175,26 @@ async function editProfile(req, res) {
     try {
         const existingUser = await User.findById(userId);
         if (!existingUser) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ message: "User not found" });
         }
 
-        const updatedUser = await User.findByIdAndUpdate(
-            userId,
-            {
-                username,
-                email,
-                bio,
-                profilePicUrl,
-                contact,
-                city,
-                hasSpun,
-                prize,
-            },
-            { new: true }
-        );
+        // Update only the allowed fields (email & phone remain unchanged)
+        existingUser.username = username || existingUser.username;
+        existingUser.bio = bio || existingUser.bio;
+        existingUser.contact = contact || existingUser.contact;
+        existingUser.city = city || existingUser.city;
+        existingUser.hasSpun = hasSpun || existingUser.hasSpun;
+        existingUser.prize = prize || existingUser.prize;
+        existingUser.profilePicUrl = profilePicUrl;
 
-        if (!updatedUser) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        await existingUser.save();
 
-        res.status(200).json({ success: true, msg: "Profile updated successfully" });
+        res.status(200).json({ success: true, msg: "Profile updated successfully", user: existingUser });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error updating profile', error });
+        res.status(500).json({ success: false, message: "Error updating profile", error });
     }
 }
+
 
 async function changePassword(req, res) {
     const { userId } = req.params;
@@ -323,4 +339,72 @@ async function updateSpin(req, res) {
         res.status(500).json({ message: "Internal server error." });
     }
 }
-module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
+
+const getUserEvents = async (req, res) => {
+    try {
+        const userId = req.user.id; // Assuming authentication middleware adds `req.user`
+        const userEvents = await Event.find({ userId }); // Fetch events from the database
+
+        if (!userEvents || userEvents.length === 0) {
+            return res.status(404).json({ message: "No events found for this user" });
+        }
+
+        res.status(200).json(userEvents);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const getUserPayments = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const userPayments = await Payment.find({ userId }); // Fetch payments from the database
+
+        if (!userPayments || userPayments.length === 0) {
+            return res.status(404).json({ message: "No payments found for this user" });
+        }
+
+        res.status(200).json(userPayments);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+const deleteUserAccount = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        if (!userId) {
+            return res.status(400).json({ message: "User ID is required" });
+        }
+
+        // Assuming you are using Mongoose
+        const deletedUser = await User.findByIdAndDelete(userId);
+
+        if (!deletedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        res.status(200).json({ message: "User account deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Server error", error: error.message });
+    }
+};
+
+
+
+module.exports = { 
+    userSignup, 
+    userSignin, 
+    userProfile, 
+    currentUser, 
+    editProfile, 
+    changePassword, 
+    forgotPassword, 
+    otpVerification, 
+    resetPassword, 
+    contactUs, 
+    updateSpin, 
+    getUserEvents,  // ✅ Only once
+    getUserPayments, // ✅ Only once
+    deleteUserAccount 
+};
