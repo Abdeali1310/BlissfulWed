@@ -72,10 +72,7 @@ const Bookings = () => {
 
   const bookings = useSelector((state) => state.bookings.bookings);
   const payments = useSelector((state) => state.payments.payments); // Assuming payments exist in store
-  const paginatedBookings = bookings.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  
 
   // Get unique service types & statuses for filtering dropdowns
   const uniqueServiceTypes = [
@@ -93,7 +90,10 @@ const Bookings = () => {
       (booking.status === filterStatus || filterStatus === "")
     );
   });
-
+  const paginatedBookings = filteredBookings.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
   const getPaymentDetails = (bookingId) => {
     if (!Array.isArray(payments) || payments.length === 0) {
       console.log("No payments found!");
@@ -241,7 +241,7 @@ const Bookings = () => {
       </Grid>
 
       {/* Bookings Table */}
-      <Grid item xs={12} sx={{ padding: 3, marginBottom: "1rem" }}>
+      <Grid item xs={12} sx={{ padding: 3, marginBottom: "1rem", minWidth:{xs:"50vh" ,lg:"100%"} }}>
         {/* Title */}
         <Typography
           variant="h5"
@@ -397,6 +397,7 @@ const Bookings = () => {
               })}
             </TableBody>
 
+          </Table>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
@@ -406,7 +407,6 @@ const Bookings = () => {
               onPageChange={handleChangePage}
               onRowsPerPageChange={handleChangeRowsPerPage}
             />
-          </Table>
         </TableContainer>
       </Grid>
       <Dialog open={open} onClose={() => setOpen(false)}>

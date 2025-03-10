@@ -62,7 +62,7 @@ const AdminDashboard = () => {
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const tabs = [
     { id: "dashboard", label: "Dashboard (Home)", icon: <FaHome size={20} /> },
-    { id: "bookings", label: "Bookings", icon: <FaClipboardList size={20} /> },
+    { id: "bookings", label: "Bookings Management", icon: <FaClipboardList size={20} /> },
     { id: "services", label: "Services", icon: <FaConciergeBell size={20} /> },
     { id: "packages", label: "Packages", icon: <FaBox size={20} /> },
     { id: "users", label: "Users Management", icon: <FaUsers size={20} /> },
@@ -189,7 +189,7 @@ const UsersTab = () => (
 
 const BookingsTab = () => (
   <div>
-    <h1 className="text-2xl font-bold">Bookings</h1>
+    <h1 className="text-2xl font-bold text-pink-500">Bookings Management</h1>
     <Bookings />
   </div>
 );
