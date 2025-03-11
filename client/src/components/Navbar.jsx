@@ -33,7 +33,7 @@ const Navbar = () => {
   const [userName, setUserName] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  
+
   const handleOpenServices = (event) =>
     setAnchorElServices(event.currentTarget);
   const handleCloseServices = () => setAnchorElServices(null);
@@ -49,30 +49,29 @@ const Navbar = () => {
 
   const toggleDrawer = () => setMobileOpen(!mobileOpen);
   const currentUser = async () => {
-    const curr_userId = localStorage.getItem("user");
-
-    if (curr_userId) {
-      try {
-        const response = await axios.post(
-          "http://localhost:3000/api/v1/user",
-          { curr_userId },
-          {
-            withCredentials: true, // Ensure cookies are sent (if using sessions)
-          }
-        );
-
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/api/v1/user", // ✅ Use GET request
+        { withCredentials: true }
+      );
+  
+      console.log("Response Data:", response.data); // ✅ Debug log to check response
+  
+      if (response.data.user) {
         setUserProfilePic(response.data.user.profilePicUrl);
         setUserName(response.data.user.username);
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
+      } else {
+        console.log("User data is missing in response");
       }
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
     }
   };
-
+  
   useEffect(() => {
     currentUser();
   }, []);
-
+  
   return (
     <AppBar
       position="static"
@@ -323,7 +322,7 @@ const Navbar = () => {
               "Music & DJ",
               "Bridal Makeup",
               "Photography",
-              "Groom Wear"
+              "Groom Wear",
             ].map((service) => (
               <ListItem button key={service} onClick={toggleDrawer}>
                 <Link

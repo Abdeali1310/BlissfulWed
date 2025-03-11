@@ -101,8 +101,8 @@ async function userSignin(req, res) {
                 expires,
                 httpOnly: true,
                 signed: true,
-                secure: true,
-            });
+                secure: process.env.NODE_ENV === "production", // ✅ Only secure in production
+              });              
 
             return res
                 .status(200)
@@ -125,26 +125,27 @@ async function userSignin(req, res) {
     }
 }
 
-// Current User
-async function currentUser(req, res) {
-    if (req.userId) {
-        try {
-            const user = await User.findById(req.userId)
-                .populate('events')  // Fetch event history
-                .populate('payments'); // Fetch payment history
-
-            if (!user) {
-                return res.status(404).json({ msg: "User not found" });
-            }
-
-            return res.status(200).json({ user });
-        } catch (error) {
-            return res.status(500).json({ msg: "Server error", error });
-        }
-    } else {
-        return res.status(401).json({ msg: "Sign in required" });
+const currentUser = async (req, res) => {
+  try {
+    if (!req.userId) {
+      return res.status(401).json({ error: "Unauthorized - No userId" });
     }
-}
+
+    const user = await User.findById(req.userId).select(
+      "profilePicUrl username"
+    );
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 
 // Fetch User Profile
 async function userProfile(req, res) {
@@ -163,37 +164,43 @@ async function userProfile(req, res) {
     }
 }
 
-// Edit Profile (without modifying email & phone number)
-async function editProfile(req, res) {
-    const { userId } = req.params;
-    const { username, bio, contact, city, hasSpun, prize } = req.body;
+//getuserprofile
 
-    const profilePicUrl = req.file
-        ? req.file.path
-        : "https://static.vecteezy.com/system/resources/previews/002/534/006/original/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg";
-
+async function getUserProfile(req, res) {
     try {
-        const existingUser = await User.findById(userId);
-        if (!existingUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Update only the allowed fields (email & phone remain unchanged)
-        existingUser.username = username || existingUser.username;
-        existingUser.bio = bio || existingUser.bio;
-        existingUser.contact = contact || existingUser.contact;
-        existingUser.city = city || existingUser.city;
-        existingUser.hasSpun = hasSpun || existingUser.hasSpun;
-        existingUser.prize = prize || existingUser.prize;
-        existingUser.profilePicUrl = profilePicUrl;
-
-        await existingUser.save();
-
-        res.status(200).json({ success: true, msg: "Profile updated successfully", user: existingUser });
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json(user);
     } catch (error) {
-        res.status(500).json({ success: false, message: "Error updating profile", error });
+        res.status(500).json({ message: "Error fetching profile", error });
     }
-}
+  };
+  
+
+// Edit Profile (without modifying email & phone number)
+async function updateUserProfile(req, res){
+    try {
+      const user = await User.findById(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      const { name, bio, gender } = req.body;
+      if (name) user.name = name;
+      if (bio) user.bio = bio;
+      if (gender) user.gender = gender;
+      if (req.file) user.profilePicture = req.file.path;
+  
+      await user.save();
+  
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  };
+  
 
 
 async function changePassword(req, res) {
@@ -370,34 +377,28 @@ const getUserPayments = async (req, res) => {
     }
 };
 
-const deleteUserAccount = async (req, res) => {
+async function deleteUserAccount(req, res){
     try {
-        const userId = req.params.userId;
-        if (!userId) {
-            return res.status(400).json({ message: "User ID is required" });
-        }
-
-        // Assuming you are using Mongoose
-        const deletedUser = await User.findByIdAndDelete(userId);
-
-        if (!deletedUser) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        res.status(200).json({ message: "User account deleted successfully" });
+      const user = await User.findByIdAndDelete(req.user.id);
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+      res.status(200).json({ message: 'Account deleted successfully' });
     } catch (error) {
-        res.status(500).json({ message: "Server error", error: error.message });
+      res.status(500).json({ message: error.message });
     }
-};
+  };
+  
 
 
 
 module.exports = { 
     userSignup, 
     userSignin, 
+    getUserProfile,
     userProfile, 
     currentUser, 
-    editProfile, 
+    updateUserProfile, 
     changePassword, 
     forgotPassword, 
     otpVerification, 

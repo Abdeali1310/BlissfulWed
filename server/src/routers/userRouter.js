@@ -2,28 +2,35 @@ const express = require("express");
 const { 
     userSignup, 
     userSignin, 
+    getUserProfile,
     userProfile, 
     currentUser, 
-    editProfile, 
+    updateUserProfile, 
     changePassword, 
     forgotPassword, 
     otpVerification, 
     resetPassword, 
     contactUs, 
     updateSpin, 
-    getUserEvents, 
-    getUserPayments, 
+    getUserEvents,  
+    getUserPayments,
     deleteUserAccount 
 } = require("../controllers/userController");
+const { protect } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 const { isLoggedIn } = require("../middlewares/userAuth");
 const userRouter = express.Router();
 
-userRouter.post("/", isLoggedIn, currentUser);
+userRouter.get("/", isLoggedIn, currentUser);
 userRouter.post("/signup", userSignup);
 userRouter.post("/signin", userSignin);
 userRouter.post("/contact-email", contactUs);
-userRouter.get("/profile", isLoggedIn, userProfile);
-userRouter.put("/profile/edit/:userId", isLoggedIn, editProfile);
+userRouter.get("/profile", isLoggedIn, getUserProfile);
+userRouter.get('/profile', protect, getUserProfile);
+userRouter.put('/profile', protect, upload.single('profilePicture'), updateUserProfile);
+userRouter.delete('/profile', protect, deleteUserAccount);
+userRouter.delete('/profile', isLoggedIn, deleteUserAccount);
+userRouter.put("/profile/edit/:userId", isLoggedIn, updateUserProfile);
 userRouter.put("/changePassword/:userId", isLoggedIn, changePassword);
 userRouter.post("/forgotPassword", forgotPassword);
 userRouter.post("/forgotPassword/otpVerification", otpVerification);

@@ -23,6 +23,7 @@ import PackageDetails from "./components/PackageDetails.jsx";
 import Payment from "./pages/Payment.jsx"
 import PaymentStatus from "./pages/PaymentStatus.jsx"
 import Spinner from "./extras/Spinner.jsx"
+import UserProf from "./components/UserProf.jsx"
 const App = () => {
   return (
 
@@ -64,6 +65,8 @@ const App = () => {
 
         <Route path="/service/:serviceType" element={<ServiceDetails />} />
         <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
+
+        <Route path="/profile" element={<UserProf />} />
 
         <Route path="/booking" element={<BookingPage />} />
 
