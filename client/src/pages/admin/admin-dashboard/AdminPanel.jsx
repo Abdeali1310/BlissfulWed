@@ -34,6 +34,7 @@ import { fetchServices } from "../../../redux/slices/serviceSlice";
 import DashboardHome from "./components/DashboardHome";
 import Bookings from "./pages/Bookings";
 import Service from "./components/Service";
+import Payment from "./pages/Payment";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -65,7 +66,6 @@ const AdminDashboard = () => {
     { id: "dashboard", label: "Dashboard (Home)", icon: <FaHome size={20} /> },
     { id: "bookings", label: "Bookings Management", icon: <FaClipboardList size={20} /> },
     { id: "services", label: "Services", icon: <FaConciergeBell size={20} /> },
-    { id: "packages", label: "Packages", icon: <FaBox size={20} /> },
     { id: "users", label: "Users Management", icon: <FaUsers size={20} /> },
     {
       id: "payment",
@@ -246,7 +246,7 @@ const GalleryMgmtTab = () => (
 const PaymentMgmtTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Payment Management</h1>
-    <p className="mt-2">Track and manage customer payments.</p>
+    <Payment />
   </div>
 );
 

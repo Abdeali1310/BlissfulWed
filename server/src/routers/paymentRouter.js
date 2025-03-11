@@ -1,5 +1,5 @@
 const express = require("express");
-const { createPayment,getPaymentDetails, verifyPayment, getPaymentByUserId, getAllPaymentDetails } = require("../controllers/paymentController");
+const { createPayment,getPaymentDetails, verifyPayment, getPaymentByUserId, getAllPaymentDetails, handleRefund } = require("../controllers/paymentController");
 const { isLoggedIn } = require("../middlewares/userAuth");
 
 const paymentRouter = express.Router();
@@ -9,5 +9,6 @@ paymentRouter.post("/create",isLoggedIn, createPayment);
 paymentRouter.get("/verify",isLoggedIn, verifyPayment);
 paymentRouter.get("/details",isLoggedIn, getPaymentDetails);
 paymentRouter.get("/user/:userId", getPaymentByUserId);
+paymentRouter.put("/refund/:paymentId", handleRefund);
 
 module.exports = paymentRouter;

@@ -214,7 +214,7 @@ async function getPaymentDetails(req, res) {
 const getPaymentByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
-    
+
     // Fetch all payments associated with the user
     const payments = await Payment.find({ userId: userId })
       .populate("bookingId", "date status totalAmount")
@@ -233,20 +233,57 @@ const getPaymentByUserId = async (req, res) => {
 
 const getAllPaymentDetails = async (req, res) => {
   try {
-      const userId = req.userId;
+    const userId = req.userId;
 
-      let payments;
-      if (userId) {
-        payments = await Payment.find({ user: userId }).populate("booking", "eventType amount status");
-      } else {
-        payments = await Payment.find().populate("bookingId", "serviceType");
-      }
-      
-      res.status(200).json({ success: true, payments });
+    let payments;
+    if (userId) {
+      payments = await Payment.find({ userId })
+        .populate({
+          path: "bookingId",
+          populate: { path: "service", select: "serviceType" } // Double populate service inside booking
+        })
+        .populate("userId", "username");
+    } else {
+      payments = await Payment.find()
+        .populate({
+          path: "bookingId",
+          populate: { path: "service", select: "serviceType" } // Double populate
+        })
+        .populate("userId", "username");
+    }
+
+    res.status(200).json({ success: true, payments });
   } catch (error) {
-      console.error("Error fetching payments:", error);
-      res.status(500).json({ message: "Server Error" });
+    console.error("Error fetching payments:", error);
+    res.status(500).json({ message: "Server Error" });
   }
 };
 
-module.exports = {getAllPaymentDetails, getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }
+const handleRefund = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+
+    const payment = await Payment.findById(paymentId);
+    if (!payment) {
+      return res.status(404).json({ success: false, message: "Payment not found" });
+    }
+
+    // Ensure payment is eligible for a refund
+    if (payment.paymentStatus !== "Paid" || payment.remainingAmount !== 0) {
+      return res.status(400).json({ success: false, message: "Refund not allowed for this payment" });
+    }
+
+    // Update refund status
+    payment.refundStatus = "Refunded";
+    payment.refundAmount = (payment.totalAmount * 70 )/100 // Refunding 70% amount
+    payment.refundProcessedAt = new Date();
+    await payment.save();
+
+    res.status(200).json({ success: true, message: "Refund processed successfully" });
+  } catch (error) {
+    console.error("Error processing refund:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+module.exports = { handleRefund,getAllPaymentDetails, getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }
