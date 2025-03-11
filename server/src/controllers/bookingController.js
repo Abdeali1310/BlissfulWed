@@ -220,6 +220,29 @@ const cancelBookingByAdmin = async (req, res) => {
     }
 };
 
+const completeBookingByAdmin = async (req, res) => {
+    try {
+        const { bookingId } = req.params;
+
+        const booking = await Booking.findById(bookingId);
+        if (!booking) {
+            return res.status(404).json({ message: "Booking not found" });
+        }
+
+        if (booking.status === "Completed") {
+            return res.status(400).json({ message: "Booking is already completed" });
+        }
+
+        booking.status = "Completed";
+        await booking.save();
+
+        return res.json({ success: true, booking });
+    } catch (error) {
+        console.error("Error completing booking:", error);
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 //get booked dates
 const getBookedDates = async (req, res) => {
     try {
@@ -263,4 +286,4 @@ const getBookingByUserId = async (req, res) => {
         return res.status(500).json({ message: "Internal Server Error" });
     }
 };
-module.exports = { cancelBookingByAdmin, getBookingByUserId, createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking, getBookedDates }
+module.exports = { completeBookingByAdmin,cancelBookingByAdmin, getBookingByUserId, createBooking, getBookingById, getAllBookings, updateBookingStatus, cancelBooking, getBookedDates }

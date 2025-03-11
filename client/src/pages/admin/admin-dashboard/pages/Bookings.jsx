@@ -69,10 +69,31 @@ const Bookings = () => {
 
   const [open, setOpen] = React.useState(false);
   const [selectedBooking, setSelectedBooking] = React.useState(null);
+  const [completeDialogOpen, setCompleteDialogOpen] = useState(false);
+  const [selectedBookingForComplete, setSelectedBookingForComplete] =
+    useState(null);
 
   const bookings = useSelector((state) => state.bookings.bookings);
   const payments = useSelector((state) => state.payments.payments); // Assuming payments exist in store
-  
+  // Open dialog
+  const handleOpenCompleteDialog = (booking) => {
+    setSelectedBookingForComplete(booking);
+    setCompleteDialogOpen(true);
+  };
+
+  // Close dialog
+  const handleCloseCompleteDialog = () => {
+    setCompleteDialogOpen(false);
+    setSelectedBookingForComplete(null);
+  };
+
+  // Confirm completion
+  const confirmCompleteBooking = () => {
+    if (selectedBookingForComplete) {
+      handleCompleteBooking(selectedBookingForComplete._id);
+    }
+    setCompleteDialogOpen(false);
+  };
 
   // Get unique service types & statuses for filtering dropdowns
   const uniqueServiceTypes = [
@@ -110,7 +131,10 @@ const Bookings = () => {
   const totalBookings = bookings.length;
   const pendingBookings = bookings.filter((b) => b.status === "Pending").length;
   const completedBookings = bookings.filter(
-    (b) => b.status === "Booked"
+    (b) => b.status === "Completed"
+  ).length;
+  const cancelBookings = bookings.filter(
+    (b) => b.status === "Cancelled"
   ).length;
   const totalRevenue = bookings
     .filter((b) => b.status === "Booked") // Only include completed bookings
@@ -149,6 +173,35 @@ const Bookings = () => {
     }
   };
 
+  const handleCompleteBooking = async (bookingId) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/api/v1/booking/complete/${bookingId}`
+      );
+
+      if (response.data.success) {
+        toast.success("Booking marked as completed!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+
+        dispatch(fetchBookings()); // Refresh the booking list
+      } else {
+        toast.error("Failed to complete booking. Try again.", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error completing booking:", error);
+
+      const errorMessage =
+        error.response?.data?.message ||
+        "Server error, please try again later.";
+      toast.error(errorMessage, { position: "top-right", autoClose: 3000 });
+    }
+  };
+
   return (
     <Grid
       container
@@ -156,7 +209,7 @@ const Bookings = () => {
       sx={{
         marginBottom: "1rem",
         padding: 3,
-        maxWidth: { xs: "100%", lg: "83%" },
+        maxWidth: { xs: "100%", lg: "81%" },
       }}
     >
       {/* Total Bookings */}
@@ -215,7 +268,25 @@ const Bookings = () => {
           <Typography variant="h4">{completedBookings || 0}</Typography>
         </Paper>
       </Grid>
+      {/* Cancelled Bookings */}
 
+      <Grid item xs={12} sm={6} md={3}>
+        <Paper
+          elevation={4}
+          sx={{
+            padding: 3,
+            textAlign: "center",
+            backgroundColor: "#D32F2F",
+            color: "#fff",
+            borderRadius: 2,
+            width: "100%",
+            minWidth: "250px",
+          }}
+        >
+          <Typography variant="h6">Cancelled Bookings</Typography>
+          <Typography variant="h4">{cancelBookings || 0}</Typography>
+        </Paper>
+      </Grid>
       {/* Total Revenue */}
       <Grid item xs={12} sm={6} md={3}>
         <Paper
@@ -241,7 +312,15 @@ const Bookings = () => {
       </Grid>
 
       {/* Bookings Table */}
-      <Grid item xs={12} sx={{ padding: 3, marginBottom: "1rem", minWidth:{xs:"50vh" ,lg:"100%"} }}>
+      <Grid
+        item
+        xs={12}
+        sx={{
+          padding: 3,
+          marginBottom: "1rem",
+          minWidth: { xs: "50vh", lg: "100%" },
+        }}
+      >
         {/* Title */}
         <Typography
           variant="h5"
@@ -332,6 +411,8 @@ const Bookings = () => {
               {paginatedBookings.map((booking) => {
                 const paidAmount = getPaymentDetails(booking._id);
                 const remainingAmount = booking.totalAmount - paidAmount;
+                const bookingDate = new Date(booking.date);
+                const isPastDate = bookingDate < new Date(); // Check if date is in the past
 
                 return (
                   <TableRow key={booking._id}>
@@ -340,14 +421,7 @@ const Bookings = () => {
                     <TableCell>
                       {booking.service.serviceType || "N/A"}
                     </TableCell>
-                    <TableCell
-                      sx={{
-                        maxWidth: "150px",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
+                    <TableCell>
                       <Tooltip title={booking.address || "N/A"} arrow>
                         <span>{booking.address || "N/A"}</span>
                       </Tooltip>
@@ -367,6 +441,8 @@ const Bookings = () => {
                               ? "#43A047"
                               : booking.status === "Rescheduled"
                               ? "#1E88E5"
+                              : booking.status === "Completed"
+                              ? "#e73895"
                               : "#D32F2F",
                           color: "#fff",
                           fontWeight: "bold",
@@ -379,6 +455,14 @@ const Bookings = () => {
                     <TableCell>
                       {booking.status === "Cancelled" ? (
                         "N/A"
+                      ) : isPastDate ? ( // Show "Complete" button if date is in the past
+                        <Button
+                          variant="outlined"
+                          color="success"
+                          onClick={() => handleOpenCompleteDialog(booking)}
+                        >
+                          Complete
+                        </Button>
                       ) : (
                         <Button
                           variant="outlined"
@@ -396,17 +480,16 @@ const Bookings = () => {
                 );
               })}
             </TableBody>
-
           </Table>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25]}
-              component="div"
-              count={filteredBookings.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-            />
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredBookings.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
         </TableContainer>
       </Grid>
       <Dialog open={open} onClose={() => setOpen(false)}>
@@ -429,6 +512,22 @@ const Bookings = () => {
             color="error"
           >
             Yes, Cancel
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={completeDialogOpen} onClose={handleCloseCompleteDialog}>
+        <DialogTitle>Confirm Completion</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to mark this booking as completed?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseCompleteDialog} color="error">
+            Cancel
+          </Button>
+          <Button onClick={confirmCompleteBooking} color="success">
+            Confirm
           </Button>
         </DialogActions>
       </Dialog>

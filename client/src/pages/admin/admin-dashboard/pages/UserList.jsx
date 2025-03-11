@@ -19,6 +19,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  TablePagination,
 } from "@mui/material";
 import axios from "axios";
 
@@ -28,6 +29,8 @@ const UserList = ({ onUserSelect }) => {
   const [filter, setFilter] = useState({ gender: "", city: "" });
   const [openDialog, setOpenDialog] = useState(false);
   const [selectedUserId, setSelectedUserId] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage] = useState(8); // Display 8 users per page
 
   const fetchUsers = async () => {
     try {
@@ -62,11 +65,20 @@ const UserList = ({ onUserSelect }) => {
     setSelectedUserId(null);
   };
 
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
   const filteredUsers = users.filter(
     (user) =>
       user.username.toLowerCase().includes(search.toLowerCase()) &&
       (filter.gender ? user.gender === filter.gender : true) &&
       (filter.city ? user.city === filter.city : true)
+  );
+
+  const paginatedUsers = filteredUsers.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
   );
 
   return (
@@ -104,7 +116,7 @@ const UserList = ({ onUserSelect }) => {
       <TableContainer
         component={Paper}
         sx={{
-          maxWidth: { xs: "100%", sm: "100%", md: "75%", lg:"80%" },
+          maxWidth: { xs: "100%", sm: "100%", md: "75%", lg: "80%" },
           overflowX: "auto",
           whiteSpace: "nowrap",
         }}
@@ -122,7 +134,7 @@ const UserList = ({ onUserSelect }) => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredUsers.map((user) => (
+            {paginatedUsers.map((user) => (
               <TableRow key={user._id}>
                 <TableCell>
                   <Avatar src={user.profilePicUrl} />
@@ -145,7 +157,17 @@ const UserList = ({ onUserSelect }) => {
             ))}
           </TableBody>
         </Table>
+      {/* Pagination Controls */}
+      <TablePagination
+        rowsPerPageOptions={[8]}
+        component="div"
+        count={filteredUsers.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+      />
       </TableContainer>
+
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
