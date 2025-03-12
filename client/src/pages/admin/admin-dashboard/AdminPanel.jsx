@@ -35,6 +35,8 @@ import DashboardHome from "./components/DashboardHome";
 import Bookings from "./pages/Bookings";
 import Service from "./components/Service";
 import Payment from "./pages/Payment";
+import Reviews from "./components/Reviews";
+import Reports from "./pages/Reports";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -253,14 +255,14 @@ const PaymentMgmtTab = () => (
 const ReviewsFeedbackTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Reviews & Feedback</h1>
-    <p className="mt-2">Manage customer reviews and feedback.</p>
+    <Reviews />
   </div>
 );
 
 const ReportsAnalyticsTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Reports & Analytics</h1>
-    <p className="mt-2">View system reports and performance analytics.</p>
+    <Reports />
   </div>
 );
 

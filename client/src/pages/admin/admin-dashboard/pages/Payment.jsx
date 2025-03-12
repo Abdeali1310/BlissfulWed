@@ -94,7 +94,7 @@ const Payment = () => {
 
   const summaryData = [
     {
-      label: "Total Revenue",
+      label: "Total Transactions",
       value: `₹${totalRevenue.toLocaleString()}`,
       icon: <PaymentsIcon />,
       bg: "#e73895",
@@ -247,7 +247,8 @@ const Payment = () => {
   // Process refund
   const handleRefund = async () => {
     if (!selectedPaymentId) return;
-
+    console.log(selectedPaymentId);
+    
     try {
       const response = await axios.put(
         `http://localhost:3000/api/v1/payment/refund/${selectedPaymentId}`

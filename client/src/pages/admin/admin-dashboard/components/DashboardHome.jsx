@@ -401,31 +401,3 @@ const DashboardHome = () => {
 
 export default DashboardHome;
 
-// {/* Available Services */}
-// <Grid item xs={12}>
-// <Paper elevation={3} sx={{ padding: 3, textAlign: "center" }}>
-//   <Typography variant="h6" sx={{ color: themeColor }}>
-//     Available Services
-//   </Typography>
-//   <TableContainer>
-//     <Table>
-//       <TableHead>
-//         <TableRow>
-//           <TableCell sx={{ fontWeight: "bold" }}>
-//             Service Name
-//           </TableCell>
-//           <TableCell sx={{ fontWeight: "bold" }}>Category</TableCell>
-//         </TableRow>
-//       </TableHead>
-//       <TableBody>
-//         {services?.map((service, index) => (
-//           <TableRow key={index}>
-//             <TableCell>{service.name}</TableCell>
-//             <TableCell>{service.category}</TableCell>
-//           </TableRow>
-//         ))}
-//       </TableBody>
-//     </Table>
-//   </TableContainer>
-// </Paper>
-// </Grid>
