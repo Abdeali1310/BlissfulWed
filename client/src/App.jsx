@@ -20,10 +20,10 @@ import IndividualService from "./pages/Services/IndividualService.jsx";
 import BookingPage from "./pages/Booking.jsx";
 import Packages from "./components/Packages.jsx";
 import PackageDetails from "./components/PackageDetails.jsx";
-import Payment from "./pages/Payment.jsx"
-import PaymentStatus from "./pages/PaymentStatus.jsx"
-import Spinner from "./extras/Spinner.jsx"
-import UserProf from "./components/UserProf.jsx"
+import Payment from "./pages/Payment.jsx";
+import PaymentStatus from "./pages/PaymentStatus.jsx";
+import Spinner from "./extras/Spinner.jsx";
+import AdminPanel from "./pages/admin/admin-dashboard/AdminPanel.jsx";
 const App = () => {
   return (
 
@@ -64,9 +64,10 @@ const App = () => {
         <Route path="/admin/signin" element={<AdminSignIn />} />
 
         <Route path="/service/:serviceType" element={<ServiceDetails />} />
-        <Route path="/service/:serviceType/:serviceId" element={<IndividualService />} />
-
-        <Route path="/profile" element={<UserProf />} />
+        <Route
+          path="/service/:serviceType/:serviceId"
+          element={<IndividualService />}
+        />
 
         <Route path="/booking" element={<BookingPage />} />
 
@@ -75,6 +76,7 @@ const App = () => {
         <Route path="/payment-status" element={<PaymentStatus />} />
 
         <Route path="/spinner" element={<Spinner />} />
+          <Route path="/admin-dashboard" element={<AdminPanel />} />
       </Routes>
     </div>
   );

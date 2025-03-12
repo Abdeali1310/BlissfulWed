@@ -110,7 +110,7 @@ const Header = () => {
           />
 
           {/* Tagline */}
-          <div className="absolute items-center top-[80%] justify-center left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-pink-500 font-bold text-2xl lg:text-5xl font-cursive font-black bg-black/40 px-4 py-2 rounded-lg z-20 shadow-md shadow-black w-[90%] md:w-[50%]">
+          <div className="absolute items-center top-[80%] justify-center left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-pink-500 font-bold text-2xl lg:text-5xl font-cursive bg-black/40 px-4 py-2 rounded-lg z-20 shadow-md shadow-black w-[90%] md:w-[50%]">
             <p>
               Welcome to BlissfulWed - Where Every Detail Tells a Love Story.
             </p>

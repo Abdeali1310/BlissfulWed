@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     },
     bio: {
         type: String,
-        default: "Hello, User",
+        default: "",
     },
     profilePicUrl: {
         type: String,
@@ -52,28 +52,6 @@ const userSchema = new mongoose.Schema({
     resetOtpExpiry: {
         type: Date 
     },
-
-    bookings: [
-        {
-          serviceName: String,
-          date: Date,
-          status: {
-            type: String,
-            enum: ['Pending', 'Confirmed', 'Completed'],
-          },
-        },
-      ],
-
-      payments: [
-        {
-          amount: Number,
-          date: Date,
-          status: {
-            type: String,
-            enum: ['Paid', 'Pending'],
-          },
-        },
-      ]
 }, { timestamps: true })
 
 //password hashing

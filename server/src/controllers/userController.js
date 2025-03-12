@@ -101,8 +101,8 @@ async function userSignin(req, res) {
                 expires,
                 httpOnly: true,
                 signed: true,
-                secure: process.env.NODE_ENV === "production", // ✅ Only secure in production
-              });              
+                secure: true,
+            });
 
             return res
                 .status(200)
@@ -125,83 +125,60 @@ async function userSignin(req, res) {
     }
 }
 
-const currentUser = async (req, res) => {
-  try {
-    if (!req.userId) {
-      return res.status(401).json({ error: "Unauthorized - No userId" });
-    }
-
-    const user = await User.findById(req.userId).select(
-      "profilePicUrl username"
-    );
-
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    res.status(200).json({ user });
-  } catch (error) {
-    console.error("Error fetching user:", error);
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-
-// Fetch User Profile
-async function userProfile(req, res) {
-    try {
-        const user = await User.findById(req.userId)
-            .populate('events')  // Include event history
-            .populate('payments'); // Include payment history
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        res.status(200).json({ user });
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching profile", error });
+//current user
+async function currentUser(req, res) {
+    if (req.userId) {
+        const id = req.userId;
+        const user = await User.findById(id);
+        return res.send({ user: user })
+    } else {
+        return res.status(411).json({ msg: "Sign in required" })
     }
 }
 
-//getuserprofile
+//auth check
+async function userProfile(req, res) {
+    res.status(200).send({ message: "Hello", userId: req.userId });
+}
 
-async function getUserProfile(req, res) {
+async function editProfile(req, res) {
+    const { userId } = req.params;
+    const { username, email, bio, contact, city, hasSpun, prize } = req.body;
+
+    const profilePicUrl = req.file
+        ? req.file.path
+        : "https://static.vecteezy.com/system/resources/previews/002/534/006/original/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg";
+
     try {
-      const user = await User.findById(req.user.id);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.status(200).json(user);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching profile", error });
-    }
-  };
-  
+        const existingUser = await User.findById(userId);
+        if (!existingUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
 
-// Edit Profile (without modifying email & phone number)
-async function updateUserProfile(req, res){
-    try {
-      const user = await User.findById(req.user.id);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-  
-      const { name, bio, gender } = req.body;
-      if (name) user.name = name;
-      if (bio) user.bio = bio;
-      if (gender) user.gender = gender;
-      if (req.file) user.profilePicture = req.file.path;
-  
-      await user.save();
-  
-      res.status(200).json(user);
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  };
-  
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            {
+                username,
+                email,
+                bio,
+                profilePicUrl,
+                contact,
+                city,
+                hasSpun,
+                prize,
+            },
+            { new: true }
+        );
 
+        if (!updatedUser) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({ success: true, msg: "Profile updated successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: 'Error updating profile', error });
+    }
+}
 
 async function changePassword(req, res) {
     const { userId } = req.params;
@@ -346,66 +323,4 @@ async function updateSpin(req, res) {
         res.status(500).json({ message: "Internal server error." });
     }
 }
-
-const getUserEvents = async (req, res) => {
-    try {
-        const userId = req.user.id; // Assuming authentication middleware adds `req.user`
-        const userEvents = await Event.find({ userId }); // Fetch events from the database
-
-        if (!userEvents || userEvents.length === 0) {
-            return res.status(404).json({ message: "No events found for this user" });
-        }
-
-        res.status(200).json(userEvents);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-const getUserPayments = async (req, res) => {
-    try {
-        const userId = req.user.id;
-        const userPayments = await Payment.find({ userId }); // Fetch payments from the database
-
-        if (!userPayments || userPayments.length === 0) {
-            return res.status(404).json({ message: "No payments found for this user" });
-        }
-
-        res.status(200).json(userPayments);
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-async function deleteUserAccount(req, res){
-    try {
-      const user = await User.findByIdAndDelete(req.user.id);
-      if (!user) {
-        return res.status(404).json({ message: 'User not found' });
-      }
-      res.status(200).json({ message: 'Account deleted successfully' });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  };
-  
-
-
-
-module.exports = { 
-    userSignup, 
-    userSignin, 
-    getUserProfile,
-    userProfile, 
-    currentUser, 
-    updateUserProfile, 
-    changePassword, 
-    forgotPassword, 
-    otpVerification, 
-    resetPassword, 
-    contactUs, 
-    updateSpin, 
-    getUserEvents,  // ✅ Only once
-    getUserPayments, // ✅ Only once
-    deleteUserAccount 
-};
+module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
