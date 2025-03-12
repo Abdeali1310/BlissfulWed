@@ -107,9 +107,13 @@ async function userSignin(req, res) {
             return res
                 .status(200)
                 .json({
-                    user: existingUser._id,
-                    name: existingUser.username,
-                    email: existingUser.email,
+                    user: {
+                        _id: existingUser._id,
+                        name: existingUser.username,
+                        email: existingUser.email,
+                        profilePicUrl: existingUser.profilePicUrl,
+                        hasSpun: existingUser.hasSpun,
+                    },
                     token,
                 });
         }
@@ -125,16 +129,18 @@ async function userSignin(req, res) {
     }
 }
 
-//current user
 async function currentUser(req, res) {
     if (req.userId) {
-        const id = req.userId;
-        const user = await User.findById(id);
-        return res.send({ user: user })
+        const user = await User.findById(req.userId);
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+        return res.status(200).json({ user });
     } else {
-        return res.status(411).json({ msg: "Sign in required" })
+        return res.status(401).json({ msg: "Sign in required" });
     }
 }
+
 
 //auth check
 async function userProfile(req, res) {

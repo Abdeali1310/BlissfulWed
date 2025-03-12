@@ -42,7 +42,7 @@ export default function Signin() {
       
       if (res.data.token) {
         toast.success("Successfully Signed In!");
-        localStorage.setItem("user", res.data.user);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
         setTimeout(() => {
             navigate("/")
         }, 1000);
