@@ -143,7 +143,7 @@ async function userProfile(req, res) {
 
 async function editProfile(req, res) {
   const { userId } = req.params;
-  const { username, email, bio, contact, city, hasSpun, prize } = req.body;
+  const { username, city, bio } = req.body;
 
   const profilePicUrl = req.file
     ? req.file.path
@@ -155,32 +155,17 @@ async function editProfile(req, res) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        username,
-        email,
-        bio,
-        profilePicUrl,
-        contact,
-        city,
-        hasSpun,
-        prize,
-      },
-      { new: true }
-    );
+    // ✅ Allow only username, city, bio, and profilePicUrl to be updated
+    if (username) existingUser.username = username;
+    if (city) existingUser.city = city;
+    if (bio) existingUser.bio = bio;
+    if (profilePicUrl) existingUser.profilePicUrl = profilePicUrl;
 
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
-    }
+    await existingUser.save();
 
-    res
-      .status(200)
-      .json({ success: true, msg: "Profile updated successfully" });
+    res.status(200).json({ success: true, msg: "Profile updated successfully", user: existingUser });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error updating profile", error });
+    res.status(500).json({ success: false, message: "Error updating profile", error });
   }
 }
 
