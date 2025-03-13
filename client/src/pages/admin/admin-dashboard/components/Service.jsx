@@ -187,7 +187,7 @@ const Service = () => {
           <Card sx={{ backgroundColor: "#D1C4E9", p: 2 }}>
             <CardContent>
               <Typography variant="h6" color="#5A3D3D">
-                Top 5 Most Booked Services
+                Top Most Booked Services
               </Typography>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={topServices}>

@@ -453,7 +453,7 @@ const Bookings = () => {
                     <TableCell>₹{paidAmount}</TableCell>
                     <TableCell>₹{remainingAmount}</TableCell>
                     <TableCell>
-                      {booking.status === "Cancelled" ? (
+                      {booking.status === "Cancelled" ||  booking.status === "Completed"? (
                         "N/A"
                       ) : isPastDate ? ( // Show "Complete" button if date is in the past
                         <Button

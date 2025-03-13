@@ -248,7 +248,7 @@ const Payment = () => {
   const handleRefund = async () => {
     if (!selectedPaymentId) return;
     console.log(selectedPaymentId);
-    
+
     try {
       const response = await axios.put(
         `http://localhost:3000/api/v1/payment/refund/${selectedPaymentId}`
@@ -257,6 +257,12 @@ const Payment = () => {
       if (response.data.success) {
         toast.success("Refund processed successfully!");
         dispatch(fetchPayments()); // Refresh payment data
+        setTimeout(() => {
+          window.open(
+            "https://merchant.cashfree.com/merchants/pg/transactions/payments?env=test",
+            
+          );
+        }, 1000);
       } else {
         toast.error(response.data.message);
       }

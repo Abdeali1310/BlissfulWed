@@ -37,6 +37,8 @@ import Service from "./components/Service";
 import Payment from "./pages/Payment";
 import Reviews from "./components/Reviews";
 import Reports from "./pages/Reports";
+import AdminAccount from "./pages/Account/AdminAccount";
+import CustomerSupport from "./components/Support/CustomerSupport";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -85,7 +87,6 @@ const AdminDashboard = () => {
       label: "Customer Support",
       icon: <FaEnvelope size={20} />,
     },
-    { id: "settings", label: "Settings", icon: <FaCog size={20} /> },
     { id: "account", label: "Account", icon: <FaUser size={20} /> },
   ];
 
@@ -167,7 +168,6 @@ const AdminDashboard = () => {
           {activeTab === "payment" && <PaymentMgmtTab />}
           {activeTab === "reviews" && <ReviewsFeedbackTab />}
           {activeTab === "reports" && <ReportsAnalyticsTab />}
-          {activeTab === "settings" && <SettingsTab />}
           {activeTab === "support" && <CustomerQueriesSupportTab />}
           {activeTab === "account" && <AccountTab />}
         </div>
@@ -266,23 +266,19 @@ const ReportsAnalyticsTab = () => (
   </div>
 );
 
-const SettingsTab = () => (
-  <div>
-    <Settings />
-  </div>
-);
+
 
 const CustomerQueriesSupportTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Customer Queries & Support</h1>
-    <p className="mt-2">Manage customer inquiries and support requests.</p>
+    <CustomerSupport />
   </div>
 );
 
 const AccountTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Account</h1>
-    <p className="mt-2">Manage personal account settings and details.</p>
+    <AdminAccount />
   </div>
 );
 

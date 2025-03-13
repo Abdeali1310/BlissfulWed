@@ -14,6 +14,7 @@ const packageroutes =require("./routers/packageRoutes.js");
 const paymentRouter = require("./routers/paymentRouter.js");
 const invoiceRouter = require("./routers/invoiceRouter.js");
 const searchRouter = require("./routers/searchRouter.js");
+const supportRouter = require("./routers/supportRouter.js");
 
 const PORT = 3000;
 
@@ -41,6 +42,7 @@ app.use("/api/packages",packageroutes);
 app.use("/api/v1/payment",paymentRouter)
 app.use("/api/v1/invoice",invoiceRouter)
 app.use("/api/v1/search",searchRouter);
+app.use("/api/v1/support",supportRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

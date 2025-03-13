@@ -8,6 +8,9 @@ const AdminSchema = new mongoose.Schema({
     contact: { type: String, required: true, unique: true },
     gender: { type: String, enum: ['male', 'female', 'other'], required: true },
     key: { type: String, required: true },
+    profilePic: {
+        type: String, default: "https://static.vecteezy.com/system/resources/previews/002/534/006/original/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg"
+    },
 }, { timestamps: true });
 
 // Hash password before saving

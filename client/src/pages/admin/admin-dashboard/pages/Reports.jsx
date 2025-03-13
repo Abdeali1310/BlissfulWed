@@ -24,6 +24,7 @@ import {
   LineChart,
   Line,
 } from "recharts";
+import ReportsTable from "./ReportsTable";
 
 // Helper function to get the most popular event name
 const getMostPopularEvent = (bookings) => {
@@ -199,59 +200,6 @@ const Reports = () => {
 
       pdf.save("report.pdf");
     });
-  };
-  const downloadCSV = () => {
-    const reportElement = document.getElementById("reportPage");
-  
-    if (!reportElement) {
-      console.error("Report page not found!");
-      return;
-    }
-  
-    let csvContent = "";
-  
-    // Extract tables from the report page
-    const tables = reportElement.querySelectorAll("table");
-  
-    if (tables.length > 0) {
-      tables.forEach((table) => {
-        const rows = table.querySelectorAll("tr");
-  
-        rows.forEach((row) => {
-          const columns = row.querySelectorAll("th, td");
-          const rowData = Array.from(columns).map((col) => 
-            `"${col.innerText.replace(/"/g, '""')}"` // Escape quotes properly
-          );
-          csvContent += rowData.join(",") + "\n"; // Join with commas and add new line
-        });
-  
-        csvContent += "\n"; // Separate tables with an empty line
-      });
-    } else {
-      // If no tables, extract paragraph and heading text
-      const textElements = reportElement.querySelectorAll("p, h1, h2, h3, h4, h5, h6, div");
-      
-      textElements.forEach((el) => {
-        const text = el.innerText.trim();
-        if (text) {
-          csvContent += `"${text.replace(/"/g, '""')}"\n`; // Add text with newline
-        }
-      });
-    }
-  
-    if (!csvContent.trim()) {
-      console.error("No content found to export.");
-      return;
-    }
-  
-    // Create and download the CSV file
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.setAttribute("href", URL.createObjectURL(blob));
-    link.setAttribute("download", "report.csv");
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
   
 
@@ -451,6 +399,10 @@ const Reports = () => {
               </Paper>
             </Grid>
           </Grid>
+
+
+          {/* table */}
+          <ReportsTable />
         </Box>
       </div>
 
@@ -463,14 +415,7 @@ const Reports = () => {
         Download Report as PDF
       </Button>
 
-      <Button
-        sx={{ marginBlock: "2rem", marginLeft: "1rem" }}
-        variant="outlined"
-        color="primary"
-        onClick={downloadCSV}
-      >
-        Download Report as CSV
-      </Button>
+      
     </>
   );
 };

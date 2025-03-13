@@ -5,150 +5,105 @@ const Settings = () => {
   const translations = {
     en: {
       settings: "Settings",
-      theme: "Dark Mode",
       fontSize: "Font Size",
-      requestDeletion: "Request Account Deletion",
-      securityLogs: "Security Logs and Alerts",
-      noLogs: "No security logs available at this time.",
-      language: "Language",
-    },
-    es: {
-      settings: "Configuraciones",
-      theme: "Modo Oscuro",
-      fontSize: "Tamaño de Fuente",
-      requestDeletion: "Solicitar Eliminación de Cuenta",
-      securityLogs: "Registros de Seguridad y Alertas",
-      noLogs: "No hay registros de seguridad disponibles en este momento.",
-      language: "Idioma",
-    },
-    fr: {
-      settings: "Paramètres",
-      theme: "Mode Sombre",
-      fontSize: "Taille de la Police",
-      requestDeletion: "Demander la Suppression du Compte",
-      securityLogs: "Journaux de Sécurité et Alertes",
-      noLogs: "Aucun journal de sécurité disponible pour le moment.",
-      language: "Langue",
-    },
-    hi: {
-      settings: "सेटिंग्स",
-      theme: "डार्क मोड",
-      fontSize: "फ़ॉन्ट आकार",
-      requestDeletion: "खाता हटाने का अनुरोध करें",
-      securityLogs: "सुरक्षा लॉग और अलर्ट",
-      noLogs: "इस समय कोई सुरक्षा लॉग उपलब्ध नहीं है।",
-      language: "भाषा",
+      profileVisibility: "Profile Visibility",
+      notifications: "Enable Notifications",
+      timezone: "Timezone",
     },
   };
 
-  // Load preferences from localStorage
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return localStorage.getItem("darkMode") === "true";
-  });
-
+  // Load saved preferences from localStorage
   const [fontSize, setFontSize] = useState(() => {
     return localStorage.getItem("fontSize") || 16;
   });
 
-  const [language, setLanguage] = useState(() => {
-    return localStorage.getItem("language") || "en";
+  const [profileVisibility, setProfileVisibility] = useState(() => {
+    return localStorage.getItem("profileVisibility") || "public";
   });
 
-  // Apply dark mode & font size on mount
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-    localStorage.setItem("darkMode", isDarkMode);
-  }, [isDarkMode]);
+  const [notifications, setNotifications] = useState(() => {
+    return localStorage.getItem("notifications") === "true";
+  });
 
+  const [timezone, setTimezone] = useState(() => {
+    return localStorage.getItem("timezone") || "UTC";
+  });
+
+  // Apply font size on mount
   useEffect(() => {
     document.documentElement.style.fontSize = `${fontSize}px`;
     localStorage.setItem("fontSize", fontSize);
   }, [fontSize]);
 
+  // Update localStorage when settings change
   useEffect(() => {
-    localStorage.setItem("language", language);
-  }, [language]);
+    localStorage.setItem("profileVisibility", profileVisibility);
+  }, [profileVisibility]);
 
-  const toggleTheme = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  useEffect(() => {
+    localStorage.setItem("notifications", notifications);
+  }, [notifications]);
 
-  const handleFontSizeChange = (e) => {
-    setFontSize(e.target.value);
-  };
-
-  const handleLanguageChange = (e) => {
-    setLanguage(e.target.value);
-  };
-
-  const requestAccountDeletion = () => {
-    if (window.confirm("Are you sure you want to request account deletion?")) {
-      alert("Account deletion requested.");
-    }
-  };
+  useEffect(() => {
+    localStorage.setItem("timezone", timezone);
+  }, [timezone]);
 
   return (
     <div className="settings h-[80vh] w-[45vh] lg:h-100vh lg:w-full dark:bg-gray-900 dark:text-white p-6 rounded-md w-[75%] shadow-md">
-      <h1 className="text-2xl font-bold">{translations[language].settings}</h1>
-
-      {/* Dark Mode Toggle */}
-      <div className="my-4 flex items-center gap-4">
-        <label>{translations[language].theme}:</label>
-        <button
-          onClick={toggleTheme}
-          className={`px-4 py-1 rounded ${isDarkMode ? "bg-gray-800 text-white" : "bg-gray-300 text-black"}`}
-        >
-          {isDarkMode ? "🌙" : "☀️"}
-        </button>
-      </div>
-
-      {/* Language Selection */}
-      <div className="my-4 flex items-center gap-4">
-        <label>{translations[language].language}:</label>
-        <select
-          value={language}
-          onChange={handleLanguageChange}
-          className="border dark:bg-gray-800 p-2 rounded"
-        >
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="fr">Français</option>
-          <option value="hi">हिन्दी</option>
-        </select>
-      </div>
+      <h1 className="text-2xl font-bold">{translations.en.settings}</h1>
 
       {/* Font Size Adjustment */}
       <div className="my-4 flex items-center gap-4">
-        <label>{translations[language].fontSize}:</label>
+        <label>{translations.en.fontSize}:</label>
         <input
           type="range"
           min="12"
           max="24"
           value={fontSize}
-          onChange={handleFontSizeChange}
+          onChange={(e) => setFontSize(e.target.value)}
           className="slider"
         />
         <span>{fontSize}px</span>
       </div>
 
-      {/* Request Account Deletion */}
+      {/* Profile Visibility */}
       <div className="my-4">
-        <button
-          onClick={requestAccountDeletion}
-          className="bg-red-500 dark:bg-red-700 text-white px-3 py-1 rounded"
+        <label>{translations.en.profileVisibility}:</label>
+        <select
+          value={profileVisibility}
+          onChange={(e) => setProfileVisibility(e.target.value)}
+          className="border dark:bg-gray-800 p-2 rounded w-full"
         >
-          {translations[language].requestDeletion}
-        </button>
+          <option value="public">Public</option>
+          <option value="private">Private</option>
+          <option value="friends">Friends Only</option>
+        </select>
       </div>
 
-      {/* Security Logs and Alerts */}
+      {/* Notifications Toggle */}
+      <div className="my-4 flex items-center gap-4">
+        <label>{translations.en.notifications}:</label>
+        <input
+          type="checkbox"
+          checked={notifications}
+          onChange={() => setNotifications(!notifications)}
+          className="w-5 h-5"
+        />
+      </div>
+
+      {/* Timezone Selection */}
       <div className="my-4">
-        <h2 className="text-xl">{translations[language].securityLogs}</h2>
-        <p>{translations[language].noLogs}</p>
+        <label>{translations.en.timezone}:</label>
+        <select
+          value={timezone}
+          onChange={(e) => setTimezone(e.target.value)}
+          className="border dark:bg-gray-800 p-2 rounded w-full"
+        >
+          <option value="UTC">UTC</option>
+          <option value="IST">IST (Indian Standard Time)</option>
+          <option value="EST">EST (Eastern Standard Time)</option>
+          <option value="PST">PST (Pacific Standard Time)</option>
+        </select>
       </div>
     </div>
   );

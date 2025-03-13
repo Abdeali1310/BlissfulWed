@@ -59,8 +59,13 @@ const getTopBookedServices = async (req, res) => {
   try {
     const topServices = await Booking.aggregate([
       {
+        $addFields: {
+          serviceId: { $toObjectId: "$service" }, // Convert service to ObjectId
+        },
+      },
+      {
         $group: {
-          _id: { $toObjectId: "$service" }, // Convert to ObjectId
+          _id: "$serviceId",
           totalBookings: { $sum: 1 },
         },
       },
@@ -76,15 +81,24 @@ const getTopBookedServices = async (req, res) => {
       },
       { $unwind: "$serviceDetails" },
       {
+        $group: {
+          _id: "$serviceDetails.serviceType", // Group by service type instead of ID
+          totalBookings: { $sum: "$totalBookings" },
+          price: { $first: "$serviceDetails.price" },
+          category: { $first: "$serviceDetails.category" },
+        },
+      },
+      {
         $project: {
-          _id: "$serviceDetails._id",
-          serviceType: "$serviceDetails.serviceType",
+          _id: 0,
+          serviceType: "$_id",
           totalBookings: 1,
-          price: "$serviceDetails.price",
-          category: "$serviceDetails.category",
+          price: 1,
+          category: 1,
         },
       },
     ]);
+    
 
     res.status(200).json(topServices);
   } catch (error) {
