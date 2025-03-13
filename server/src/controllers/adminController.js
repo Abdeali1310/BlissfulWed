@@ -114,4 +114,65 @@ async function currentAdmin(req, res) {
     }
 }
 
-module.exports = { adminSignup, adminSignin, currentAdmin }
+const uploadProfilePic = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ error: "No file uploaded" });
+        }
+
+        const adminId = req.body.adminId;
+        const imageUrl = req.file.path; // Cloudinary URL
+
+        const admin = await Admin.findByIdAndUpdate(
+            adminId,
+            { profilePic: imageUrl },
+            { new: true }
+        );
+
+        if (!admin) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+
+        res.status(200).json({ message: "Profile picture updated", admin });
+    } catch (error) {
+        res.status(500).json({ error: "Error uploading image" });
+    }
+};
+
+const getAdminDetails = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+        const admin = await Admin.findById(adminId).select("-password -key");
+
+        if (!admin) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+
+        res.status(200).json(admin);
+    } catch (error) {
+        res.status(500).json({ error: "Error fetching admin details" });
+    }
+};
+
+const updateAdminProfile = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+        const { name, email, contact, gender } = req.body;
+
+        const admin = await Admin.findByIdAndUpdate(
+            adminId,
+            { name, email, contact, gender },
+            { new: true }
+        );
+
+        if (!admin) {
+            return res.status(404).json({ error: "Admin not found" });
+        }
+
+        res.status(200).json({ message: "Profile updated", admin });
+    } catch (error) {
+        res.status(500).json({ error: "Error updating profile" });
+    }
+};
+
+module.exports = { getAdminDetails, updateAdminProfile, uploadProfilePic, adminSignup, adminSignin, currentAdmin }

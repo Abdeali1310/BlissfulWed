@@ -61,7 +61,7 @@ async function createPayment(req, res) {
         "X-Api-Version": "2025-01-01",
       },
     });
-
+    const cf_order_id = response.data.cf_order_id;
 
     if (response.data.payment_session_id) {
       const headers = {
@@ -100,13 +100,16 @@ async function createPayment(req, res) {
           "send_sms": false,
           "send_email": true
         },
-        
+
       };
+      
       const paymentLinkResponse = await axios.post(
         'https://sandbox.cashfree.com/pg/links',  // Use the correct endpoint
         paymentLinkData,
         { headers }
       );
+
+      
       const paymentLink = paymentLinkResponse.data.link_url;
 
       // Save Payment in DB
@@ -119,6 +122,7 @@ async function createPayment(req, res) {
         dueDate,
         paymentMethod,
         transactionId: orderId,
+        cashfreeOrderId:cf_order_id,
         paymentStatus: "Pending",
       });
 
@@ -174,8 +178,8 @@ async function verifyPayment(req, res) {
       if (!payment) {
         return res.status(404).json({ success: false, message: "Payment not found" });
       }
-       payment.paymentStatus = "Paid";
-       await payment.save()
+      payment.paymentStatus = "Paid";
+      await payment.save()
       return res.json({
         success: true,
         paymentStatus: payment.paymentStatus,
@@ -191,24 +195,166 @@ async function verifyPayment(req, res) {
   }
 }
 
-async function getPaymentDetails(req,res){
+async function getPaymentDetails(req, res) {
   try {
     const { order_id } = req.query;
 
     if (!order_id) {
-        return res.status(400).json({ success: false, message: "Order ID is required" });
+      return res.status(400).json({ success: false, message: "Order ID is required" });
     }
 
     const payment = await Payment.findOne({ transactionId: order_id }).populate("userId bookingId");
 
     if (!payment) {
-        return res.status(404).json({ success: false, message: "Payment not found" });
+      return res.status(404).json({ success: false, message: "Payment not found" });
     }
 
     res.json({ success: true, payment });
-} catch (error) {
+  } catch (error) {
     res.status(500).json({ success: false, message: "Server error", error });
-}
+  }
 }
 
-module.exports = { createPayment, verifyPayment, getPaymentDetails }
+const getPaymentByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    // Fetch all payments associated with the user
+    const payments = await Payment.find({ userId: userId })
+      .populate("bookingId", "date status totalAmount")
+      .sort({ createdAt: -1 });
+
+    if (!payments.length) {
+      return res.status(404).json({ message: "No payments found for this user." });
+    }
+
+    return res.status(200).json({ payments });
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+const getAllPaymentDetails = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    let payments;
+    if (userId) {
+      payments = await Payment.find({ userId })
+        .populate({
+          path: "bookingId",
+          populate: { path: "service", select: "serviceType" } // Double populate service inside booking
+        })
+        .populate("userId", "username");
+    } else {
+      payments = await Payment.find()
+        .populate({
+          path: "bookingId",
+          populate: { path: "service", select: "serviceType" } // Double populate
+        })
+        .populate("userId", "username");
+    }
+
+    res.status(200).json({ success: true, payments });
+  } catch (error) {
+    console.error("Error fetching payments:", error);
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+const handleRefund = async (req, res) => {
+  try {
+    const { paymentId } = req.params;
+
+    // Fetch the payment details from the database
+    const payment = await Payment.findById(paymentId);
+    if (!payment) {
+      return res.status(404).json({ success: false, message: "Payment not found" });
+    }
+
+    if (payment.paymentStatus !== "Paid" || payment.remainingAmount !== 0) {
+      return res.status(400).json({ success: false, message: "Refund not allowed for this payment" });
+    }
+
+    // 1️⃣ Fetch the correct PAID order ID using the extended API
+    // const paidOrderId = await getPaidOrderId(payment.transactionId);
+    // if (!paidOrderId) {
+    //   return res.status(400).json({ success: false, message: "No paid order found for this user" });
+    // }
+
+    const refundAmount = (payment.totalAmount * 70) / 100;
+    // console.log(`Processing refund for order: ${paidOrderId} - Amount: ${refundAmount}`);
+
+    // const options = {
+    //   method: "POST",
+    //   headers: {
+    //     "x-api-version": "2025-01-01",
+    //     "x-client-id": process.env.CASHFREE_APP_ID,
+    //     "x-client-secret": process.env.CASHFREE_SECRET,
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     refund_amount: refundAmount,
+    //     refund_id: `refund_${paymentId}`,
+    //     refund_note: "Refund processed",
+    //     refund_speed: "STANDARD",
+    //   }),
+    // };
+    
+    // // 2️⃣ Call Cashfree refund API using the correct PAID order ID
+    // const response = await fetch(`https://sandbox.cashfree.com/pg/orders/${paidOrderId}/refunds`, options);
+    // const data = await response.json();
+    // console.log("Refund API Response:", data);
+
+    // if (!response.ok) {
+    //   return res.status(400).json({ success: false, message: "Refund failed", error: data });
+    // }
+
+    // 3️⃣ Update payment record in the database
+    payment.refundStatus = "Refunded";
+    payment.refundAmount = refundAmount;
+    payment.refundProcessedAt = new Date();
+    await payment.save();
+
+    res.status(200).json({ success: true, message: "Refund processed successfully" });
+  } catch (error) {
+    console.error("Error processing refund:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Function to get the correct "PAID" order ID using the extended API
+const getPaidOrderId = async (orderId) => {
+  try {
+    const options = {
+      method: "GET",
+      headers: {
+        "x-api-version": "2025-01-01",
+        "x-client-id": process.env.CASHFREE_APP_ID,
+        "x-client-secret": process.env.CASHFREE_SECRET,
+      },
+    };
+
+   
+
+    const extendedResponse = await fetch(`https://sandbox.cashfree.com/pg/orders/${orderId}/extended`, options);
+    const extendedData = await extendedResponse.json();
+    console.log("Extended Order Details:", JSON.stringify(extendedData));
+
+    if (extendedData && extendedData.order_id) {
+      console.log("✅ Correct Paid Order ID for Refund:", extendedData.order_id);
+      return extendedData.order_id;
+    } else {
+      console.warn("⚠️ Order ID not found in extended API response.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching paid order ID:", error);
+    return null;
+  }
+};
+
+
+
+module.exports = { handleRefund,getAllPaymentDetails, getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }

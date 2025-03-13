@@ -1,13 +1,15 @@
 const express = require("express");
-const { createPayment,getPaymentDetails, verifyPayment } = require("../controllers/paymentController");
+const { createPayment,getPaymentDetails, verifyPayment, getPaymentByUserId, getAllPaymentDetails, handleRefund } = require("../controllers/paymentController");
 const { isLoggedIn } = require("../middlewares/userAuth");
 const Payment = require("../models/Payment");
 
 const paymentRouter = express.Router();
 
+paymentRouter.get("/", getAllPaymentDetails);
 paymentRouter.post("/create",isLoggedIn, createPayment);
 paymentRouter.get("/verify",isLoggedIn, verifyPayment);
 paymentRouter.get("/details",isLoggedIn, getPaymentDetails);
+<<<<<<< HEAD
 paymentRouter.get("/history/:userId", async (req, res) => {
     try {
       const { userId } = req.params;
@@ -21,5 +23,9 @@ paymentRouter.get("/history/:userId", async (req, res) => {
       res.status(500).json({ success: false, message: "Failed to fetch payment history" });
     }
   });
+=======
+paymentRouter.get("/user/:userId", getPaymentByUserId);
+paymentRouter.put("/refund/:paymentId", handleRefund);
+>>>>>>> 6a9208b6752d8b6ef49cb37ff519ffa72e41c719
 
 module.exports = paymentRouter;

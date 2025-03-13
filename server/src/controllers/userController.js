@@ -305,6 +305,7 @@ async function contactUs(req, res) {
   }
 }
 
+
 async function updateSpin(req, res) {
   try {
     const { userId, prize } = req.body;
@@ -336,50 +337,4 @@ async function updateSpin(req, res) {
     res.status(500).json({ message: "Internal server error." });
   }
 }
-
-const getUserHistory = async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    if (!userId) {
-      return res
-        .status(400)
-        .json({ success: false, message: "User ID is required" });
-    }
-
-    // Fetch payments based on userId
-    const payments = await Payment.find({ userId }).sort({ createdAt: -1 });
-
-    // Fetch bookings based on userId and populate related service/package data
-    const events = await Booking.find({ user: userId })
-      .populate("service")
-      .populate("package")
-      .sort({ date: -1 });
-
-    return res.status(200).json({
-      success: true,
-      payments,
-      events,
-    });
-  } catch (error) {
-    console.error("Error fetching history:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Failed to fetch user history" });
-  }
-};
-
-module.exports = {
-  userSignup,
-  updateSpin,
-  userSignin,
-  userProfile,
-  currentUser,
-  editProfile,
-  changePassword,
-  forgotPassword,
-  otpVerification,
-  resetPassword,
-  contactUs,
-  getUserHistory,
-};
+module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }

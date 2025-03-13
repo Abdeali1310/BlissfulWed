@@ -38,7 +38,12 @@ const paymentSchema = new mongoose.Schema({
     transactionId: {
         type: String,
         unique: true,
-        sparse: true, // Some failed transactions may not have this
+        sparse: true, 
+    },
+    cashfreeOrderId:{
+        type: String,
+        unique: true,
+        sparse: true, 
     },
     paymentStatus: {
         type: String,

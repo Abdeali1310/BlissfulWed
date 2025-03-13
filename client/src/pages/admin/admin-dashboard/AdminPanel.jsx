@@ -23,13 +23,39 @@ import {
 import { Drawer, IconButton } from "@mui/material";
 import Navbar from "./components/Navbar";
 import Settings from "./components/Settings";
+import UserProfile from "./pages/UserProfile";
+import UserList from "./pages/UserList";
+import { useDispatch } from "react-redux";
+import { fetchUsers } from "../../../redux/slices/userSlice";
+import { fetchPayments } from "../../../redux/slices/paymentSlice";
+import { fetchBookings } from "../../../redux/slices/bookingSlice";
+import { fetchReviews } from "../../../redux/slices/reviewSlice";
+import { fetchServices } from "../../../redux/slices/serviceSlice";
+import DashboardHome from "./components/DashboardHome";
+import Bookings from "./pages/Bookings";
+import Service from "./components/Service";
+import Payment from "./pages/Payment";
+import Reviews from "./components/Reviews";
+import Reports from "./pages/Reports";
+import AdminAccount from "./pages/Account/AdminAccount";
+import CustomerSupport from "./components/Support/CustomerSupport";
 
 const AdminDashboard = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchUsers());
+    dispatch(fetchPayments());
+    dispatch(fetchBookings());
+    dispatch(fetchReviews());
+    dispatch(fetchServices());
+  }, [dispatch]);
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(
     localStorage.getItem("theme") === "dark"
   );
+
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -42,11 +68,14 @@ const AdminDashboard = () => {
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const tabs = [
     { id: "dashboard", label: "Dashboard (Home)", icon: <FaHome size={20} /> },
-    { id: "bookings", label: "Bookings", icon: <FaClipboardList size={20} /> },
+    { id: "bookings", label: "Bookings Management", icon: <FaClipboardList size={20} /> },
     { id: "services", label: "Services", icon: <FaConciergeBell size={20} /> },
-    { id: "packages", label: "Packages", icon: <FaBox size={20} /> },
     { id: "users", label: "Users Management", icon: <FaUsers size={20} /> },
-    { id: "payment", label: "Payment Management", icon: <FaDollarSign size={20} /> },
+    {
+      id: "payment",
+      label: "Payment Management",
+      icon: <FaDollarSign size={20} />,
+    },
     { id: "reviews", label: "Reviews & Feedback", icon: <FaStar size={20} /> },
     {
       id: "reports",
@@ -58,7 +87,6 @@ const AdminDashboard = () => {
       label: "Customer Support",
       icon: <FaEnvelope size={20} />,
     },
-    { id: "settings", label: "Settings", icon: <FaCog size={20} /> },
     { id: "account", label: "Account", icon: <FaUser size={20} /> },
   ];
 
@@ -75,28 +103,28 @@ const AdminDashboard = () => {
       <div className="hidden lg:flex w-[35vh] bg-pink-500 text-white p-5 flex-col">
         <h2 className="text-2xl font-bold mb-6">BlissfulWed</h2>
         <nav className="space-y-2">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setIsDrawerOpen(false);
-                }}
-                className={`flex items-center gap-3 w-full px-4 py-2 rounded-lg transition-all duration-200 ${
-                  activeTab === tab.id
-                    ? darkMode ? "bg-gray-700" : "bg-pink-700"
-                    : darkMode ? "hover:bg-gray-600" : "hover:bg-pink-800"
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-          <button onClick={toggleDarkMode} className="mt-6 flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg text-white">
-          {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setIsDrawerOpen(false);
+              }}
+              className={`flex items-center gap-3 w-full px-4 py-2 rounded-lg transition-all duration-200 ${
+                activeTab === tab.id
+                  ? darkMode
+                    ? "bg-gray-700"
+                    : "bg-pink-700"
+                  : darkMode
+                  ? "hover:bg-gray-600"
+                  : "hover:bg-pink-800"
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </nav>
       </div>
 
       {/* MUI Drawer for Mobile */}
@@ -124,10 +152,6 @@ const AdminDashboard = () => {
               </button>
             ))}
           </nav>
-          <button onClick={toggleDarkMode} className="mt-6 flex items-center gap-2 px-4 py-2 bg-gray-700 rounded-lg text-white">
-          {darkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </button>
         </div>
       </Drawer>
       <div className="flex flex-col">
@@ -144,7 +168,6 @@ const AdminDashboard = () => {
           {activeTab === "payment" && <PaymentMgmtTab />}
           {activeTab === "reviews" && <ReviewsFeedbackTab />}
           {activeTab === "reports" && <ReportsAnalyticsTab />}
-          {activeTab === "settings" && <SettingsTab />}
           {activeTab === "support" && <CustomerQueriesSupportTab />}
           {activeTab === "account" && <AccountTab />}
         </div>
@@ -156,7 +179,7 @@ const AdminDashboard = () => {
 const DashboardTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Dashboard</h1>
-    <p className="mt-2">Overview of all activities and stats.</p>
+    <DashboardHome />
   </div>
 );
 
@@ -169,8 +192,8 @@ const UsersTab = () => (
 
 const BookingsTab = () => (
   <div>
-    <h1 className="text-2xl font-bold">Bookings</h1>
-    <p className="mt-2">Manage and track customer bookings.</p>
+    <h1 className="text-2xl font-bold text-pink-500">Bookings Management</h1>
+    <Bookings />
   </div>
 );
 
@@ -184,7 +207,7 @@ const InvoiceMgmtTab = () => (
 const ServicesTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Services</h1>
-    <p className="mt-2">Manage services offered for events.</p>
+    <Service />
   </div>
 );
 
@@ -195,12 +218,25 @@ const PackagesTab = () => (
   </div>
 );
 
-const UsersMgmtTab = () => (
-  <div>
-    <h1 className="text-2xl font-bold">Users Management</h1>
-    <p className="mt-2">Manage user accounts and permissions.</p>
-  </div>
-);
+const UsersMgmtTab = () => {
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold">Users Management</h1>
+      <p className="mt-2">Manage user accounts and permissions.</p>
+
+      {selectedUser ? (
+        <UserProfile
+          userId={selectedUser}
+          goBack={() => setSelectedUser(null)}
+        />
+      ) : (
+        <UserList onUserSelect={(id) => setSelectedUser(id)} />
+      )}
+    </div>
+  );
+};
 
 const GalleryMgmtTab = () => (
   <div>
@@ -212,41 +248,37 @@ const GalleryMgmtTab = () => (
 const PaymentMgmtTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Payment Management</h1>
-    <p className="mt-2">Track and manage customer payments.</p>
+    <Payment />
   </div>
 );
 
 const ReviewsFeedbackTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Reviews & Feedback</h1>
-    <p className="mt-2">Manage customer reviews and feedback.</p>
+    <Reviews />
   </div>
 );
 
 const ReportsAnalyticsTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Reports & Analytics</h1>
-    <p className="mt-2">View system reports and performance analytics.</p>
+    <Reports />
   </div>
 );
 
-const SettingsTab = () => (
-  <div>
-    <Settings />
-  </div>
-);
+
 
 const CustomerQueriesSupportTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Customer Queries & Support</h1>
-    <p className="mt-2">Manage customer inquiries and support requests.</p>
+    <CustomerSupport />
   </div>
 );
 
 const AccountTab = () => (
   <div>
     <h1 className="text-2xl font-bold">Account</h1>
-    <p className="mt-2">Manage personal account settings and details.</p>
+    <AdminAccount />
   </div>
 );
 

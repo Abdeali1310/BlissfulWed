@@ -19,6 +19,7 @@ const ImageCarousel = ({ images }) => {
       prevIndex === 0 ? images.length - 1 : prevIndex - 1
     );
   };
+  console.log(images);
 
   return (
     <div className="relative w-[350px] md:w-[500px] lg:w-[600px] flex items-center">
@@ -28,7 +29,7 @@ const ImageCarousel = ({ images }) => {
       >
         <ChevronLeft size={24} />
       </button>
-
+    
       <div className="overflow-hidden w-full">
         <motion.div
           className="flex gap-4"

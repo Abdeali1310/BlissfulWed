@@ -1,5 +1,5 @@
 const express = require("express");
-const { createReview, getAllReviews, updateReview, deleteReview } = require("../controllers/reviewController");
+const { createReview, getAllReviews, updateReview, deleteReview, getAllReviewsForAdmin } = require("../controllers/reviewController");
 const { isLoggedIn } = require("../middlewares/userAuth");
 
 const reviewRouter = express.Router();
@@ -8,5 +8,5 @@ reviewRouter.post("/", isLoggedIn, createReview);  // Create Review (Logged-in u
 reviewRouter.get("/", getAllReviews);  // Get All Reviews
 reviewRouter.put("/:id", isLoggedIn, updateReview);  // Update Review (Only owner)
 reviewRouter.delete("/:id", isLoggedIn, deleteReview);  // Delete Review (Only owner)
-
+reviewRouter.get("/admin/reviews",getAllReviewsForAdmin)
 module.exports = reviewRouter;
