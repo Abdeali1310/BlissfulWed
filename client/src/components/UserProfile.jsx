@@ -90,11 +90,29 @@ const UserProfile = () => {
 
   const handleSave = async () => {
     try {
+      const formData = new FormData();
+      formData.append("username", editedUser.username);
+      formData.append("city", editedUser.city);
+      formData.append("bio", editedUser.bio);
+
+      // ✅ If a new file is selected, add it to the FormData
+      if (editedUser.profilePicFile) {
+        formData.append("profilePic", editedUser.profilePicFile);
+      }
+
       const response = await axios.put(
-        `http://localhost:3000/api/v1/user/${user._id}`,
-        editedUser,
-        { withCredentials: true }
+        `http://localhost:3000/api/v1/user/profile/edit/${user._id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            "Content-Type": "multipart/form-data", // ✅ Necessary for file upload
+          },
+          withCredentials: true,
+        }
       );
+
+      // ✅ Update the state with the new user data
       setUser(response.data.user);
       setIsEditing(false);
       alert("Profile updated successfully");
@@ -105,10 +123,22 @@ const UserProfile = () => {
   };
 
   const handleChange = (e) => {
-    setEditedUser((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
+    const { name, value, files } = e.target;
+
+    if (name === "profilePic" && files.length > 0) {
+      const file = files[0];
+
+      setEditedUser((prev) => ({
+        ...prev,
+        profilePicFile: file, // ✅ Save file for upload
+        profilePicUrl: URL.createObjectURL(file), // ✅ Preview file
+      }));
+    } else {
+      setEditedUser((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   if (!user) return <Typography>Loading...</Typography>;
@@ -186,7 +216,7 @@ const UserProfile = () => {
             {/* Avatar with Edit Icon */}
             <Box sx={{ position: "relative", display: "inline-block" }}>
               <Avatar
-                src={user.profilePicUrl}
+                src={editedUser.profilePicUrl || user.profilePicUrl}
                 sx={{
                   width: 120,
                   height: 120,
@@ -208,16 +238,9 @@ const UserProfile = () => {
                 >
                   <input
                     type="file"
+                    name="profilePic"
                     hidden
-                    onChange={(e) => {
-                      const file = e.target.files[0];
-                      if (file) {
-                        setEditedUser((prev) => ({
-                          ...prev,
-                          profilePicUrl: URL.createObjectURL(file),
-                        }));
-                      }
-                    }}
+                    onChange={handleChange}
                   />
                   <FaPen size={14} />
                 </IconButton>
@@ -304,6 +327,16 @@ const UserProfile = () => {
                   onChange={handleChange}
                   fullWidth
                   margin="normal"
+                />
+                <TextField
+                  label="Bio"
+                  value={editedUser.bio}
+                  name="bio"
+                  onChange={handleChange}
+                  fullWidth
+                  margin="normal"
+                  multiline
+                  rows={3}
                 />
 
                 <Box sx={{ display: "flex", gap: 2, mt: 2 }}>

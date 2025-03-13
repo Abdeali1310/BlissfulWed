@@ -70,6 +70,9 @@ const App = () => {
           element={<IndividualService />}
         />
 
+        {/* user profile*/}
+        <Route path="/user/profile" element={<UserProfile />} />
+
         <Route path="/booking" element={<BookingPage />} />
 
         {/* payment */}
@@ -77,14 +80,9 @@ const App = () => {
         <Route path="/payment-status" element={<PaymentStatus />} />
 
         <Route path="/spinner" element={<Spinner />} />
-<<<<<<< HEAD
-          <Route path="/admin-dashboard" element={<AdminPanel />} />
-       <Route path="/user/profile" element={<UserProfile/>}/>
-=======
         
         {/* payment */}
         <Route path="/admin-dashboard" element={<AdminPanel />} />
->>>>>>> 6a9208b6752d8b6ef49cb37ff519ffa72e41c719
       </Routes>
     </div>
   );
