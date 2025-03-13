@@ -53,20 +53,20 @@ const Navbar = () => {
 
     if (curr_userId) {
       try {
-        const response = await axios.get(
-          "http://localhost:3000/api/v1/user/current",
+        const response = await axios.post(
+          "http://localhost:3000/api/v1/user",
+          { curr_userId },
           {
-            params: { userId: curr_userId }, // If you want to pass it as a query param
             withCredentials: true, // Ensure cookies are sent (if using sessions)
           }
         );
-    
+
         setUserProfilePic(response.data.user.profilePicUrl);
         setUserName(response.data.user.username);
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
-    }    
+    }
   };
 
   useEffect(() => {

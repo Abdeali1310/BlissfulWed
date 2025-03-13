@@ -26,30 +26,26 @@ const Header = () => {
   const [loading, setLoading] = useState(true);
   const [loadedImages, setLoadedImages] = useState(0);
   const [user, setUser] = useState(null);
-
-    useEffect(() => {
-    // ✅ Read and parse user data from localStorage
-    const storedUser = JSON.parse(localStorage.getItem("user"));
-    if (storedUser) {
-      setUser(storedUser);
-    }
-
-    axios
-    .get("http://localhost:3000/api/v1/user/current", { withCredentials: true })
-    .then((res) => {
-      console.log(res.data.user);
-      setUser(res.data.user);
-    })
-    .catch((err) => {
-      console.error("Error fetching user profile:", err);
-    });
-
-    // ✅ Preload images
+  useEffect(() => {
+    // Preload images
     weddingImages.forEach((src) => {
       const img = new Image();
       img.src = src;
-      img.onload = () => setLoadedImages((prev) => prev + 1);
+      img.onload = () => {
+        setLoadedImages((prev) => prev + 1);
+      };
     });
+
+    axios
+      .post("http://localhost:3000/api/v1/user", {}, { withCredentials: true })
+      .then((res) => {
+        console.log(res.data.user);
+
+        setUser(res.data.user);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
   useEffect(() => {

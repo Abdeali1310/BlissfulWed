@@ -24,7 +24,7 @@ import Payment from "./pages/Payment.jsx";
 import PaymentStatus from "./pages/PaymentStatus.jsx";
 import Spinner from "./extras/Spinner.jsx";
 import AdminPanel from "./pages/admin/admin-dashboard/AdminPanel.jsx";
-import Profile from "./components/UserProfile.jsx"
+import UserProfile from "./components/UserProfile.jsx";
 const App = () => {
   return (
 
@@ -49,8 +49,6 @@ const App = () => {
         />
         <Route path="/user/change-password" element={<Changepassword />} />
         <Route path="/user/reset-password" element={<ResetPasswordPage />} />
-
-        <Route path="/user/profile" element={<Profile />} />
 
         {/* Admin Authentication */}
         <Route path="/admin/signup" element={<AdminSignup />} />
@@ -80,6 +78,7 @@ const App = () => {
 
         <Route path="/spinner" element={<Spinner />} />
           <Route path="/admin-dashboard" element={<AdminPanel />} />
+       <Route path="/user/profile" element={<UserProfile/>}/>
       </Routes>
     </div>
   );
