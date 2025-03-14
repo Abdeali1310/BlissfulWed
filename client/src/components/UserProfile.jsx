@@ -15,6 +15,7 @@ import {
   IconButton,
   Tab,
   Tabs,
+  Stack,
 } from "@mui/material";
 import {
   FaUser,
@@ -22,64 +23,186 @@ import {
   FaMoneyBill,
   FaCog,
   FaPen,
+  FaLock,
+  FaArrowLeft,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+// import changePassword from "../../../server/src/controllers/userController";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [editedUser, setEditedUser] = useState(null);
   const [activeTab, setActiveTab] = useState("profile");
   const [isEditing, setIsEditing] = useState(false);
-  const [historyData, setHistoryData] = useState({ payments: [], events: [] });
-  const [activeSubTab, setActiveSubTab] = useState("payments");
+  const [historyData, setHistoryData] = useState({
+    previouslyBookedEvents: [],
+    upcomingEvents: [],
+    remainingAmount: [],
+    totalPayments: 0,
+    payments: [], // ✅ Ensure payments array is initialized
+  });
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [bookings, setBookings] = useState([]);
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    try {
+      // ✅ Remove userId from localStorage
+      localStorage.removeItem("userId");
+      localStorage.removeItem("user");
+
+      // ✅ Redirect to homepage
+      navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      alert("Failed to log out. Please try again.");
+    }
+  };
 
   useEffect(() => {
     const fetchUserDetails = async () => {
-      const curr_userId = localStorage.getItem("user");
-      if (!curr_userId) return;
-
       try {
+        const curr_userId = localStorage.getItem("user");
+        if (!curr_userId) return;
+
         const response = await axios.post(
           "http://localhost:3000/api/v1/user",
           { curr_userId },
           { withCredentials: true }
         );
+
         setUser(response.data.user);
         setEditedUser(response.data.user);
+
+        // ✅ Store userId for fetching history
+        localStorage.setItem("userId", response.data.user._id);
+
+        console.log("User details fetched:", response.data.user);
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
     };
 
-    fetchUserDetails();
+    fetchUserDetails(); // ✅ Correctly define and call the function
   }, []);
 
-  useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const curr_userId = localStorage.getItem("userId"); // ✅ Get userId from localStorage
+  const handleChangePassword = async () => {
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      alert("New password and confirm password do not match");
+      return;
+    }
 
+    try {
+      const response = await axios.put(
+        `http://localhost:3000/api/v1/user/changePassword/${user._id}`, // ✅ Use user._id for the endpoint
+        {
+          oldPassword: passwordData.currentPassword, // ✅ Match backend parameter names
+          newPassword: passwordData.newPassword,
+        },
+        { withCredentials: true }
+      );
+
+      alert(response.data.msg); // ✅ Show success message
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
+    } catch (error) {
+      console.error("Error changing password:", error.response.data);
+      alert(error.response.data.message || "Failed to change password");
+    }
+  };
+
+  const fetchUserBookings = async () => {
+    try {
+      const curr_userId = localStorage.getItem("user");
+      if (!curr_userId) return;
+
+      const response = await axios.get(
+        `http://localhost:3000/api/v1/booking/user/${curr_userId}`, // ✅ Pass userId in URL
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      console.log("Fetched bookings:", response.data.bookings);
+      setBookings(response.data.bookings);
+    } catch (error) {
+      console.error("Error fetching bookings:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "events") {
+      fetchUserBookings(); // ✅ Fetch bookings when "events" tab is active
+    }
+  }, [activeTab]);
+
+  const tableCellStyle = {
+    padding: "12px",
+    textAlign: "center",
+    border: "1px solid #ddd",
+    fontSize: "14px",
+    color: "#333", // Ensure text is visible
+  };
+
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        const curr_userId = localStorage.getItem("userId");
         if (!curr_userId) return;
 
         const response = await axios.get(
-          `http://localhost:3000/api/v1/user/history/${curr_userId}`,
+          `http://localhost:3000/api/v1/user/payment-history/${curr_userId}`,
           { withCredentials: true }
         );
 
-        console.log("History response:", response.data);
+        // console.log("Raw payment history response:", response.data);
 
-        // ✅ Store payment and event data in state
-        setHistoryData({
-          payments: response.data.payments || [],
-          events: response.data.events || [],
-        });
+        // ✅ If `response.data` is an object, extract the `payments` array
+        const formattedData = Array.isArray(response.data)
+          ? response.data
+          : response.data?.payments || [];
+
+        const formattedPayments = formattedData.map((payment) => ({
+          ...payment,
+          _id: payment?._id?.toString() || "",
+          userId: payment?.userId?.toString() || "",
+          bookingId: payment?.bookingId?.toString() || "",
+        }));
+
+        setHistoryData((prev) => ({
+          ...prev,
+          payments: formattedPayments,
+        }));
+        setActiveTab("transaction"); // ✅ Force re-rendering to update tab state
+        setTimeout(() => setActiveTab("transaction"), 0);
       } catch (error) {
-        console.error("Error fetching history:", error);
+        console.error("Error fetching payment history:", error);
       }
     };
 
-    fetchHistory();
+    fetchPayments();
   }, []);
+
+  useEffect(() => {
+    console.log("Active Tab:", activeTab);
+  }, [activeTab]);
+
+  useEffect(() => {
+    console.log("Updated history data:", historyData.payments);
+  }, [historyData]);
 
   const handleEdit = () => setIsEditing(true);
 
@@ -145,7 +268,12 @@ const UserProfile = () => {
 
   const tabs = [
     { id: "profile", label: "Profile", icon: <FaUser size={20} /> },
-    { id: "history", label: "History", icon: <FaClipboardList size={20} /> },
+    {
+      id: "transaction",
+      label: "Transaction",
+      icon: <FaMoneyBill size={20} />,
+    },
+    { id: "events", label: "Events", icon: <FaClipboardList size={20} /> },
     { id: "settings", label: "Settings", icon: <FaCog size={20} /> },
   ];
 
@@ -164,11 +292,13 @@ const UserProfile = () => {
         sx={{
           width: 240,
           flexShrink: 0,
+          overflowx: "hidden",
           [`& .MuiDrawer-paper`]: {
             width: 240,
             boxSizing: "border-box",
             backgroundColor: "#e91e63",
             color: "#fff",
+            overflowX: "hidden",
           },
         }}
       >
@@ -262,20 +392,46 @@ const UserProfile = () => {
                   Gender: {user.gender || "Not Specified"}
                 </Typography>
 
-                <Button
-                  onClick={handleEdit}
-                  sx={{
-                    mt: 3,
-                    backgroundColor: "#e91e63",
-                    color: "#fff",
-                    "&:hover": { backgroundColor: "#d81b60" },
-                    padding: "10px 20px",
-                    fontSize: "16px",
-                    fontWeight: "bold",
-                  }}
+                <Stack
+                  spacing={2}
+                  mt={2}
+                  alignItems="center"
+                  sx={{ width: "100%" }}
                 >
-                  Edit Profile
-                </Button>
+                  {/* Edit Button */}
+                  <Button
+                    onClick={handleEdit}
+                    fullWidth
+                    startIcon={<FaPen />}
+                    sx={{
+                      backgroundColor: "#e91e63",
+                      color: "#fff",
+                      "&:hover": { backgroundColor: "#d81b60" },
+                      padding: "10px 20px",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Edit Profile
+                  </Button>
+
+                  {/* Back Button */}
+                  <Button
+                    onClick={() => navigate("/")}
+                    fullWidth
+                    startIcon={<FaArrowLeft />}
+                    sx={{
+                      backgroundColor: "#ccc",
+                      color: "#000",
+                      "&:hover": { backgroundColor: "#bbb" },
+                      padding: "10px 20px",
+                      fontSize: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Back
+                  </Button>
+                </Stack>
               </>
             ) : (
               <>
@@ -365,132 +521,349 @@ const UserProfile = () => {
             )}
           </>
         )}
-
-        {/* === History Tab === */}
-        {activeTab === "history" && (
+        {activeTab === "transaction" && (
           <>
-            {/* Sub-Tabs */}
-            <Tabs
-              value={activeSubTab}
-              onChange={(e, newValue) => setActiveSubTab(newValue)}
-              textColor="primary"
-              indicatorColor="primary"
+            {/* === Back Button === */}
+
+            <Typography variant="h5" fontWeight="bold" mb={2}>
+              Your Transactions:
+            </Typography>
+
+            {historyData?.payments?.length > 0 ? (
+              <Box sx={{ overflowX: "auto", maxHeight: "500px" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: "10px",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  {/* === Table Head === */}
+                  <thead>
+                    <tr style={{ backgroundColor: "#e91e63", color: "#fff" }}>
+                      <th style={tableCellStyle}>Transaction ID</th>
+                      <th style={tableCellStyle}>Total Amount</th>
+                      <th style={tableCellStyle}>Advance Amount</th>
+                      <th style={tableCellStyle}>Remaining Amount</th>
+                      <th style={tableCellStyle}>Payment Method</th>
+                      <th style={tableCellStyle}>Payment Status</th>
+                      <th style={tableCellStyle}>Refund Status</th>
+                      <th style={tableCellStyle}>Refund Amount</th>
+                      <th style={tableCellStyle}>Cancellation Status</th>
+                      <th style={tableCellStyle}>Cancellation Reason</th>
+                      <th style={tableCellStyle}>Paid At</th>
+                      <th style={tableCellStyle}>Due Date</th>
+                      <th style={tableCellStyle}>Refund</th>
+                    </tr>
+                  </thead>
+                  {/* === Table Body === */}
+                  <tbody>
+                    {historyData.payments.map((payment, index) => (
+                      <tr
+                        key={index}
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0 ? "#fafafa" : "#f1f1f1",
+                          transition: "background-color 0.3s",
+                        }}
+                      >
+                        <td style={tableCellStyle}>
+                          {payment?.transactionId ?? "N/A"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          ₹{payment?.totalAmount ?? "0"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          ₹{payment?.advanceAmount ?? "0"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          ₹{payment?.remainingAmount ?? "0"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {payment?.paymentMethod ?? "Not Specified"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {payment?.paymentStatus ?? "Unknown"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {payment?.refundStatus ?? "Not Requested"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          ₹{payment?.refundAmount ?? "0"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {payment?.cancellationStatus ?? "Not Cancelled"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {payment?.cancellationReason ?? "N/A"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {payment?.paidAt
+                            ? new Date(payment.paidAt).toLocaleDateString()
+                            : "Not Available"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {payment?.dueDate
+                            ? new Date(payment.dueDate).toLocaleDateString()
+                            : "Not Available"}
+                        </td>
+                        {/* ✅ Add Request for Refund Button */}
+                        {payment?.remainingAmount === 0 && (
+                          <td style={tableCellStyle}>
+                            <Button
+                              onClick={() =>
+                                handleRefundRequest(payment.transactionId)
+                              }
+                              sx={{
+                                backgroundColor: "#e91e63",
+                                color: "#fff",
+                                "&:hover": { backgroundColor: "#d81b60" },
+                                padding: "5px 10px",
+                                fontSize: "14px",
+                                fontWeight: "bold",
+                                borderRadius: "6px",
+                                textTransform: "none",
+                              }}
+                            >
+                              Request for Refund
+                            </Button>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Box>
+            ) : (
+              <Typography>No payment history available</Typography>
+            )}
+            <Box
               sx={{
-                mb: 2,
-                "& .MuiTab-root": {
-                  fontSize: "16px",
-                  fontWeight: "500",
-                  color: "#555",
-                  padding: "12px 24px",
-                  borderRadius: "12px",
-                  "&:hover": {
-                    backgroundColor: "#fce4ec",
-                    color: "#e91e63",
-                    transition: "all 0.2s ease",
-                  },
-                },
-                "& .Mui-selected": {
-                  color: "#e91e63",
-                  backgroundColor: "#f8bbd0",
-                  fontWeight: "600",
-                },
-                "& .MuiTabs-indicator": {
-                  backgroundColor: "#e91e63",
-                  height: "4px",
-                  borderRadius: "2px",
-                },
+                mt: 4, // ✅ Added more top margin for spacing
+                pt: 2, // ✅ Added internal padding from top
+                display: "flex", // ✅ Use flex for alignment
+                justifyContent: "flex-start", // ✅ Align to the left side
               }}
             >
-              <Tab
-                label="Payments"
-                value="payments"
+              <Button
+                onClick={() => setActiveTab("profile")}
                 sx={{
-                  textTransform: "none",
-                  marginRight: "8px",
+                  backgroundColor: "#ccc",
+                  color: "#000",
+                  "&:hover": { backgroundColor: "#bbb" },
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
                 }}
-              />
-              <Tab
-                label="Events"
-                value="events"
-                sx={{
-                  textTransform: "none",
-                  marginLeft: "8px",
-                }}
-              />
-            </Tabs>
+              >
+                Back
+              </Button>
+            </Box>
+          </>
+        )}
+        {activeTab === "events" && (
+          <>
+            <Typography variant="h5" fontWeight="bold" mb={2}>
+              Your Bookings:
+            </Typography>
 
-            {activeSubTab === "payments" && (
-              <>
-                {historyData.payments.length > 0 ? (
-                  historyData.payments.map((payment, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 2,
-                        borderBottom: "1px solid #ddd",
-                        backgroundColor: "#fafafa",
-                        borderRadius: "8px",
-                        marginBottom: "8px",
-                        transition: "0.3s",
-                        "&:hover": {
-                          backgroundColor: "#f1f1f1",
-                        },
-                      }}
-                    >
-                      <Typography fontWeight="bold" color="green">
-                        ₹{payment.totalAmount}
-                      </Typography>
-                      <Typography>Status: {payment.paymentStatus}</Typography>
-                      <Typography>Method: {payment.paymentMethod}</Typography>
-                      <Typography>
-                        Paid on: {new Date(payment.paidAt).toLocaleDateString()}
-                      </Typography>
-                    </Box>
-                  ))
-                ) : (
-                  <Typography>No payment history available</Typography>
-                )}
-              </>
+            {bookings.length > 0 ? (
+              <Box sx={{ overflowX: "auto", maxHeight: "500px" }}>
+                <table
+                  style={{
+                    width: "100%",
+                    borderCollapse: "collapse",
+                    marginTop: "10px",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                    backgroundColor: "#fff",
+                  }}
+                >
+                  {/* Table Head */}
+                  <thead>
+                    <tr style={{ backgroundColor: "#e91e63", color: "#fff" }}>
+                      <th style={tableCellStyle}>Booking ID</th>
+                      <th style={tableCellStyle}>Type</th>
+                      <th style={tableCellStyle}>Service/Package</th>
+                      <th style={tableCellStyle}>Date</th>
+                      <th style={tableCellStyle}>Time Slot</th>
+                      <th style={tableCellStyle}>Guests</th>
+                      <th style={tableCellStyle}>Total Amount</th>
+                      <th style={tableCellStyle}>Status</th>
+                      <th style={tableCellStyle}>Address</th>
+                    </tr>
+                  </thead>
+                  {/* Table Body */}
+                  <tbody>
+                    {bookings.map((booking, index) => (
+                      <tr
+                        key={index}
+                        style={{
+                          backgroundColor:
+                            index % 2 === 0 ? "#fafafa" : "#f1f1f1",
+                          transition: "background-color 0.3s",
+                        }}
+                      >
+                        <td style={tableCellStyle}>{booking._id}</td>
+                        <td style={tableCellStyle}>{booking.type}</td>
+                        <td style={tableCellStyle}>
+                          {booking?.service?.serviceType}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {new Date(booking.date).toLocaleDateString()}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {booking.timeSlot || "N/A"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          {booking.noOfGuests || 0}
+                        </td>
+                        <td style={tableCellStyle}>
+                          ₹{booking.totalAmount || 0}
+                        </td>
+                        <td style={tableCellStyle}>{booking.status}</td>
+                        <td style={tableCellStyle}>{booking.address}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </Box>
+            ) : (
+              <Typography>No bookings available</Typography>
             )}
 
-            {activeSubTab === "events" && (
-              <>
-                {historyData.events.length > 0 ? (
-                  historyData.events.map((event, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 2,
-                        borderBottom: "1px solid #ddd",
-                        backgroundColor: "#f9f9f9",
-                        borderRadius: "8px",
-                        marginBottom: "8px",
-                        transition: "0.3s ease",
-                        "&:hover": {
-                          backgroundColor: "#f1f1f1",
-                        },
-                      }}
-                    >
-                      <Typography fontWeight="bold" color="#e91e63">
-                        {event.type === "Service"
-                          ? event.service.serviceType
-                          : event.package.packageName}
-                      </Typography>
-                      <Typography>Status: {event.status}</Typography>
-                      <Typography>
-                        Date: {new Date(event.date).toLocaleDateString()}
-                      </Typography>
-                      <Typography>Guests: {event.noOfGuests}</Typography>
-                      <Typography>
-                        Total Amount: ₹{event.totalAmount}
-                      </Typography>
-                    </Box>
-                  ))
-                ) : (
-                  <Typography>No event history available</Typography>
-                )}
-              </>
-            )}
+            {/* Back Button */}
+            <Box
+              sx={{
+                mt: 4,
+                display: "flex",
+                justifyContent: "flex-start",
+              }}
+            >
+              <Button
+                onClick={() => setActiveTab("profile")}
+                sx={{
+                  backgroundColor: "#ccc",
+                  color: "#000",
+                  "&:hover": { backgroundColor: "#bbb" },
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                  borderRadius: "8px",
+                }}
+              >
+                Back
+              </Button>
+            </Box>
+          </>
+        )}
+
+        {activeTab === "settings" && (
+          <>
+            <Typography variant="h5" fontWeight="bold" mb={2}>
+              Settings
+            </Typography>
+
+            {/* Change Password */}
+            <TextField
+              label="Current Password"
+              type="password"
+              value={passwordData.currentPassword}
+              onChange={(e) =>
+                setPasswordData((prev) => ({
+                  ...prev,
+                  currentPassword: e.target.value,
+                }))
+              }
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="New Password"
+              type="password"
+              value={passwordData.newPassword}
+              onChange={(e) =>
+                setPasswordData((prev) => ({
+                  ...prev,
+                  newPassword: e.target.value,
+                }))
+              }
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              label="Confirm New Password"
+              type="password"
+              value={passwordData.confirmPassword}
+              onChange={(e) =>
+                setPasswordData((prev) => ({
+                  ...prev,
+                  confirmPassword: e.target.value,
+                }))
+              }
+              fullWidth
+              margin="normal"
+            />
+
+            {/* ✅ Stack for better alignment */}
+            <Stack spacing={2} mt={2} alignItems="center">
+              {/* Change Password Button */}
+              <Button
+                onClick={handleChangePassword}
+                fullWidth
+                startIcon={<FaLock />}
+                sx={{
+                  backgroundColor: "#e91e63",
+                  color: "#fff",
+                  "&:hover": { backgroundColor: "#d81b60" },
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                }}
+              >
+                Change Password
+              </Button>
+
+              {/* Back Button */}
+              <Button
+                onClick={() => setActiveTab("profile")}
+                fullWidth
+                startIcon={<FaArrowLeft />}
+                sx={{
+                  backgroundColor: "#ccc",
+                  color: "#000",
+                  "&:hover": { backgroundColor: "#bbb" },
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                }}
+              >
+                Back
+              </Button>
+
+              {/* Logout Button */}
+              <Button
+                onClick={handleLogout}
+                fullWidth
+                startIcon={<FaSignOutAlt />}
+                sx={{
+                  backgroundColor: "#ff3d00",
+                  color: "#fff",
+                  "&:hover": { backgroundColor: "#d32f2f" },
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                  fontWeight: "bold",
+                }}
+              >
+                Logout
+              </Button>
+            </Stack>
           </>
         )}
       </Box>

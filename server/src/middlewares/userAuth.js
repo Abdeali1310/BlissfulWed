@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const User = require('../models/User')
 
 const isLoggedIn = (req, res, next) => {
     const token = req.signedCookies["auth_token"];

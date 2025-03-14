@@ -1,5 +1,5 @@
 const express = require("express");
-const { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, updateSpin } = require("../controllers/userController");
+const { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, updateSpin, getUserPaymentHistory } = require("../controllers/userController");
 const { isLoggedIn } = require("../middlewares/userAuth");
 const userRouter = express.Router();
 const multer  = require('multer');
@@ -21,5 +21,18 @@ userRouter.post("/forgotPassword",forgotPassword)
 userRouter.post("/forgotPassword/otpVerification",otpVerification)
 userRouter.post("/resetPassword",resetPassword)
 userRouter.put("/update-spin",isLoggedIn,updateSpin)
-// userRouter.get("/history/:userId", isLoggedIn, getUserHistory);
+// userRouter.get("/profile/data/:userId", getUserHistory);
+userRouter.get("/payment-history/:userId",isLoggedIn, getUserPaymentHistory);
+userRouter.post("/logout", (req, res) => {
+    res.clearCookie("auth_token", {
+      httpOnly: true,
+      signed: true,
+      path: "/",
+      domain: "localhost",
+    });
+    res.status(200).json({ message: "Logged out successfully" });
+  });
+  
+// userRouter.get("/user/:userid",isLoggedIn,getUserBookings);
+
 module.exports = userRouter;

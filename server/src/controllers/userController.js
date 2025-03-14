@@ -1,4 +1,7 @@
 const User = require("../models/User");
+const Booking = require('../models/Booking');
+
+const Payment = require('../models/Payment');
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { z } = require("zod");
@@ -174,28 +177,22 @@ async function changePassword(req, res) {
   const { oldPassword, newPassword } = req.body;
 
   try {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+      }
 
-    const isPasswordValid = await bcrypt.compare(
-      oldPassword.trim(),
-      user.password.trim()
-    );
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid old password" });
-    }
-    user.password = newPassword.trim();
-    await user.save();
+      const isPasswordValid = await bcrypt.compare(oldPassword.trim(), user.password.trim());
+      if (!isPasswordValid) {
+          return res.status(401).json({ message: 'Invalid old password' });
+      }
+      user.password = newPassword.trim();
+      await user.save();
 
-    res
-      .status(200)
-      .json({ success: true, msg: "Password changed successfully" });
+
+      res.status(200).json({ success: true, msg: "Password changed successfully" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ success: false, message: "Error changing password", error });
+      res.status(500).json({ success: false, message: 'Error changing password', error });
   }
 }
 
@@ -337,4 +334,47 @@ async function updateSpin(req, res) {
     res.status(500).json({ message: "Internal server error." });
   }
 }
-module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs }
+
+const getUserPaymentHistory = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    console.log("Fetching payment history for user:", userId);
+
+    // ✅ Find all payments linked to the user ID
+    const payments = await Payment.find({ userId }).sort({ createdAt: -1 });
+
+    console.log("Payment History:", payments);
+
+    if (!payments || payments.length === 0) {
+      return res.status(404).json({ message: "No payment history found" });
+    }
+
+    res.status(200).json({ success: true, payments });
+  } catch (error) {
+    console.error("Error fetching payment history:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch payment history",
+      error: error.message,
+    });
+  }
+};
+
+const getUserBookings = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const bookings = await Booking.find({ user: userId })
+      .populate("service", "name price")
+      .populate("package", "name price");
+
+    res.status(200).json({ success: true, bookings });
+  } catch (error) {
+    console.error("Error fetching user bookings:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch bookings" });
+  }
+};
+
+
+module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, getUserPaymentHistory,getUserBookings }

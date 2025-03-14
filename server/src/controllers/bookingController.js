@@ -271,7 +271,7 @@ const getBookingByUserId = async (req, res) => {
 
         // Find all bookings of the user and populate related fields
         const bookings = await Booking.find({ user: userId })
-            .populate("service", "name description price") // Populate service details
+            .populate("service", "serviceType description price") // Populate service details
             .populate("package", "name details price") // Populate package details
             .sort({ createdAt: -1 });
 
