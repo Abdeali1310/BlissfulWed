@@ -104,25 +104,7 @@ const Navbar = () => {
           <SearchBox />
         </Box>
 
-        <Box sx={{ mx: 2, cursor: "pointer" }} onMouseEnter={handleOpenPackage}>
-          <Typography>Packages</Typography>
-        </Box>
-        <Menu
-          anchorEl={anchorElPackage}
-          open={Boolean(anchorElPackage)}
-          onClose={handleClosePackage}
-        >
-          {["Basic", "Premium", "Luxury"].map((item) => (
-            <MenuItem key={item} onClick={handleClosePackage}>
-              <Link
-                to={`/package/${item.toLowerCase()}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                {item}
-              </Link>
-            </MenuItem>
-          ))}
-        </Menu>
+        
 
         <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
           <Link
@@ -337,22 +319,7 @@ const Navbar = () => {
           </List>
           <Divider />
 
-          {/* Packages Section */}
-          <List>
-            <ListItem>
-              <Typography variant="h6">Packages</Typography>
-            </ListItem>
-            {["Basic", "Standard", "Premium"].map((packageName) => (
-              <ListItem button key={packageName} onClick={toggleDrawer}>
-                <Link
-                  to={`/packages/${packageName.toLowerCase()}`}
-                  style={{ textDecoration: "none", color: "inherit" }}
-                >
-                  {packageName}
-                </Link>
-              </ListItem>
-            ))}
-          </List>
+          
           <Divider />
 
           {/* Albums Section */}

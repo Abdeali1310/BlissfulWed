@@ -35,7 +35,7 @@ const Services = () => {
   const loading = false;
 
   return (
-    <Box sx={{ marginTop: 15, marginBottom: 5, overflow: "hidden", paddingInline:2.5 }}>
+    <Box sx={{ marginTop: 15, marginBottom: 5, overflow: "hidden", paddingInline:2.5,p:5 }}>
       <Typography
         variant="h4"
         sx={{

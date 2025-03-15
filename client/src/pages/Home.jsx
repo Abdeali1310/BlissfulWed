@@ -16,7 +16,6 @@ const Home = () => {
       <Navbar />
       <Header />
       <Services />
-      <Packages />
       <PopularFeatures />
       <WhyUs />
       <Faq />

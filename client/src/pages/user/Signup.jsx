@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -9,6 +10,7 @@ import {
   Paper,
   Typography,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 import weddingImage from "../../assets/wedding.webp";
 import axios from "axios";
@@ -26,6 +28,8 @@ const signupSchema = z.object({
 
 export default function Signup() {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // ⏳ State for loader
+
   const {
     register,
     handleSubmit,
@@ -36,6 +40,8 @@ export default function Signup() {
 
   const onSubmit = async (data) => {
     console.log("Form Data:", data);
+    setLoading(true); // Start loader ⏳
+
     try {
       const res = await axios.post(
         "http://localhost:3000/api/v1/user/signup",
@@ -54,6 +60,8 @@ export default function Signup() {
     } catch (error) {
       console.log(error);
       toast.error("Email/User or contact number is already Registered");
+    } finally {
+      setLoading(false); // Stop loader ⏳
     }
   };
 
@@ -174,6 +182,7 @@ export default function Signup() {
                     type="submit"
                     variant="contained"
                     fullWidth
+                    disabled={loading} // Disable button when loading
                     sx={{
                       mt: 3,
                       py: 1.5,
@@ -182,7 +191,7 @@ export default function Signup() {
                       "&:hover": { backgroundColor: "#e74895" },
                     }}
                   >
-                    Sign Up
+                    {loading ? <CircularProgress size={24} color="inherit" /> : "Sign Up"}
                   </Button>
                 </form>
 

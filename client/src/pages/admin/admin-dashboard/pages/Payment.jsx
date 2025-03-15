@@ -94,7 +94,7 @@ const Payment = () => {
 
   const summaryData = [
     {
-      label: "Total Transactions",
+      label: "Total Transactions Amount",
       value: `₹${totalRevenue.toLocaleString()}`,
       icon: <PaymentsIcon />,
       bg: "#e73895",
@@ -603,6 +603,7 @@ const Payment = () => {
                     "Payment ID",
                     "Username",
                     "Method",
+                    "Transaction Id",
                     "Status",
                     "Total Amount (₹)",
                     "Paid Amount (₹)",
@@ -626,6 +627,7 @@ const Payment = () => {
                     <TableCell>{p._id}</TableCell>
                     <TableCell>{p.userId?.username || "N/A"}</TableCell>
                     <TableCell>{p.paymentMethod}</TableCell>
+                    <TableCell>{p.transactionId}</TableCell>
                     <TableCell
                       sx={{
                         color:

@@ -28,7 +28,9 @@ const PaymentStatus = () => {
           `http://localhost:3000/api/v1/payment/verify?order_id=${orderId}`,
           { withCredentials: true }
         );
-        setStatus(paymentRes.data.success ? paymentRes.data.paymentStatus : "Failed");
+        setStatus(
+          paymentRes.data.success ? paymentRes.data.paymentStatus : "Failed"
+        );
 
         // Fetch payment details
         const detailsRes = await axios.get(
@@ -61,7 +63,16 @@ const PaymentStatus = () => {
               `http://localhost:3000/api/v1/invoice/get-invoice?invoiceId=${invoice._id}&bookingId=${invoice.bookingId}&userId=${invoice.userId}`,
               { withCredentials: true }
             );
+            
             setInvoiceDetails(invoiceDetailsRes.data.invoice);
+
+            // If payment is successful, send invoice email automatically
+            await axios.post(
+              "http://localhost:3000/api/v1/payment/send-invoice-email",
+              { transactionId: detailsRes.data.payment.transactionId },
+              { withCredentials: true }
+            ); 
+            console.log("Invoice email sent successfully.");
           }
         }
       } catch (error) {
@@ -97,13 +108,19 @@ const PaymentStatus = () => {
     const details = [
       { label: "Invoice ID:", value: invoiceDetails._id || "N/A" },
       { label: "Booking ID:", value: invoiceDetails.bookingId?._id },
-      {label : "Event Type:", value: invoiceDetails.bookingId?.service?.serviceType},
+      {
+        label: "Event Type:",
+        value: invoiceDetails.bookingId?.service?.serviceType,
+      },
       { label: "Customer Name:", value: invoiceDetails.userId?.username },
       { label: "Customer Email:", value: invoiceDetails.userId?.email },
       { label: "Customer Contact:", value: invoiceDetails.userId?.contact },
       {
         label: "Event Address:",
-        value: doc.splitTextToSize(invoiceDetails.bookingId?.address || "N/A", 100),
+        value: doc.splitTextToSize(
+          invoiceDetails.bookingId?.address || "N/A",
+          100
+        ),
       },
       {
         label: "Event Date:",
@@ -111,12 +128,15 @@ const PaymentStatus = () => {
       },
       { label: "Total Amount:", value: `${invoiceDetails.totalAmount}` },
       { label: "Advance Paid:", value: `${invoiceDetails.advanceAmount}` },
-      { label: "Remaining Amount:", value: `${invoiceDetails.remainingAmount}` },
+      {
+        label: "Remaining Amount:",
+        value: `${invoiceDetails.remainingAmount}`,
+      },
       { label: "Payment Method:", value: invoiceDetails.paymentMethod },
       { label: "Payment Status:", value: invoiceDetails.paymentStatus },
       {
         label: "Paid At:",
-        value: (invoiceDetails.paidAt),
+        value: invoiceDetails.paidAt,
       },
       {
         label: "Due Date:",
@@ -147,7 +167,14 @@ const PaymentStatus = () => {
 
     doc.setTextColor(153, 51, 102);
     doc.setFont("times", "italic");
-    doc.text("Thank you for choosing BlissfulWed!", 105, 280, null, null, "center");
+    doc.text(
+      "Thank you for choosing BlissfulWed!",
+      105,
+      280,
+      null,
+      null,
+      "center"
+    );
 
     doc.save("BlissfulWed_Invoice.pdf");
   };
@@ -195,7 +222,10 @@ const PaymentStatus = () => {
             {message}
           </h1>
           {button}
-          <a href="/" className="px-6 py-3 bg-pink-600 text-white rounded-lg shadow-lg mt-4">
+          <a
+            href="/"
+            className="px-6 py-3 bg-pink-600 text-white rounded-lg shadow-lg mt-4"
+          >
             Go to Home
           </a>
         </div>

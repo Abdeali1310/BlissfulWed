@@ -11,7 +11,6 @@ import photographyImg from "../assets/photography.jpg";
 import { Link } from "react-router-dom";
 
 const features = [
-  { title: "Best Sold Package", redirect:"/packages/luxury-package", subtitle: "Luxury Package", image: bestSoldImg },
   { title: "Haldi Service",redirect:"/service/haldi", subtitle: "Seamless & Stress-Free", image: planningImg },
   { title: "Exclusive Theme",redirect:"/service/decoration/67ab5aefa8ef6ca75f626dfd", subtitle: "Royal Theme", image: themeImg },
   { title: "Best Catering Service",redirect:"/service/catering", subtitle: "Gourmet Delights", image: cateringImg },

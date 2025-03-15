@@ -121,7 +121,7 @@ const Bookings = () => {
       return 0;
     }
 
-    const payment = payments.find(
+    const payment = payments?.find(
       (p) => String(p.bookingId._id) === String(bookingId)
     );
 

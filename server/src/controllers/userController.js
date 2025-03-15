@@ -4,7 +4,7 @@ const bcrypt = require('bcryptjs');
 const { z } = require('zod');
 const crypto = require("crypto");
 const { signupSchema, signinSchema } = require('../utils/validation');
-const { sendOtpEmail, sendContactEmail } = require('../utils/emailService');
+const { sendOtpEmail, sendContactEmail, sendEmail } = require('../utils/emailService');
 
 
 async function userSignup(req, res) {
@@ -47,6 +47,22 @@ async function userSignup(req, res) {
                 httpOnly: true,
                 signed: true,
                 secure: true,
+            });
+
+            await sendEmail({
+                to: user.email,
+                subject: "🎉 Welcome to BlissfulWed! Your Registration is Successful",
+                text: `Dear ${user.username},\n\n
+                🎊 Congratulations! You have successfully registered on *BlissfulWed.*\n\n
+                📌 *Your Details:*\n
+                - 👤 *Username:* ${user.username}  
+                - 📧 *Email:* ${user.email}  
+                - 📍 *City:* ${user.city}  
+                ✅ You can now explore and book amazing wedding services effortlessly.\n\n
+                🔐 *For security reasons, never share your login credentials.*\n\n
+                🌟 *Thank you for joining BlissfulWed! We are thrilled to have you onboard.*\n\n
+                Best Regards,\n
+                🏆 *The BlissfulWed Team*`,
             });
 
             return res.status(201).json({
@@ -301,8 +317,7 @@ const deleteUserById = async (req, res) => {
   
       // Ensure the ID is valid
       if (!userId) return res.status(400).json({ error: "User ID is required" });
-        console.log("hh");
-        console.log(userId);
+        
         
         
       // Delete the user and return a response

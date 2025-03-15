@@ -3,6 +3,9 @@ const Booking = require("../models/Booking");
 const { Cashfree } = require("../config/cashfreeConfig.js"); // Correct import
 const axios = require("axios");
 const User = require("../models/User");
+const Invoice = require("../models/Invoice.js");
+const { sendEmail } = require("../utils/emailService.js");
+const generateInvoicePdf = require("../utils/generateInvoice.js");
 require("dotenv").config();
 
 // 🔹 Create a new payment order
@@ -355,6 +358,59 @@ const getPaidOrderId = async (orderId) => {
   }
 };
 
+async function sendInvoiceEmail(req, res) {
+  try {
+    const { transactionId } = req.body;
+    console.log(transactionId);
+    
+    if (!transactionId) {
+      return res.status(400).json({ success: false, message: "Transaction ID is required" });
+    }
+
+    // Fetch Invoice Details
+    const invoice = await Invoice.findOne({ transactionId })
+      .populate("userId")
+      .populate({
+        path: "bookingId",
+        populate: { path: "service" }, // Populating service details inside booking
+      });
+
+    if (!invoice) {
+      return res.status(404).json({ success: false, message: "Invoice not found" });
+    }
+
+    // Generate Invoice PDF
+    const pdfBuffer = await generateInvoicePdf(invoice);
+
+    // Send Email with Invoice
+    await sendEmail({
+      to: invoice.userId.email,
+      subject: "🎉 Booking Confirmed! Your Invoice from BlissfulWed 📄",
+      text: `Dear ${invoice.userId.username},\n\n
+      ✅ Your booking is confirmed! Our team will reach out to you shortly.\n\n
+      📄 *Invoice Details:*\n
+      - 🆔 *Booking ID:* ${invoice.bookingId._id}  
+      - 💳 *Transaction ID:* ${invoice.transactionId}  
+      📎 *Attached:* Your invoice for the booking.\n\n
+      🙏 *Thank you for choosing BlissfulWed!* We look forward to making your event special.\n\n
+      Best Regards,\n
+      ♥ *BlissfulWed Team*`,
+      attachments: [
+        {
+          filename: `Invoice_${invoice._id}.pdf`,
+          content: Buffer.from(pdfBuffer).toString("base64"),
+          encoding: "base64",
+        },
+      ],
+    });
+    
+
+    return res.json({ success: true, message: "Invoice email sent successfully." });
+  } catch (error) {
+    console.error("❌ Error sending invoice email:", error);
+    res.status(500).json({ success: false, message: "Failed to send invoice email." });
+  }
+}
 
 
-module.exports = { handleRefund,getAllPaymentDetails, getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }
+module.exports = { sendInvoiceEmail,handleRefund,getAllPaymentDetails, getPaymentByUserId, createPayment, verifyPayment, getPaymentDetails }

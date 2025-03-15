@@ -39,6 +39,7 @@ import Reviews from "./components/Reviews";
 import Reports from "./pages/Reports";
 import AdminAccount from "./pages/Account/AdminAccount";
 import CustomerSupport from "./components/Support/CustomerSupport";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
@@ -65,6 +66,16 @@ const AdminDashboard = () => {
       localStorage.setItem("theme", "light");
     }
   }, [darkMode]);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const admin = localStorage.getItem("admin");
+    
+    if (!admin) {
+      navigate("/admin/signin");
+    }
+  }, [navigate]);
   const toggleDarkMode = () => setDarkMode(!darkMode);
   const tabs = [
     { id: "dashboard", label: "Dashboard (Home)", icon: <FaHome size={20} /> },
