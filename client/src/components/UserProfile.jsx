@@ -15,6 +15,7 @@ import {
   Grid,
   IconButton,
   Stack,
+  Modal,
 } from "@mui/material";
 import {
   FaUser,
@@ -28,7 +29,9 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import RequestForm from "../pages/admin/admin-dashboard/components/Support/RequestForm";
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [editedUser, setEditedUser] = useState(null);
@@ -52,6 +55,18 @@ const UserProfile = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const toggleDrawer = () => setOpenDrawer(!openDrawer);
   const navigate = useNavigate();
+  const [openRefundModal, setOpenRefundModal] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+
+  const handleOpenRefundModal = (transactionId) => {
+    setSelectedTransaction(transactionId);
+    setOpenRefundModal(true);
+  };
+
+  const handleCloseRefundModal = () => {
+    setOpenRefundModal(false);
+    setSelectedTransaction(null);
+  };
 
   const handleLogout = () => {
     try {
@@ -84,8 +99,6 @@ const UserProfile = () => {
 
         // ✅ Store userId for fetching history
         localStorage.setItem("userId", response.data.user._id);
-
-        console.log("User details fetched:", response.data.user);
       } catch (error) {
         console.error("Error fetching user details:", error);
       }
@@ -98,29 +111,29 @@ const UserProfile = () => {
 
   const handleChangePassword = async () => {
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      alert("New password and confirm password do not match");
+      toast.error("New password and confirm password do not match");
       return;
     }
 
     try {
       const response = await axios.put(
-        `http://localhost:3000/api/v1/user/changePassword/${user._id}`, // ✅ Use user._id for the endpoint
+        `http://localhost:3000/api/v1/user/changePassword/${user._id}`,
         {
-          oldPassword: passwordData.currentPassword, // ✅ Match backend parameter names
+          oldPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
         },
         { withCredentials: true }
       );
 
-      alert(response.data.msg); // ✅ Show success message
+      toast.success(response.data.msg || "Password changed successfully");
       setPasswordData({
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
     } catch (error) {
-      console.error("Error changing password:", error.response.data);
-      alert(error.response.data.message || "Failed to change password");
+      console.error("Error changing password:", error.response?.data);
+      toast.error(error.response?.data?.message || "Failed to change password");
     }
   };
 
@@ -139,7 +152,6 @@ const UserProfile = () => {
         }
       );
 
-      console.log("Fetched bookings:", response.data.bookings);
       setBookings(response.data.bookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -194,9 +206,7 @@ const UserProfile = () => {
     fetchPayments();
   }, []);
 
-  useEffect(() => {
-    console.log("Updated history data:", historyData.payments);
-  }, [historyData]);
+  useEffect(() => {}, [historyData]);
 
   const handleEdit = () => setIsEditing(true);
 
@@ -207,7 +217,6 @@ const UserProfile = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    console.log("Field Changed:", name, "New Value:", value);
 
     if (name === "profilePic" && files.length > 0) {
       const file = files[0];
@@ -220,15 +229,12 @@ const UserProfile = () => {
     } else {
       setEditedUser((prev) => {
         const updatedUser = { ...prev, [name]: value }; // ✅ Ensure gender is updated
-        console.log("Updated Edited User State:", updatedUser); // ✅ Log new state
         return updatedUser;
       });
     }
   };
 
-  useEffect(() => {
-    console.log("Updated User Data:", editedUser);
-  }, [editedUser]);
+  useEffect(() => {}, [editedUser]);
 
   const handleSave = async () => {
     try {
@@ -259,10 +265,13 @@ const UserProfile = () => {
       setUser(response.data.user);
       setUpdateTrigger((prev) => prev + 1);
       setIsEditing(false);
-      alert("Profile updated successfully");
+
+      // ✅ Show success toast
+      toast.success("Profile updated successfully");
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile");
+      // ✅ Show error toast
+      toast.error("Failed to update profile");
     }
   };
 
@@ -288,7 +297,10 @@ const UserProfile = () => {
         color: "#000",
       }}
     >
+      <ToastContainer />
+
       {/* === Sidebar === */}
+
       <Drawer
         variant="permanent"
         sx={{
@@ -334,6 +346,7 @@ const UserProfile = () => {
       </Drawer>
 
       {/* === Main Content === */}
+
       <Box
         sx={{
           flexGrow: 1,
@@ -354,8 +367,9 @@ const UserProfile = () => {
               borderRadius: "12px",
               backgroundColor: "#fff8f8",
               boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.1)",
-              maxWidth: "600px",
               margin: "auto",
+              minWidth: "120vh",
+              minHeight: "80vh",
             }}
           >
             {/* Avatar with Edit Icon */}
@@ -395,7 +409,7 @@ const UserProfile = () => {
 
             {/* User Info */}
             {!isEditing ? (
-              <>
+              <div className=" min-w-[70vh]">
                 <Typography
                   variant="h3"
                   fontWeight="bold"
@@ -482,114 +496,118 @@ const UserProfile = () => {
                       fontSize: "18px",
                       fontWeight: "bold",
                       borderRadius: "30px",
-                      
                     }}
                   >
                     Back
                   </Button>
                 </Stack>
-              </>
+              </div>
             ) : (
               <Box sx={{ width: "100%", maxWidth: "800px", mx: "auto", p: 3 }}>
                 <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Username"
-                  value={editedUser.username}
-                  name="username"
-                  onChange={handleChange}
-                  fullWidth
-                  margin="normal"
-                  sx={{
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Email"
-                  value={editedUser.email}
-                  fullWidth
-                  margin="normal"
-                  disabled
-                  sx={{
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Gender"
-                  name="gender"
-                  value={editedUser.gender || ""}
-                  onChange={handleChange}
-                  fullWidth
-                  margin="normal"
-                  select
-                  sx={{
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                >
-                  <MenuItem value="male">Male</MenuItem>
-                  <MenuItem value="female">Female</MenuItem>
-                  <MenuItem value="other">Other</MenuItem>
-                </TextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Contact"
-                  value={editedUser.contact}
-                  fullWidth
-                  margin="normal"
-                  disabled
-                  sx={{
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                <TextField
-                  label="City"
-                  value={editedUser.city}
-                  name="city"
-                  onChange={handleChange}
-                  fullWidth
-                  margin="normal"
-                  sx={{
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                </Grid>
-                <Grid item xs={12}>
-                <TextField
-                  label="Bio"
-                  value={editedUser.bio}
-                  name="bio"
-                  onChange={handleChange}
-                  fullWidth
-                  margin="normal"
-                  multiline
-                  rows={3}
-                  sx={{
-                    backgroundColor: "#f9f9f9",
-                    borderRadius: "8px",
-                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                  }}
-                />
-                </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Username"
+                      value={editedUser.username}
+                      name="username"
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      sx={{
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Email"
+                      value={editedUser.email}
+                      fullWidth
+                      margin="normal"
+                      disabled
+                      sx={{
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Gender"
+                      name="gender"
+                      value={editedUser.gender || ""}
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      select
+                      sx={{
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      }}
+                    >
+                      <MenuItem value="male">Male</MenuItem>
+                      <MenuItem value="female">Female</MenuItem>
+                      <MenuItem value="other">Other</MenuItem>
+                    </TextField>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="Contact"
+                      value={editedUser.contact}
+                      fullWidth
+                      margin="normal"
+                      disabled
+                      sx={{
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <TextField
+                      label="City"
+                      value={editedUser.city}
+                      name="city"
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      sx={{
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Bio"
+                      value={editedUser.bio}
+                      name="bio"
+                      onChange={handleChange}
+                      fullWidth
+                      margin="normal"
+                      multiline
+                      rows={3}
+                      sx={{
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "8px",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                      }}
+                    />
+                  </Grid>
                 </Grid>
 
-                <Stack direction="row" spacing={2} mt={3} justifyContent="center">
+                <Stack
+                  direction="row"
+                  spacing={2}
+                  mt={3}
+                  justifyContent="center"
+                >
                   <Button
                     onClick={handleBack}
                     sx={{
@@ -639,7 +657,7 @@ const UserProfile = () => {
             </Typography>
 
             {historyData?.payments?.length > 0 ? (
-              <Box sx={{ overflowX: "auto", maxHeight: "500px" }}>
+              <Box sx={{ overflowX: "auto", maxWidth: "90%" }}>
                 <table
                   style={{
                     width: "100%",
@@ -653,7 +671,7 @@ const UserProfile = () => {
                 >
                   {/* === Table Head === */}
                   <thead>
-                    <tr style={{ backgroundColor: "#e91e63", color: "#fff" }}>
+                    <tr style={{ backgroundColor: "#e73895", color: "#fff" }}>
                       <th style={tableCellStyle}>Service Name</th>
                       <th style={tableCellStyle}>Advance Amount</th>
                       <th style={tableCellStyle}>Remaining Amount</th>
@@ -662,9 +680,7 @@ const UserProfile = () => {
                       <th style={tableCellStyle}>Payment Status</th>
                       <th style={tableCellStyle}>Refund Status</th>
                       <th style={tableCellStyle}>Refund Amount</th>
-                      <th style={tableCellStyle}>Cancellation Status</th>
-                      <th style={tableCellStyle}>Cancellation Reason</th>
-                      <th style={tableCellStyle}>Paid At</th>
+                        <th style={tableCellStyle}>Paid At</th>
                       <th style={tableCellStyle}>Due Date</th>
                       <th style={tableCellStyle}>Refund</th>
                     </tr>
@@ -684,13 +700,13 @@ const UserProfile = () => {
                           {payment?.bookingId?.service?.serviceType ?? "N/A"}
                         </td>
                         <td style={tableCellStyle}>
-                          ₹{payment?.totalAmount ?? "0"}
-                        </td>
-                        <td style={tableCellStyle}>
                           ₹{payment?.advanceAmount ?? "0"}
                         </td>
                         <td style={tableCellStyle}>
                           ₹{payment?.remainingAmount ?? "0"}
+                        </td>
+                        <td style={tableCellStyle}>
+                          ₹{payment?.totalAmount ?? "0"}
                         </td>
                         <td style={tableCellStyle}>
                           {payment?.paymentMethod ?? "Not Specified"}
@@ -704,12 +720,7 @@ const UserProfile = () => {
                         <td style={tableCellStyle}>
                           ₹{payment?.refundAmount ?? "0"}
                         </td>
-                        <td style={tableCellStyle}>
-                          {payment?.cancellationStatus ?? "Not Cancelled"}
-                        </td>
-                        <td style={tableCellStyle}>
-                          {payment?.cancellationReason ?? "N/A"}
-                        </td>
+                        
                         <td style={tableCellStyle}>
                           {payment?.paidAt
                             ? new Date(payment.paidAt).toLocaleDateString()
@@ -721,31 +732,50 @@ const UserProfile = () => {
                             : "Not Available"}
                         </td>
                         {/* ✅ Add Request for Refund Button */}
-                        {payment?.remainingAmount === 0 && (
-                          <td style={tableCellStyle}>
-                            <Button
-                              onClick={() =>
-                                handleRefundRequest(payment.transactionId)
-                              }
-                              sx={{
-                                backgroundColor: "#e91e63",
-                                color: "#fff",
-                                "&:hover": { backgroundColor: "#d81b60" },
-                                padding: "5px 10px",
-                                fontSize: "14px",
-                                fontWeight: "bold",
-                                borderRadius: "6px",
-                                textTransform: "none",
-                              }}
-                            >
-                              Request for Refund
-                            </Button>
-                          </td>
-                        )}
+                        {payment?.remainingAmount === 0 &&
+                          payment?.refundStatus != "Refunded" && (
+                            <td style={tableCellStyle}>
+                              <Button
+                                onClick={() =>
+                                  handleOpenRefundModal(payment.transactionId)
+                                }
+                                sx={{
+                                  backgroundColor: "#d81b60",
+                                  color: "#fff",
+                                  "&:hover": { backgroundColor: "#d81b60" },
+                                  padding: "5px 10px",
+                                  fontSize: "12px",
+                                  fontWeight: "bold",
+                                  borderRadius: "6px",
+                                  textTransform: "none",
+                                  minWidth:"20vh"
+                                }}
+                              >
+                                Cancel and Refund Request
+                              </Button>
+                            </td>
+                          )}
                       </tr>
                     ))}
                   </tbody>
                 </table>
+                <Modal open={openRefundModal} onClose={handleCloseRefundModal}>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      bgcolor: "white",
+                      boxShadow: 24,
+                      p: 3,
+                      borderRadius: 2,
+                      minWidth: 400,
+                    }}
+                  >
+                    <RequestForm />
+                  </Box>
+                </Modal>
               </Box>
             ) : (
               <Typography>No payment history available</Typography>
@@ -782,7 +812,7 @@ const UserProfile = () => {
             </Typography>
 
             {bookings.length > 0 ? (
-              <Box sx={{ overflowX: "auto", maxHeight: "500px" }}>
+              <Box sx={{ overflowX: "auto", minWidth: "120vh" }}>
                 <table
                   style={{
                     width: "100%",
@@ -798,7 +828,7 @@ const UserProfile = () => {
                   <thead>
                     <tr style={{ backgroundColor: "#e91e63", color: "#fff" }}>
                       <th style={tableCellStyle}>Service</th>
-                      
+
                       <th style={tableCellStyle}>Date</th>
                       <th style={tableCellStyle}>Time Slot</th>
                       <th style={tableCellStyle}>Guests</th>
@@ -818,9 +848,10 @@ const UserProfile = () => {
                           transition: "background-color 0.3s",
                         }}
                       >
-                        <td style={tableCellStyle}>{booking?.service?.serviceType}</td>
-                        
-                       
+                        <td style={tableCellStyle}>
+                          {booking?.service?.serviceType}
+                        </td>
+
                         <td style={tableCellStyle}>
                           {new Date(booking.date).toLocaleDateString()}
                         </td>

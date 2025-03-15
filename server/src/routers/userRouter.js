@@ -1,5 +1,5 @@
 const express = require("express");
-const { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, updateSpin, getUserPaymentHistory } = require("../controllers/userController");
+const { userSignup, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, updateSpin, getUserPaymentHistory, getAllUsers, getUserById, deleteUserById } = require("../controllers/userController");
 const { isLoggedIn } = require("../middlewares/userAuth");
 const userRouter = express.Router();
 const multer  = require('multer');
@@ -8,9 +8,7 @@ const upload = multer({storage });
 const { uploadUser } = require("../config/cloudConfigUser");
 
 userRouter.post("/",isLoggedIn,currentUser)
-// userRouter.get("/",getAllUsers)
-// userRouter.get("/:userId",getUserById)
-// userRouter.delete("/:userId",deleteUserById)
+userRouter.get("/",getAllUsers)
 userRouter.post("/signup",userSignup)
 userRouter.post("/signin",userSignin)
 userRouter.post("/contact-email",contactUs)
@@ -24,15 +22,17 @@ userRouter.put("/update-spin",isLoggedIn,updateSpin)
 // userRouter.get("/profile/data/:userId", getUserHistory);
 userRouter.get("/payment-history/:userId",isLoggedIn, getUserPaymentHistory);
 userRouter.post("/logout", (req, res) => {
-    res.clearCookie("auth_token", {
-      httpOnly: true,
-      signed: true,
-      path: "/",
-      domain: "localhost",
-    });
-    res.status(200).json({ message: "Logged out successfully" });
+  res.clearCookie("auth_token", {
+    httpOnly: true,
+    signed: true,
+    path: "/",
+    domain: "localhost",
   });
-  
+  res.status(200).json({ message: "Logged out successfully" });
+});
+
+userRouter.get("/:userId",getUserById)
+userRouter.delete("/:userId",deleteUserById)
 // userRouter.get("/user/:userid",isLoggedIn,getUserBookings);
 
 module.exports = userRouter;

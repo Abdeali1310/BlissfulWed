@@ -2,10 +2,12 @@
 import React, { useState } from "react";
 import { Button, TextField, MenuItem, Typography, Box } from "@mui/material";
 import { submitSupportRequest } from "./supportApi";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const RequestForm = () => {
   const [formData, setFormData] = useState({
-    userId:localStorage.getItem("user"),
+    userId: localStorage.getItem("user"),
     name: "",
     email: "",
     type: "query",
@@ -20,10 +22,10 @@ const RequestForm = () => {
     e.preventDefault();
     try {
       await submitSupportRequest(formData);
-      alert("Request submitted successfully!");
+      toast.success("Request submitted successfully!");
       setFormData({ name: "", email: "", type: "query", message: "" });
     } catch (error) {
-      alert("Error submitting request.");
+      toast.error(error.response?.data?.message || "Error submitting request.");
     }
   };
 
@@ -35,13 +37,27 @@ const RequestForm = () => {
       <TextField fullWidth label="Name" name="name" value={formData.name} onChange={handleChange} margin="normal" />
       <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} margin="normal" />
       <TextField select fullWidth label="Type" name="type" value={formData.type} onChange={handleChange} margin="normal">
-        <MenuItem value="query">Query</MenuItem>
-        <MenuItem value="refund">Refund</MenuItem>
+        <MenuItem value="refund" selected>Refund</MenuItem>
       </TextField>
-      <TextField fullWidth label="Message" name="message" value={formData.message} onChange={handleChange} multiline rows={3} margin="normal" />
+      <TextField
+        fullWidth
+        label="Message"
+        name="message"
+        value={formData.message}
+        onChange={handleChange}
+        multiline
+        rows={3}
+        margin="normal"
+        placeholder="Provide correct Booking details with amount and reason for cancelling booking"
+      />
       <Button variant="contained" color="primary" fullWidth onClick={handleSubmit}>
         Submit
       </Button>
+
+      {/* Toast Container for Notifications */}
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      <p className="text-yellow-600 mt-2">Note: Please allow 24-48 hours for a response.</p>
     </Box>
   );
 };

@@ -376,7 +376,14 @@ async function updateSpin(req, res) {
     res.status(500).json({ message: "Internal server error." });
   }
 }
-
+const getAllUsers = async (req, res) => {
+  try {
+      const users = await User.find(); // Fetch all users
+      res.status(200).json({ success: true, users });
+  } catch (error) {
+      res.status(500).json({ message: "Error fetching users", error });
+  }
+};
 const getUserPaymentHistory = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -418,5 +425,19 @@ const getUserBookings = async (req, res) => {
   }
 };
 
+const getUserById = async (req, res) => {
+  try {
+      const { userId } = req.params; // Extract userId from route params
+      const user = await User.findById(userId); // Find user by ID
+      
+      if (!user) {
+          return res.status(404).json({ message: "User not found" });
+      }
 
-module.exports = { userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, getUserPaymentHistory, getUserBookings }
+      res.status(200).json(user);
+  } catch (error) {
+      res.status(500).json({ message: "Error fetching user", error });
+  }
+};
+
+module.exports = {getUserById,getAllUsers,deleteUserById, userSignup, updateSpin, userSignin, userProfile, currentUser, editProfile, changePassword, forgotPassword, otpVerification, resetPassword, contactUs, getUserPaymentHistory, getUserBookings }
