@@ -12,9 +12,8 @@ import {
   ListItemText,
   TextField,
   MenuItem,
+  Grid,
   IconButton,
-  Tab,
-  Tabs,
   Stack,
 } from "@mui/material";
 import {
@@ -29,7 +28,6 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-// import changePassword from "../../../server/src/controllers/userController";
 
 const UserProfile = () => {
   const [user, setUser] = useState(null);
@@ -43,9 +41,6 @@ const UserProfile = () => {
     totalPayments: 0,
     payments: [], // ✅ Ensure payments array is initialized
   });
-  const [toastOpen, setToastOpen] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
-  const [toastSeverity, setToastSeverity] = useState("success");
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -53,6 +48,9 @@ const UserProfile = () => {
     confirmPassword: "",
   });
   const [bookings, setBookings] = useState([]);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const toggleDrawer = () => setOpenDrawer(!openDrawer);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -169,11 +167,9 @@ const UserProfile = () => {
         if (!curr_userId) return;
 
         const response = await axios.get(
-          `http://localhost:3000/api/v1/user/payment-history/${curr_userId}`,
+          `http://localhost:3000/api/v1/payment/user/${curr_userId}`,
           { withCredentials: true }
         );
-
-        // console.log("Raw payment history response:", response.data);
 
         // ✅ If `response.data` is an object, extract the `payments` array
         const formattedData = Array.isArray(response.data)
@@ -184,7 +180,7 @@ const UserProfile = () => {
           ...payment,
           _id: payment?._id?.toString() || "",
           userId: payment?.userId?.toString() || "",
-          bookingId: payment?.bookingId?.toString() || "",
+          bookingId: payment?.bookingId || {},
         }));
 
         setHistoryData((prev) => ({
@@ -195,7 +191,6 @@ const UserProfile = () => {
         console.error("Error fetching payment history:", error);
       }
     };
-
     fetchPayments();
   }, []);
 
@@ -210,12 +205,38 @@ const UserProfile = () => {
     setEditedUser(user);
   };
 
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    console.log("Field Changed:", name, "New Value:", value);
+
+    if (name === "profilePic" && files.length > 0) {
+      const file = files[0];
+
+      setEditedUser((prev) => ({
+        ...prev,
+        profilePicFile: file, // ✅ Save file for upload
+        profilePicUrl: URL.createObjectURL(file), // ✅ Preview file
+      }));
+    } else {
+      setEditedUser((prev) => {
+        const updatedUser = { ...prev, [name]: value }; // ✅ Ensure gender is updated
+        console.log("Updated Edited User State:", updatedUser); // ✅ Log new state
+        return updatedUser;
+      });
+    }
+  };
+
+  useEffect(() => {
+    console.log("Updated User Data:", editedUser);
+  }, [editedUser]);
+
   const handleSave = async () => {
     try {
       const formData = new FormData();
       formData.append("username", editedUser.username);
       formData.append("city", editedUser.city);
       formData.append("bio", editedUser.bio);
+      formData.append("gender", editedUser.gender);
 
       // ✅ If a new file is selected, add it to the FormData
       if (editedUser.profilePicFile) {
@@ -236,38 +257,12 @@ const UserProfile = () => {
 
       // ✅ Update the state with the new user data
       setUser(response.data.user);
+      setUpdateTrigger((prev) => prev + 1);
       setIsEditing(false);
       alert("Profile updated successfully");
     } catch (error) {
       console.error("Error updating profile:", error);
       alert("Failed to update profile");
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value, files } = e.target;
-
-    if (name === "profilePic" && files.length > 0) {
-      const file = files[0];
-
-      setEditedUser((prev) => ({
-        ...prev,
-        profilePicFile: file, // ✅ Save file for upload
-        profilePicUrl: URL.createObjectURL(file), // ✅ Preview file
-      }));
-    } else {
-      // Explicitly handle the gender change
-      if (name === "gender") {
-        setEditedUser((prev) => ({
-          ...prev,
-          gender: value, // Update gender directly
-        }));
-      } else {
-        setEditedUser((prev) => ({
-          ...prev,
-          [name]: value,
-        }));
-      }
     }
   };
 
@@ -349,24 +344,30 @@ const UserProfile = () => {
       >
         {/* === Profile Tab === */}
         {activeTab === "profile" && (
-          <>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              textAlign: "center",
+              p: 3,
+              borderRadius: "12px",
+              backgroundColor: "#fff8f8",
+              boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.1)",
+              maxWidth: "600px",
+              margin: "auto",
+            }}
+          >
             {/* Avatar with Edit Icon */}
-            <Box
-              sx={{
-                position: "relative",
-                display: "inline-block",
-                mb: 3,
-                xs: 12,
-              }}
-            >
+            <Box sx={{ position: "relative", display: "inline-block", mb: 3 }}>
               <Avatar
                 src={editedUser.profilePicUrl || user.profilePicUrl}
                 sx={{
-                  width: 120,
-                  height: 120,
+                  width: 140,
+                  height: 140,
                   mb: 2,
-                  border: "4px solid #f8b6d2", // Soft wedding pink border
-                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for effect
+                  border: "4px solid #f8b6d2",
+                  boxShadow: "0px 8px 24px rgba(248, 182, 210, 0.4)",
                 }}
               />
               {isEditing && (
@@ -375,9 +376,9 @@ const UserProfile = () => {
                     position: "absolute",
                     bottom: 5,
                     right: 5,
-                    backgroundColor: "#f8b6d2", // Soft pink button
+                    backgroundColor: "#d04a78",
                     color: "#fff",
-                    "&:hover": { backgroundColor: "#f285b1" }, // Slightly darker pink hover
+                    "&:hover": { backgroundColor: "#a9144b" }, // Slightly darker pink hover
                   }}
                   component="label"
                 >
@@ -396,75 +397,92 @@ const UserProfile = () => {
             {!isEditing ? (
               <>
                 <Typography
-                  variant="h4"
+                  variant="h3"
                   fontWeight="bold"
                   gutterBottom
                   sx={{
                     color: "#2a2a2a", // Dark color for text contrast
-                    fontFamily: '"Merriweather", serif', // Elegant wedding font
+                    fontFamily: '"Merriweather", serif',
+                    fontSize: "2rem",
                   }}
                 >
                   {user.username}
                 </Typography>
-                <Typography
-                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
+                <Box
+                  sx={{
+                    width: "100%",
+                    textAlign: "left",
+                    px: 2,
+                    backgroundColor: "#fff",
+                    borderRadius: "12px",
+                    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.05)",
+                    padding: "16px",
+                  }}
                 >
-                  Email: {user.email}
-                </Typography>
-                <Typography
-                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
-                >
-                  Contact: {user.contact || "Not Provided"}
-                </Typography>
-                <Typography
-                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
-                >
-                  City: {user.city || "Not Provided"}
-                </Typography>
-                <Typography
-                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
-                >
-                  Gender: {user.gender || "Not Specified"}
-                </Typography>
+                  {[
+                    { label: "Email", value: user.email },
+                    { label: "Contact", value: user.contact || "Not Provided" },
+                    { label: "City", value: user.city || "Not Provided" },
+                    { label: "Gender", value: user.gender || "Not Specified" },
+                    { label: "Bio", value: user.bio || "Not Provided" },
+                  ].map((item, index) => (
+                    <Typography
+                      key={index}
+                      sx={{
+                        color: "#5f5f5f",
+                        fontFamily: '"Lora", serif',
+                        fontSize: "1.3rem",
+                        fontWeight: "500",
+                        mb: 1,
+                      }}
+                    >
+                      <strong>{item.label}:</strong> {item.value}
+                    </Typography>
+                  ))}
+                </Box>
 
                 <Stack
-                  spacing={2}
+                  direction="row"
+                  spacing={3} // Adjust space between buttons
                   mt={3}
-                  alignItems="center"
-                  sx={{ width: "100%" }}
+                  width="100%"
+                  justifyContent="center"
                 >
-                  {/* Edit Button */}
                   <Button
                     onClick={handleEdit}
-                    fullWidth
                     startIcon={<FaPen />}
                     sx={{
-                      backgroundColor: "#f8b6d2", // Soft pink
+                      backgroundColor: "#c2185b",
                       color: "#fff",
-                      "&:hover": { backgroundColor: "#f285b1" },
-                      padding: "12px 20px",
+                      "&:hover": {
+                        backgroundColor: "#a9144b",
+                        transform: "scale(1.05)",
+                      },
+                      padding: "12px 24px",
                       fontSize: "18px",
                       fontWeight: "bold",
-                      borderRadius: "30px", // Rounded corners
-                      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow
+                      borderRadius: "30px",
+                      boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
                     }}
                   >
                     Edit Profile
                   </Button>
 
-                  {/* Back Button */}
                   <Button
                     onClick={() => navigate("/")}
-                    fullWidth
                     startIcon={<FaArrowLeft />}
                     sx={{
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: "#d6d6d6",
                       color: "#000",
-                      "&:hover": { backgroundColor: "#e0e0e0" },
-                      padding: "12px 20px",
+                      "&:hover": {
+                        backgroundColor: "#bdbdbd",
+                        transform: "scale(1.05)",
+                      },
+                      padding: "12px 24px",
                       fontSize: "18px",
                       fontWeight: "bold",
-                      borderRadius: "30px", // Rounded corners
+                      borderRadius: "30px",
+                      
                     }}
                   >
                     Back
@@ -472,7 +490,9 @@ const UserProfile = () => {
                 </Stack>
               </>
             ) : (
-              <>
+              <Box sx={{ width: "100%", maxWidth: "800px", mx: "auto", p: 3 }}>
+                <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
                 <TextField
                   label="Username"
                   value={editedUser.username}
@@ -483,9 +503,11 @@ const UserProfile = () => {
                   sx={{
                     backgroundColor: "#f9f9f9",
                     borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
                 />
+                </Grid>
+                <Grid item xs={12} sm={6}>
                 <TextField
                   label="Email"
                   value={editedUser.email}
@@ -495,33 +517,31 @@ const UserProfile = () => {
                   sx={{
                     backgroundColor: "#f9f9f9",
                     borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
                 />
+                </Grid>
+                <Grid item xs={12} sm={6}>
                 <TextField
                   label="Gender"
-                  value={editedUser.gender}
                   name="gender"
-                  onChange={(e) =>
-                    setEditedUser((prev) => ({
-                      ...prev,
-                      gender: e.target.value,
-                    }))
-                  }
+                  value={editedUser.gender || ""}
+                  onChange={handleChange}
                   fullWidth
                   margin="normal"
                   select
                   sx={{
                     backgroundColor: "#f9f9f9",
                     borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
                 >
-                  <MenuItem value="Male">Male</MenuItem>
-                  <MenuItem value="Female">Female</MenuItem>
-                  <MenuItem value="Other">Other</MenuItem>
+                  <MenuItem value="male">Male</MenuItem>
+                  <MenuItem value="female">Female</MenuItem>
+                  <MenuItem value="other">Other</MenuItem>
                 </TextField>
-
+                </Grid>
+                <Grid item xs={12} sm={6}>
                 <TextField
                   label="Contact"
                   value={editedUser.contact}
@@ -531,9 +551,11 @@ const UserProfile = () => {
                   sx={{
                     backgroundColor: "#f9f9f9",
                     borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
                 />
+                </Grid>
+                <Grid item xs={12} sm={6}>
                 <TextField
                   label="City"
                   value={editedUser.city}
@@ -544,9 +566,11 @@ const UserProfile = () => {
                   sx={{
                     backgroundColor: "#f9f9f9",
                     borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
                 />
+                </Grid>
+                <Grid item xs={12}>
                 <TextField
                   label="Bio"
                   value={editedUser.bio}
@@ -559,18 +583,26 @@ const UserProfile = () => {
                   sx={{
                     backgroundColor: "#f9f9f9",
                     borderRadius: "8px",
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
                   }}
                 />
+                </Grid>
+                </Grid>
 
-                <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
+                <Stack direction="row" spacing={2} mt={3} justifyContent="center">
                   <Button
                     onClick={handleBack}
                     sx={{
-                      backgroundColor: "#f0f0f0",
+                      backgroundColor: "#d6d6d6",
                       color: "#000",
-                      "&:hover": { backgroundColor: "#e0e0e0" },
-                      borderRadius: "30px",
+                      "&:hover": {
+                        backgroundColor: "#bdbdbd",
+                        transform: "scale(1.05)",
+                      },
+                      padding: "12px 20px",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      borderRadius: "30px", // Rounded corners
                     }}
                   >
                     Back
@@ -578,18 +610,25 @@ const UserProfile = () => {
                   <Button
                     onClick={handleSave}
                     sx={{
-                      backgroundColor: "#f8b6d2", // Soft pink
+                      backgroundColor: "#c2185b", // Soft pink
                       color: "#fff",
-                      "&:hover": { backgroundColor: "#f285b1" },
-                      borderRadius: "30px",
+                      "&:hover": {
+                        backgroundColor: "#a9144b",
+                        transform: "scale(1.05)",
+                      },
+                      padding: "12px 20px",
+                      fontSize: "18px",
+                      fontWeight: "bold",
+                      borderRadius: "30px", // Rounded corners
+                      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow
                     }}
                   >
                     Save
                   </Button>
-                </Box>
-              </>
+                </Stack>
+              </Box>
             )}
-          </>
+          </Box>
         )}
         {activeTab === "transaction" && (
           <>
@@ -615,10 +654,10 @@ const UserProfile = () => {
                   {/* === Table Head === */}
                   <thead>
                     <tr style={{ backgroundColor: "#e91e63", color: "#fff" }}>
-                      <th style={tableCellStyle}>Transaction ID</th>
-                      <th style={tableCellStyle}>Total Amount</th>
+                      <th style={tableCellStyle}>Service Name</th>
                       <th style={tableCellStyle}>Advance Amount</th>
                       <th style={tableCellStyle}>Remaining Amount</th>
+                      <th style={tableCellStyle}>Total Amount</th>
                       <th style={tableCellStyle}>Payment Method</th>
                       <th style={tableCellStyle}>Payment Status</th>
                       <th style={tableCellStyle}>Refund Status</th>
@@ -642,7 +681,7 @@ const UserProfile = () => {
                         }}
                       >
                         <td style={tableCellStyle}>
-                          {payment?.transactionId ?? "N/A"}
+                          {payment?.bookingId?.service?.serviceType ?? "N/A"}
                         </td>
                         <td style={tableCellStyle}>
                           ₹{payment?.totalAmount ?? "0"}
@@ -758,9 +797,8 @@ const UserProfile = () => {
                   {/* Table Head */}
                   <thead>
                     <tr style={{ backgroundColor: "#e91e63", color: "#fff" }}>
-                      <th style={tableCellStyle}>Booking ID</th>
-                      <th style={tableCellStyle}>Type</th>
-                      <th style={tableCellStyle}>Service/Package</th>
+                      <th style={tableCellStyle}>Service</th>
+                      
                       <th style={tableCellStyle}>Date</th>
                       <th style={tableCellStyle}>Time Slot</th>
                       <th style={tableCellStyle}>Guests</th>
@@ -780,11 +818,9 @@ const UserProfile = () => {
                           transition: "background-color 0.3s",
                         }}
                       >
-                        <td style={tableCellStyle}>{booking._id}</td>
-                        <td style={tableCellStyle}>{booking.type}</td>
-                        <td style={tableCellStyle}>
-                          {booking?.service?.serviceType}
-                        </td>
+                        <td style={tableCellStyle}>{booking?.service?.serviceType}</td>
+                        
+                       
                         <td style={tableCellStyle}>
                           {new Date(booking.date).toLocaleDateString()}
                         </td>

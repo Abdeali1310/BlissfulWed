@@ -146,7 +146,7 @@ async function userProfile(req, res) {
 
 async function editProfile(req, res) {
   const { userId } = req.params;
-  const { username, city, bio } = req.body;
+  const { username, city, bio, gender } = req.body;
 
   const profilePicUrl = req.file
     ? req.file.path
@@ -162,6 +162,7 @@ async function editProfile(req, res) {
     if (username) existingUser.username = username;
     if (city) existingUser.city = city;
     if (bio) existingUser.bio = bio;
+    if (gender) existingUser.gender = gender;
     if (profilePicUrl) existingUser.profilePicUrl = profilePicUrl;
 
     await existingUser.save();
