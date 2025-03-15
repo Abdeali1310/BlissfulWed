@@ -14,7 +14,7 @@ import weddingImage from "../../assets/weddign2.jpeg";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
-import BackgroundImage from '../../assets/BG1.jpg';
+import BackgroundImage from "../../assets/BG1.jpg";
 
 const signinSchema = z.object({
   username: z.string().min(3, "Username must be at least 3 characters"),
@@ -39,12 +39,14 @@ export default function Signin() {
         { withCredentials: true }
       );
       console.log(res);
-      
+
       if (res.data.token) {
         toast.success("Successfully Signed In!");
         localStorage.setItem("user", res.data.user);
+        // localStorage.setItem("userId", response.data.userId);
+        // // localStorage.setItem("token", response.data.token);
         setTimeout(() => {
-            navigate("/")
+          navigate("/");
         }, 1000);
       }
     } catch (error) {
@@ -55,9 +57,9 @@ export default function Signin() {
   return (
     // <div className="h-screen w-screen bg-[#fec5ea] flex justify-center items-center">
     <div
-    className="min-h-screen w-full flex justify-center items-center bg-cover bg-center bg-no-repeat"
-    style={{ backgroundImage: `url(${BackgroundImage})` }}
-  >
+      className="min-h-screen w-full flex justify-center items-center bg-cover bg-center bg-no-repeat"
+      style={{ backgroundImage: `url(${BackgroundImage})` }}
+    >
       <Container maxWidth="xl">
         <ToastContainer />
         <Grid container spacing={4} alignItems="center" justifyContent="center">
@@ -89,10 +91,15 @@ export default function Signin() {
                 item
                 xs={12}
                 md={6}
-                sx={{ p: 4, bgcolor: "#fff", textAlign: "center", width: "100%" }}
+                sx={{
+                  p: 4,
+                  bgcolor: "#fff",
+                  textAlign: "center",
+                  width: "100%",
+                }}
               >
                 <Typography variant="h4" fontWeight={600} color="#e73895">
-                  Welcome Back 
+                  Welcome Back
                 </Typography>
                 <Typography variant="body2" color="textSecondary" mb={2}>
                   Sign in to continue
@@ -116,25 +123,50 @@ export default function Signin() {
                     helperText={errors.password?.message}
                     margin="normal"
                   />
-                  <Typography variant="" sx={{textAlign:"left",display:"block",fontFamily:"Arial",fontSize:"15px"}}><Link to={"/user/forgot-password"}>Forgot password?</Link></Typography>
+                  <Typography
+                    variant=""
+                    sx={{
+                      textAlign: "left",
+                      display: "block",
+                      fontFamily: "Arial",
+                      fontSize: "15px",
+                    }}
+                  >
+                    <Link to={"/user/forgot-password"}>Forgot password?</Link>
+                  </Typography>
                   <Button
                     type="submit"
                     variant="contained"
                     fullWidth
-                    sx={{ mt: 2, bgcolor: "#e73895", color: "#fff",
-                        "&:hover":{
+                    sx={{
+                      mt: 2,
+                      bgcolor: "#e73895",
+                      color: "#fff",
+                      "&:hover": {
                         backgroundColor: "#e74895",
-                    },}}
+                      },
+                    }}
                   >
                     Sign In
                   </Button>
-                  <Typography sx={{marginTop:"2rem",lg:{marginBottom:"4rem"}}}>Do not have an account? <Link to={"/user/signup"} style={{textDecoration:"underline"}}>Sign up </Link> </Typography>
+                  <Typography
+                    sx={{ marginTop: "2rem", lg: { marginBottom: "4rem" } }}
+                  >
+                    Do not have an account?{" "}
+                    <Link
+                      to={"/user/signup"}
+                      style={{ textDecoration: "underline" }}
+                    >
+                      Sign up{" "}
+                    </Link>{" "}
+                  </Typography>
                 </form>
               </Grid>
             </Paper>
           </Grid>
         </Grid>
       </Container>
-    {/* </div> */}</div>
+      {/* </div> */}
+    </div>
   );
 }

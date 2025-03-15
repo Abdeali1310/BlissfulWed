@@ -224,7 +224,14 @@ const getPaymentByUserId = async (req, res) => {
 
     // Fetch all payments associated with the user
     const payments = await Payment.find({ userId: userId })
-      .populate("bookingId", "date status totalAmount")
+      .populate({
+        path: "bookingId",
+        select: "date status totalAmount service",
+        populate:{
+          path: "service",
+          select: "serviceType",
+        }
+      })
       .sort({ createdAt: -1 });
 
     if (!payments.length) {

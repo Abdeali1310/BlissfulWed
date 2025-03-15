@@ -24,6 +24,7 @@ import Payment from "./pages/Payment.jsx";
 import PaymentStatus from "./pages/PaymentStatus.jsx";
 import Spinner from "./extras/Spinner.jsx";
 import AdminPanel from "./pages/admin/admin-dashboard/AdminPanel.jsx";
+import UserProfile from "./components/UserProfile.jsx";
 const App = () => {
   return (
 
@@ -68,6 +69,9 @@ const App = () => {
           path="/service/:serviceType/:serviceId"
           element={<IndividualService />}
         />
+
+        {/* user profile*/}
+        <Route path="/user/profile" element={<UserProfile />} />
 
         <Route path="/booking" element={<BookingPage />} />
 

@@ -1,6 +1,7 @@
 const express = require("express");
 const { createPayment,getPaymentDetails, verifyPayment, getPaymentByUserId, getAllPaymentDetails, handleRefund, sendInvoiceEmail } = require("../controllers/paymentController");
 const { isLoggedIn } = require("../middlewares/userAuth");
+const Payment = require("../models/Payment");
 
 const paymentRouter = express.Router();
 
