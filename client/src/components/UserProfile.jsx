@@ -34,7 +34,7 @@ import { useNavigate } from "react-router-dom";
 const UserProfile = () => {
   const [user, setUser] = useState(null);
   const [editedUser, setEditedUser] = useState(null);
-  const [activeTab, setActiveTab] = useState("profile");
+  const [activeTab, setActiveTab] = useState(0);
   const [isEditing, setIsEditing] = useState(false);
   const [historyData, setHistoryData] = useState({
     previouslyBookedEvents: [],
@@ -43,6 +43,9 @@ const UserProfile = () => {
     totalPayments: 0,
     payments: [], // ✅ Ensure payments array is initialized
   });
+  const [toastOpen, setToastOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastSeverity, setToastSeverity] = useState("success");
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: "",
@@ -89,6 +92,8 @@ const UserProfile = () => {
         console.error("Error fetching user details:", error);
       }
     };
+
+    setTimeout(() => setActiveTab("profile"), 0);
 
     fetchUserDetails(); // ✅ Correctly define and call the function
   }, []);
@@ -186,8 +191,6 @@ const UserProfile = () => {
           ...prev,
           payments: formattedPayments,
         }));
-        setActiveTab("transaction"); // ✅ Force re-rendering to update tab state
-        setTimeout(() => setActiveTab("transaction"), 0);
       } catch (error) {
         console.error("Error fetching payment history:", error);
       }
@@ -195,10 +198,6 @@ const UserProfile = () => {
 
     fetchPayments();
   }, []);
-
-  useEffect(() => {
-    console.log("Active Tab:", activeTab);
-  }, [activeTab]);
 
   useEffect(() => {
     console.log("Updated history data:", historyData.payments);
@@ -257,10 +256,18 @@ const UserProfile = () => {
         profilePicUrl: URL.createObjectURL(file), // ✅ Preview file
       }));
     } else {
-      setEditedUser((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+      // Explicitly handle the gender change
+      if (name === "gender") {
+        setEditedUser((prev) => ({
+          ...prev,
+          gender: value, // Update gender directly
+        }));
+      } else {
+        setEditedUser((prev) => ({
+          ...prev,
+          [name]: value,
+        }));
+      }
     }
   };
 
@@ -344,14 +351,22 @@ const UserProfile = () => {
         {activeTab === "profile" && (
           <>
             {/* Avatar with Edit Icon */}
-            <Box sx={{ position: "relative", display: "inline-block" }}>
+            <Box
+              sx={{
+                position: "relative",
+                display: "inline-block",
+                mb: 3,
+                xs: 12,
+              }}
+            >
               <Avatar
                 src={editedUser.profilePicUrl || user.profilePicUrl}
                 sx={{
                   width: 120,
                   height: 120,
                   mb: 2,
-                  border: "3px solid #e91e63",
+                  border: "4px solid #f8b6d2", // Soft wedding pink border
+                  boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Subtle shadow for effect
                 }}
               />
               {isEditing && (
@@ -360,9 +375,9 @@ const UserProfile = () => {
                     position: "absolute",
                     bottom: 5,
                     right: 5,
-                    backgroundColor: "#e91e63",
+                    backgroundColor: "#f8b6d2", // Soft pink button
                     color: "#fff",
-                    "&:hover": { backgroundColor: "#d81b60" },
+                    "&:hover": { backgroundColor: "#f285b1" }, // Slightly darker pink hover
                   }}
                   component="label"
                 >
@@ -380,21 +395,41 @@ const UserProfile = () => {
             {/* User Info */}
             {!isEditing ? (
               <>
-                <Typography variant="h4" fontWeight="bold" gutterBottom>
+                <Typography
+                  variant="h4"
+                  fontWeight="bold"
+                  gutterBottom
+                  sx={{
+                    color: "#2a2a2a", // Dark color for text contrast
+                    fontFamily: '"Merriweather", serif', // Elegant wedding font
+                  }}
+                >
                   {user.username}
                 </Typography>
-                <Typography>Email: {user.email}</Typography>
-                <Typography>
+                <Typography
+                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
+                >
+                  Email: {user.email}
+                </Typography>
+                <Typography
+                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
+                >
                   Contact: {user.contact || "Not Provided"}
                 </Typography>
-                <Typography>City: {user.city || "Not Provided"}</Typography>
-                <Typography>
+                <Typography
+                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
+                >
+                  City: {user.city || "Not Provided"}
+                </Typography>
+                <Typography
+                  sx={{ color: "#5f5f5f", fontFamily: '"Lora", serif' }}
+                >
                   Gender: {user.gender || "Not Specified"}
                 </Typography>
 
                 <Stack
                   spacing={2}
-                  mt={2}
+                  mt={3}
                   alignItems="center"
                   sx={{ width: "100%" }}
                 >
@@ -404,12 +439,14 @@ const UserProfile = () => {
                     fullWidth
                     startIcon={<FaPen />}
                     sx={{
-                      backgroundColor: "#e91e63",
+                      backgroundColor: "#f8b6d2", // Soft pink
                       color: "#fff",
-                      "&:hover": { backgroundColor: "#d81b60" },
-                      padding: "10px 20px",
-                      fontSize: "16px",
+                      "&:hover": { backgroundColor: "#f285b1" },
+                      padding: "12px 20px",
+                      fontSize: "18px",
                       fontWeight: "bold",
+                      borderRadius: "30px", // Rounded corners
+                      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)", // Soft shadow
                     }}
                   >
                     Edit Profile
@@ -421,12 +458,13 @@ const UserProfile = () => {
                     fullWidth
                     startIcon={<FaArrowLeft />}
                     sx={{
-                      backgroundColor: "#ccc",
+                      backgroundColor: "#f0f0f0",
                       color: "#000",
-                      "&:hover": { backgroundColor: "#bbb" },
-                      padding: "10px 20px",
-                      fontSize: "16px",
+                      "&:hover": { backgroundColor: "#e0e0e0" },
+                      padding: "12px 20px",
+                      fontSize: "18px",
                       fontWeight: "bold",
+                      borderRadius: "30px", // Rounded corners
                     }}
                   >
                     Back
@@ -442,6 +480,11 @@ const UserProfile = () => {
                   onChange={handleChange}
                   fullWidth
                   margin="normal"
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
                 />
                 <TextField
                   label="Email"
@@ -449,6 +492,11 @@ const UserProfile = () => {
                   fullWidth
                   margin="normal"
                   disabled
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
                 />
                 <TextField
                   label="Gender"
@@ -463,6 +511,11 @@ const UserProfile = () => {
                   fullWidth
                   margin="normal"
                   select
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
                 >
                   <MenuItem value="Male">Male</MenuItem>
                   <MenuItem value="Female">Female</MenuItem>
@@ -475,6 +528,11 @@ const UserProfile = () => {
                   fullWidth
                   margin="normal"
                   disabled
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
                 />
                 <TextField
                   label="City"
@@ -483,6 +541,11 @@ const UserProfile = () => {
                   onChange={handleChange}
                   fullWidth
                   margin="normal"
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
                 />
                 <TextField
                   label="Bio"
@@ -493,15 +556,21 @@ const UserProfile = () => {
                   margin="normal"
                   multiline
                   rows={3}
+                  sx={{
+                    backgroundColor: "#f9f9f9",
+                    borderRadius: "8px",
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                  }}
                 />
 
-                <Box sx={{ display: "flex", gap: 2, mt: 2 }}>
+                <Box sx={{ display: "flex", gap: 2, mt: 3 }}>
                   <Button
                     onClick={handleBack}
                     sx={{
-                      backgroundColor: "#ccc",
+                      backgroundColor: "#f0f0f0",
                       color: "#000",
-                      "&:hover": { backgroundColor: "#bbb" },
+                      "&:hover": { backgroundColor: "#e0e0e0" },
+                      borderRadius: "30px",
                     }}
                   >
                     Back
@@ -509,9 +578,10 @@ const UserProfile = () => {
                   <Button
                     onClick={handleSave}
                     sx={{
-                      backgroundColor: "#e91e63",
+                      backgroundColor: "#f8b6d2", // Soft pink
                       color: "#fff",
-                      "&:hover": { backgroundColor: "#d81b60" },
+                      "&:hover": { backgroundColor: "#f285b1" },
+                      borderRadius: "30px",
                     }}
                   >
                     Save
