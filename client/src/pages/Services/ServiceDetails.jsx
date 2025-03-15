@@ -1,4 +1,4 @@
-/* eslint-disable no-undef */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
@@ -169,9 +169,7 @@ const ServiceDetails = () => {
                       </Typography>
                     </div>
 
-                    <Typography variant="body2" className="text-gray-600 mt-1">
-                      ⭐ {service.rating}
-                    </Typography>
+                    
                   </CardContent>
 
                   {/* Tags Section */}
