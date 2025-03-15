@@ -38,6 +38,7 @@ const RequestForm = () => {
       <TextField fullWidth label="Email" name="email" value={formData.email} onChange={handleChange} margin="normal" />
       <TextField select fullWidth label="Type" name="type" value={formData.type} onChange={handleChange} margin="normal">
         <MenuItem value="refund" selected>Refund</MenuItem>
+        <MenuItem value="cancel" selected>Cancel</MenuItem>
       </TextField>
       <TextField
         fullWidth

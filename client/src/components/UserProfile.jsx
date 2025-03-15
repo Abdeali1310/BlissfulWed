@@ -680,7 +680,7 @@ const UserProfile = () => {
                       <th style={tableCellStyle}>Payment Status</th>
                       <th style={tableCellStyle}>Refund Status</th>
                       <th style={tableCellStyle}>Refund Amount</th>
-                        <th style={tableCellStyle}>Paid At</th>
+                      <th style={tableCellStyle}>Paid At</th>
                       <th style={tableCellStyle}>Due Date</th>
                       <th style={tableCellStyle}>Refund</th>
                     </tr>
@@ -720,7 +720,7 @@ const UserProfile = () => {
                         <td style={tableCellStyle}>
                           ₹{payment?.refundAmount ?? "0"}
                         </td>
-                        
+
                         <td style={tableCellStyle}>
                           {payment?.paidAt
                             ? new Date(payment.paidAt).toLocaleDateString()
@@ -748,10 +748,10 @@ const UserProfile = () => {
                                   fontWeight: "bold",
                                   borderRadius: "6px",
                                   textTransform: "none",
-                                  minWidth:"20vh"
+                                  minWidth: "20vh",
                                 }}
                               >
-                                Cancel and Refund Request
+                                Refund Request
                               </Button>
                             </td>
                           )}
@@ -759,23 +759,6 @@ const UserProfile = () => {
                     ))}
                   </tbody>
                 </table>
-                <Modal open={openRefundModal} onClose={handleCloseRefundModal}>
-                  <Box
-                    sx={{
-                      position: "absolute",
-                      top: "50%",
-                      left: "50%",
-                      transform: "translate(-50%, -50%)",
-                      bgcolor: "white",
-                      boxShadow: 24,
-                      p: 3,
-                      borderRadius: 2,
-                      minWidth: 400,
-                    }}
-                  >
-                    <RequestForm />
-                  </Box>
-                </Modal>
               </Box>
             ) : (
               <Typography>No payment history available</Typography>
@@ -805,6 +788,23 @@ const UserProfile = () => {
             </Box>
           </>
         )}
+        <Modal open={openRefundModal} onClose={handleCloseRefundModal}>
+          <Box
+            sx={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              bgcolor: "white",
+              boxShadow: 24,
+              p: 3,
+              borderRadius: 2,
+              minWidth: 400,
+            }}
+          >
+            <RequestForm />
+          </Box>
+        </Modal>
         {activeTab === "events" && (
           <>
             <Typography variant="h5" fontWeight="bold" mb={2}>
@@ -835,6 +835,7 @@ const UserProfile = () => {
                       <th style={tableCellStyle}>Total Amount</th>
                       <th style={tableCellStyle}>Status</th>
                       <th style={tableCellStyle}>Address</th>
+                      <th style={tableCellStyle}>Cancel Booking</th>
                     </tr>
                   </thead>
                   {/* Table Body */}
@@ -866,6 +867,33 @@ const UserProfile = () => {
                         </td>
                         <td style={tableCellStyle}>{booking.status}</td>
                         <td style={tableCellStyle}>{booking.address}</td>
+                        <td style={tableCellStyle}>
+                          {new Date(booking.date) > new Date() &&
+                          booking.status !== "Cancelled" ? (
+                            <Button
+                              onClick={() => handleOpenRefundModal(booking._id)}
+                              sx={{
+                                backgroundColor: "#ff3d00",
+                                color: "#fff",
+                                "&:hover": { backgroundColor: "#d32f2f" },
+                                padding: "5px 10px",
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                                borderRadius: "6px",
+                                textTransform: "none",
+                                minWidth: "20vh",
+                              }}
+                            >
+                              Cancel Booking
+                            </Button>
+                          ) : (
+                            <Typography
+                              sx={{ color: "#d32f2f", fontWeight: "bold" }}
+                            >
+                              {booking.status}
+                            </Typography>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
