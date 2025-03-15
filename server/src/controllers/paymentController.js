@@ -7,7 +7,7 @@ const Invoice = require("../models/Invoice.js");
 const { sendEmail } = require("../utils/emailService.js");
 const generateInvoicePdf = require("../utils/generateInvoice.js");
 require("dotenv").config();
-
+const nodemailer = require("nodemailer");
 // 🔹 Create a new payment order
 async function createPayment(req, res) {
   try {
@@ -277,8 +277,7 @@ const handleRefund = async (req, res) => {
   try {
     const { paymentId } = req.params;
 
-    // Fetch the payment details from the database
-    const payment = await Payment.findById(paymentId);
+    const payment = await Payment.findById(paymentId).populate("userId");
     if (!payment) {
       return res.status(404).json({ success: false, message: "Payment not found" });
     }
@@ -287,50 +286,48 @@ const handleRefund = async (req, res) => {
       return res.status(400).json({ success: false, message: "Refund not allowed for this payment" });
     }
 
-    // 1️⃣ Fetch the correct PAID order ID using the extended API
-    // const paidOrderId = await getPaidOrderId(payment.transactionId);
-    // if (!paidOrderId) {
-    //   return res.status(400).json({ success: false, message: "No paid order found for this user" });
-    // }
-
+    // Calculate refund amount
     const refundAmount = (payment.totalAmount * 70) / 100;
-    // console.log(`Processing refund for order: ${paidOrderId} - Amount: ${refundAmount}`);
-
-    // const options = {
-    //   method: "POST",
-    //   headers: {
-    //     "x-api-version": "2025-01-01",
-    //     "x-client-id": process.env.CASHFREE_APP_ID,
-    //     "x-client-secret": process.env.CASHFREE_SECRET,
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify({
-    //     refund_amount: refundAmount,
-    //     refund_id: `refund_${paymentId}`,
-    //     refund_note: "Refund processed",
-    //     refund_speed: "STANDARD",
-    //   }),
-    // };
-    
-    // // 2️⃣ Call Cashfree refund API using the correct PAID order ID
-    // const response = await fetch(`https://sandbox.cashfree.com/pg/orders/${paidOrderId}/refunds`, options);
-    // const data = await response.json();
-    // console.log("Refund API Response:", data);
-
-    // if (!response.ok) {
-    //   return res.status(400).json({ success: false, message: "Refund failed", error: data });
-    // }
-
-    // 3️⃣ Update payment record in the database
     payment.refundStatus = "Refunded";
     payment.refundAmount = refundAmount;
     payment.refundProcessedAt = new Date();
     await payment.save();
 
+    // Send email notification
+    await sendRefundEmail(payment.userId.email, refundAmount);
+
     res.status(200).json({ success: true, message: "Refund processed successfully" });
   } catch (error) {
     console.error("Error processing refund:", error);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+// Function to send refund email
+const sendRefundEmail = async (userEmail, refundAmount) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER, // Your email
+        pass: process.env.EMAIL_PASS, // Your email password or app password
+      },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: userEmail,
+      subject: "Refund Processed Successfully",
+      html: `<p>Dear User,</p>
+             <p>Your refund of ₹${refundAmount} (70% of actual amount) has been successfully processed.</p>
+             <p>It may take 3-5 business days to reflect in your account.</p>
+             <p>Thank you for using our service.</p>`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("Refund email sent to:", userEmail);
+  } catch (error) {
+    console.error("Error sending refund email:", error);
   }
 };
 
